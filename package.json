@@ -1,0 +1,57 @@
+{
+  "name": "did-jwt-vc",
+  "version": "0.0.1",
+  "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
+  "main": "lib/index.js",
+  "umd:main": "lib/index.umd.js",
+  "modules": "lib/index.mjs",
+  "source": "src/index.ts",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "src",
+    "esm",
+    "tutorial"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build": "microbundle"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "did-jwt": "^0.2.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.d.ts",
+      "!**/node_modules/**"
+    ],
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "ethr-did": "^1.1.0",
+    "jest": "^24.8.0",
+    "microbundle": "^0.11.0",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.5.3"
+  }
+}
