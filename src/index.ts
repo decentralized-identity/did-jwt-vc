@@ -1,5 +1,7 @@
 import { createJWT, Signer } from 'did-jwt'
 
+const JWT_ALG = 'ES256K-R'
+
 interface VC {
   '@context': string[]
   type: string[]
@@ -10,9 +12,22 @@ interface VerifiableCredentialPayload {
   sub: string
   nbf: number
   vc: VC
-  jti?: string
   aud?: string
   exp?: number
+  jti?: string
+}
+
+interface VP {
+  '@context': string[]
+  type: string[]
+  verifiableCredential: string[]
+}
+
+interface PresentationPayload {
+  vp: VP
+  aud?:string
+  exp?: number
+  jti?:string
 }
 
 interface Issuer {
@@ -27,6 +42,17 @@ export async function createVerifiableCredential(
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
-    alg: 'ES256K-R'
+    alg: JWT_ALG
+  })
+}
+
+export async function createPresentation(
+  payload: PresentationPayload,
+  issuer: Issuer
+): Promise<string> {
+  return createJWT(payload, {
+    issuer: issuer.did,
+    signer: issuer.signer,
+    alg: JWT_ALG
   })
 }
