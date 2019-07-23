@@ -59,6 +59,19 @@ export async function createPresentation(
   })
 }
 
-function validateVerifiableCredentialAttributes(payload: VerifiableCredentialPayload) {
+// The main scenario we want to guard against is having a timestamp in milliseconds
+// instead of seconds (ex: from new Date().getTime()). 
+// We will check the number of digits and assume that any number with 12 or more 
+// digits is a millisecond timestamp.
+// 10 digits max is 9999999999 -> 11/20/2286 @ 5:46pm (UTC)
+// 11 digits max is 99999999999 -> 11/16/5138 @ 9:46am (UTC)
+// 12 digits max is 999999999999 -> 09/27/33658 @ 1:46am (UTC)
+function isTimestampInSeconds(t: number):boolean {
+  if (!Number.isInteger(t)) return false
+  return t < 100000000000
+}
+
+function validateVerifiableCredentialAttributes(payload: VerifiableCredentialPayload):void {
   if (!payload.sub.match(DID_FORMAT)) throw new TypeError('sub must be a valid did') 
+  if (!isTimestampInSeconds(payload.nbf)) throw new TypeError('nbf must be a unix timestamp (seconds since epoch)')
 }
