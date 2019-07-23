@@ -1,6 +1,7 @@
 import { createJWT, Signer } from 'did-jwt'
 
 const JWT_ALG = 'ES256K-R'
+const DID_FORMAT = /^did:([a-zA-Z0-9_]+):([:[a-zA-Z0-9_.-]+)(\/[^#]*)?(#.*)?$/
 
 interface VC {
   '@context': string[]
@@ -39,6 +40,7 @@ export async function createVerifiableCredential(
   payload: VerifiableCredentialPayload,
   issuer: Issuer
 ): Promise<string> {
+  validateVerifiableCredentialAttributes(payload)
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
@@ -55,4 +57,8 @@ export async function createPresentation(
     signer: issuer.signer,
     alg: JWT_ALG
   })
+}
+
+function validateVerifiableCredentialAttributes(payload: VerifiableCredentialPayload) {
+  if (!payload.sub.match(DID_FORMAT)) throw new TypeError('sub must be a valid did') 
 }

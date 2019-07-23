@@ -41,32 +41,31 @@ describe('createVerifiableCredential', () => {
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
-
   it('throws a TypeError if sub is not a valid did', async () => {
-    expect(
-      await createVerifiableCredential(
+    await expect(
+      createVerifiableCredential(
         {
           ...verifiableCredentialPayload,
           sub: INVALID_DID
         },
         did
       )
-    ).toThrow(TypeError)
+    ).rejects.toThrow(TypeError)
   })
   it('throws a TypeError if nbf is not a valid timestamp in seconds', async () => {
-    expect(
-      await createVerifiableCredential(
+    await expect(
+      createVerifiableCredential(
         {
           ...verifiableCredentialPayload,
           nbf: INVALID_TIMESTAMP
         },
         did
       )
-    ).toThrow(TypeError)
+    ).rejects.toThrow(TypeError)
   })
   it('throws a TypeError if it does not contain at least the default @context', async () => {
-    expect(
-      await createVerifiableCredential(
+    await expect(
+      createVerifiableCredential(
         {
           ...verifiableCredentialPayload,
           vc: {
@@ -77,11 +76,11 @@ describe('createVerifiableCredential', () => {
         },
         did
       )
-    ).toThrow(TypeError)
+    ).rejects.toThrow(TypeError)
   })
   it('throws a TypeError if it does not contain at least the default type', async () => {
-    expect(
-      await createVerifiableCredential(
+    await expect(
+      createVerifiableCredential(
         {
           ...verifiableCredentialPayload,
           vc: {
@@ -92,11 +91,11 @@ describe('createVerifiableCredential', () => {
         },
         did
       )
-    ).toThrow(TypeError)
+    ).rejects.toThrow(TypeError)
   })
   it('throws a TypeError if the credentialSubject is empty', async () => {
-    expect(
-      await createVerifiableCredential(
+    await expect(
+      createVerifiableCredential(
         {
           ...verifiableCredentialPayload,
           vc: {
@@ -107,29 +106,29 @@ describe('createVerifiableCredential', () => {
         },
         did
       )
-    ).toThrow(TypeError)
+    ).rejects.toThrow(TypeError)
   })
   it('throws a TypeError if aud is present and is not a valid did', async () => {
-    expect(
-      await createVerifiableCredential(
+    await expect(
+      createVerifiableCredential(
         {
           ...verifiableCredentialPayload,
           aud: INVALID_DID
         },
         did
       )
-    ).toThrow(TypeError)
+    ).rejects.toThrow(TypeError)
   })
   it('throws a TypeError if exp is present and is not a valid timestamp in seconds', async () => {
-    expect(
-      await createVerifiableCredential(
+    await expect(
+      createVerifiableCredential(
         {
           ...verifiableCredentialPayload,
           exp: INVALID_TIMESTAMP
         },
         did
       )
-    ).toThrow(TypeError)
+    ).rejects.toThrow(TypeError)
   })
 
   // TODO: validate that issuer is a valid DID?
