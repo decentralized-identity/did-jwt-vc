@@ -130,9 +130,14 @@ describe('createVerifiableCredential', () => {
       )
     ).rejects.toThrow(TypeError)
   })
-
-  // TODO: validate that issuer is a valid DID?
-  // TODO: validate something about signer?
+  it('throws a TypeError if iss is not a valid did', async () => {
+    await expect(
+      createVerifiableCredential(verifiableCredentialPayload, {
+        did: INVALID_DID,
+        signer: did.signer
+      })
+    ).rejects.toThrow(TypeError)
+  })
 })
 
 describe('createPresentation', () => {
