@@ -11,15 +11,8 @@ const issuerIdentity = {
 const did = new EthrDID(issuerIdentity)
 
 const exampleVcJwt =
-  `eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksInN1YiI6ImRp
-  ZDpldGhyOjB4MTIzNDU2NzgiLCJuYmYiOjE1NjI5NTAyODI4MDEsInZjIjp7IkBjb250ZXh0IjpbIm
-  h0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3Jn
-  LzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudG
-  lhbCIsIlVuaXZlcnNpdHlEZWdyZWVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRl
-  Z3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQmFjY2FsYXVyw6lhdCBlbiBtdX
-  NpcXVlcyBudW3DqXJpcXVlcyJ9fX0sImlzcyI6ImRpZDpldGhyOjB4ZjEyMzJmODQwZjNhZDdkMjNm
-  Y2RhYTg0ZDZjNjZkYWMyNGVmYjE5OCJ9.uYSRgDNmZnz0k5rORCBIIzEahVask5eQ2PFZI2_JAatvr
-  pZ2t_3iTvPmBy6Kzt2W20fw5jUJ7GoZXJqoba4UVQA`
+// tslint:disable-next-line: max-line-length
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksInN1YiI6ImRpZDpldGhyOjB4MTIzNDU2NzgiLCJuYmYiOjE1NjI5NTAyODI4MDEsInZjIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlEZWdyZWVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRlZ3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQmFjY2FsYXVyw6lhdCBlbiBtdXNpcXVlcyBudW3DqXJpcXVlcyJ9fX0sImlzcyI6ImRpZDpldGhyOjB4ZjEyMzJmODQwZjNhZDdkMjNmY2RhYTg0ZDZjNjZkYWMyNGVmYjE5OCJ9.uYSRgDNmZnz0k5rORCBIIzEahVask5eQ2PFZI2_JAatvrpZ2t_3iTvPmBy6Kzt2W20fw5jUJ7GoZXJqoba4UVQA'
 
 describe('createVerifiableCredential', () => {
   it('creates a valid Verifiable Credential JWT with required fields', async () => {
@@ -46,6 +39,21 @@ describe('createVerifiableCredential', () => {
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
+  })
+
+  it('throws a TypeError if sub is not a valid did', () => {
+  })
+  it('throws a TypeError if nbf is not a valid timestamp in seconds', () => {
+  })
+  it('throws a TypeError if it does not contain at least the default @context', () => {
+  })
+  it('throws a TypeError if it does not contain at least the default type', () => {
+  })
+  it('throws a TypeError if the credentialSubject is empty', () => {
+  })
+  it('throws a TypeError if aud is present and is not a valid did', () => {
+  })
+  it('throws a TypeError if exp is present and is not a valid timestamp in seconds', () => {
   })
 })
 
