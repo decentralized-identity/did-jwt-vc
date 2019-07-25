@@ -2,6 +2,7 @@ import { createJWT, Signer } from 'did-jwt'
 
 const JWT_ALG = 'ES256K-R'
 const DID_FORMAT = /^did:([a-zA-Z0-9_]+):([:[a-zA-Z0-9_.-]+)(\/[^#]*)?(#.*)?$/
+const JWT_FORMAT = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/
 const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1'
 const DEFAULT_TYPE = 'VerifiableCredential'
 
@@ -43,6 +44,7 @@ export async function createVerifiableCredential(
   issuer: Issuer
 ): Promise<string> {
   validateVerifiableCredentialAttributes(payload)
+  validateIssuer(issuer)
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
@@ -54,6 +56,8 @@ export async function createPresentation(
   payload: PresentationPayload,
   issuer: Issuer
 ): Promise<string> {
+  validatePresentationAttributes(payload)
+  validateIssuer(issuer)
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
@@ -70,6 +74,12 @@ export async function createPresentation(
 // 12 digits max is 999999999999 -> 09/27/33658 @ 1:46am (UTC)
 function isTimestampInSeconds(t: number): boolean {
   return Number.isInteger(t) && t < 100000000000
+}
+
+function validateIssuer(issuer: Issuer): void {
+  if (!issuer.did.match(DID_FORMAT)) {
+    throw new TypeError('issuer.did must be a valid did')
+  }
 }
 
 function validateVerifiableCredentialAttributes(
@@ -94,6 +104,34 @@ function validateVerifiableCredentialAttributes(
   }
   if (Object.keys(payload.vc.credentialSubject).length === 0) {
     throw new TypeError('vc.credentialSubject must not be empty')
+  }
+  if (payload.aud && !payload.aud.match(DID_FORMAT)) {
+    throw new TypeError('aud must be a valid did or undefined')
+  }
+  if (payload.exp && !isTimestampInSeconds(payload.exp)) {
+    throw new TypeError('exp must be a unix timestamp in seconds')
+  }
+}
+
+function validatePresentationAttributes(
+  payload: PresentationPayload
+): void {
+  if (payload.vp['@context'].length < 1 ||
+  !payload.vp['@context'].includes(DEFAULT_CONTEXT)) {
+    throw new TypeError(
+      `vp['@context'] must include at least "${DEFAULT_CONTEXT}"`
+    )
+  }
+  if (payload.vp.type.length < 1 || !payload.vp.type.includes(DEFAULT_TYPE)) {
+    throw new TypeError(`vp.type must include at least "${DEFAULT_TYPE}"`)
+  }
+  if (payload.vp.verifiableCredential.length < 1) {
+    throw new TypeError('vp.verifiableCredential must not be empty')
+  }
+  for (const vc of payload.vp.verifiableCredential) {
+    if(!vc.match(JWT_FORMAT)) {
+      throw new TypeError('vp.verifiableCredential must only contain JWTs')
+    }
   }
   if (payload.aud && !payload.aud.match(DID_FORMAT)) {
     throw new TypeError('aud must be a valid did or undefined')
