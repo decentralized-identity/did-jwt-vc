@@ -105,9 +105,6 @@ function validateVerifiableCredentialAttributes(
   if (Object.keys(payload.vc.credentialSubject).length === 0) {
     throw new TypeError('vc.credentialSubject must not be empty')
   }
-  if (payload.aud && !payload.aud.match(DID_FORMAT)) {
-    throw new TypeError('aud must be a valid did or undefined')
-  }
   if (payload.exp && !isTimestampInSeconds(payload.exp)) {
     throw new TypeError('exp must be a unix timestamp in seconds')
   }

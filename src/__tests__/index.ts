@@ -118,17 +118,6 @@ describe('createVerifiableCredential', () => {
       )
     ).rejects.toThrow(TypeError)
   })
-  it('throws a TypeError if aud is present and is not a valid did', async () => {
-    await expect(
-      createVerifiableCredential(
-        {
-          ...verifiableCredentialPayload,
-          aud: INVALID_DID
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
-  })
   it('throws a TypeError if exp is present and is not a valid timestamp in seconds', async () => {
     await expect(
       createVerifiableCredential(
