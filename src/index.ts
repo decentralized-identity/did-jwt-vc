@@ -19,6 +19,7 @@ interface VerifiableCredentialPayload {
   aud?: string
   exp?: number
   jti?: string
+  [x: string]: any
 }
 
 interface VP {
@@ -32,6 +33,7 @@ interface PresentationPayload {
   aud?: string
   exp?: number
   jti?: string
+  [x: string]: any
 }
 
 interface Issuer {
