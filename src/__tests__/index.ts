@@ -7,7 +7,8 @@ import {
   validateContext,
   validateJwtFormat,
   validateTimestamp,
-  validateType
+  validateType,
+  validateCredentialSubject
 } from '../validators'
 jest.mock('../validators')
 
@@ -23,6 +24,7 @@ const mockValidateTimestamp = <jest.Mock<typeof validateTimestamp>>(
 
 const mockValidateContext = <jest.Mock<typeof validateContext>>validateContext
 const mockValidateType = <jest.Mock<typeof validateType>>validateType
+const mockValidateCredentialSubject = <jest.Mock<typeof validateCredentialSubject>>validateCredentialSubject
 
 export const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
 export const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
@@ -101,21 +103,7 @@ describe('createVerifiableCredential', () => {
     expect(mockValidateType).toHaveBeenCalledWith(
       verifiableCredentialPayload.vc.type
     )
-  })
-  it('throws a TypeError if the credentialSubject is empty', async () => {
-    await expect(
-      createVerifiableCredential(
-        {
-          ...verifiableCredentialPayload,
-          vc: {
-            '@context': verifiableCredentialPayload.vc['@context'],
-            type: verifiableCredentialPayload.vc.type,
-            credentialSubject: {}
-          }
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
+    expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialPayload.vc.credentialSubject)
   })
   it('calls functions to validate optional fields if they are present', async () => {
     const timestamp = Math.floor(new Date().getTime())

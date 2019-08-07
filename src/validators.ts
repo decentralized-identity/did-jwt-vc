@@ -4,6 +4,7 @@ import {
   DEFAULT_TYPE,
   JWT_FORMAT
 } from './constants'
+import { CredentialSubject } from './VerifiableCredential';
 
 export function validateDidFormat(value: string): void {
   if (!value.match(DID_FORMAT)) {
@@ -41,5 +42,11 @@ export function validateContext(value: string[]): void {
 export function validateType(value: string[]): void {
   if (value.length < 1 || !value.includes(DEFAULT_TYPE)) {
     throw new TypeError(`type is missing default "${DEFAULT_TYPE}"`)
+  }
+}
+
+export function validateCredentialSubject(value: CredentialSubject): void {
+  if (Object.keys(value).length === 0) {
+    throw new TypeError('credentialSubject must not be empty')
   }
 }

@@ -2,17 +2,18 @@ import { createJWT, Signer } from 'did-jwt'
 import {
   JWT_ALG} from './constants'
 import * as validators from './validators'
+import { CredentialSubject } from './VerifiableCredential';
 
 interface VC {
   '@context': string[]
   type: string[]
-  credentialSubject: object
+  credentialSubject: CredentialSubject
 }
 
-interface VerifiableCredentialPayload {
+export interface VerifiableCredentialPayload {
   sub: string
-  nbf: number
   vc: VC
+  nbf?: number
   aud?: string
   exp?: number
   jti?: string
@@ -70,9 +71,7 @@ function validateVerifiableCredentialAttributes(
   validators.validateDidFormat(payload.sub)
   validators.validateContext(payload.vc['@context'])
   validators.validateType(payload.vc.type)
-  if (Object.keys(payload.vc.credentialSubject).length === 0) {
-    throw new TypeError('vc.credentialSubject must not be empty')
-  }
+  validators.validateCredentialSubject(payload.vc.credentialSubject)
   if(payload.nbf) validators.validateTimestamp(payload.nbf)
   if(payload.exp) validators.validateTimestamp(payload.exp)
 }

@@ -88,4 +88,15 @@ describe('validators', () => {
       expect(() => validators.validateJwtFormat('not a jwt')).toThrow(TypeError)
     })
   })
+
+  describe('validateCredentialSubject', () => {
+    it('does not throw if the value is an object with at least one attribute', () => {
+      expect(() =>
+        validators.validateCredentialSubject({ name: 'test' })
+      ).not.toThrow()
+    })
+    it('throws a TypeError if the value is an object with no attributes', () => {
+      expect(() => validators.validateCredentialSubject({})).toThrow(TypeError)
+    })
+  })
 })
