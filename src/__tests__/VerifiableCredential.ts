@@ -89,6 +89,16 @@ describe('VerifiableCredential', () => {
           expect.anything()
         )
       })
+      it('calls createVerifiableCredential with exp in the payload if expires has been set', () => {
+        const timestamp = Math.floor(new Date().getTime() / 1000)
+        vc.setExpires(timestamp).build()
+        expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
+          expect.objectContaining({
+            exp: timestamp
+          }),
+          expect.anything()
+        )
+      })
       it('calls createVerifiableCredential with jti in the payload if id has been set', () => {
         const id = faker.random.word()
         vc.setId(id).build()
@@ -204,9 +214,33 @@ describe('VerifiableCredential', () => {
       vc.setValidFrom(value)
       expect(mockedValidateTimestamp).toHaveBeenCalledWith(value)
     })
-    it('sets the timestamp of the vc', () => {
+    it('sets the validFrom timestamp of the vc', () => {
       const value = faker.random.number()
       expect(vc.setValidFrom(value).validFrom).toEqual(value)
+    })
+  })
+
+  describe('setExpires', () => {
+    it('calls timestamp validator', () => {
+      const value = faker.random.number()
+      vc.setExpires(value)
+      expect(mockedValidateTimestamp).toHaveBeenCalledWith(value)
+    })
+    it('sets the expires timestamp of the vc', () => {
+      const value = faker.random.number()
+      expect(vc.setExpires(value).expires).toEqual(value)
+    })
+  })
+
+  describe('expiresIn', () => {
+    it('throws an error if validFrom has not been set', () => {
+      expect(() => vc.expiresIn(faker.random.number())).toThrow()
+    })
+
+    it('sets the expires timestamp of the vc to validFrom + duration provided', () => {
+      const timestamp = Math.floor(new Date().getTime() / 1000)
+      const validFor = 60000
+      expect(vc.setValidFrom(timestamp).expiresIn(validFor).expires).toEqual(timestamp + validFor)
     })
   })
 
