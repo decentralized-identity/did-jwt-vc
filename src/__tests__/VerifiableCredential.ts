@@ -54,7 +54,7 @@ describe('VerifiableCredential', () => {
     })
   })
 
-  describe.only('build', () => {
+  describe('build', () => {
     describe('when required attributes have been set', () => {
       beforeEach(() => {
         vc.setSigner(SIGNER)
