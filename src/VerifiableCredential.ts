@@ -1,11 +1,8 @@
   // tslint:disable: variable-name
 import { Signer } from 'did-jwt'
 import * as validators from './validators'
-import { createVerifiableCredential, VerifiableCredentialPayload } from '.';
-
-export interface CredentialSubject {
-  [x: string]: any
-}
+import { createVerifiableCredential } from '.';
+import { CredentialSubject, VerifiableCredentialPayload } from './types';
 
 export class VerifiableCredentialBuilder {
   private _signer: Signer
@@ -39,7 +36,6 @@ export class VerifiableCredentialBuilder {
       signer: this._signer
     })
   }
-
   setSigner(signer: Signer): VerifiableCredentialBuilder {
     this._signer = signer
     return this

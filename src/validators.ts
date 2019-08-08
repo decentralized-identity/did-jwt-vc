@@ -4,7 +4,7 @@ import {
   DEFAULT_TYPE,
   JWT_FORMAT
 } from './constants'
-import { CredentialSubject } from './VerifiableCredential';
+import { CredentialSubject } from './types'
 
 export function validateDidFormat(value: string): void {
   if (!value.match(DID_FORMAT)) {

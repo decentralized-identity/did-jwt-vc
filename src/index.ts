@@ -1,43 +1,14 @@
-import { createJWT, Signer } from 'did-jwt'
-import {
-  JWT_ALG} from './constants'
+import { createJWT } from 'did-jwt'
+import { JWT_ALG } from './constants'
 import * as validators from './validators'
-import { CredentialSubject } from './VerifiableCredential';
+import { VerifiableCredentialBuilder } from './VerifiableCredential'
+import {
+  VerifiableCredentialPayload,
+  Issuer,
+  PresentationPayload
+} from './types'
 
-interface VC {
-  '@context': string[]
-  type: string[]
-  credentialSubject: CredentialSubject
-}
-
-export interface VerifiableCredentialPayload {
-  sub: string
-  vc: VC
-  nbf?: number
-  aud?: string
-  exp?: number
-  jti?: string
-  [x: string]: any
-}
-
-interface VP {
-  '@context': string[]
-  type: string[]
-  verifiableCredential: string[]
-}
-
-interface PresentationPayload {
-  vp: VP
-  aud?: string
-  exp?: number
-  jti?: string
-  [x: string]: any
-}
-
-export interface Issuer {
-  did: string
-  signer: Signer
-}
+export { VerifiableCredentialBuilder }
 
 export async function createVerifiableCredential(
   payload: VerifiableCredentialPayload,
@@ -72,8 +43,8 @@ function validateVerifiableCredentialAttributes(
   validators.validateContext(payload.vc['@context'])
   validators.validateType(payload.vc.type)
   validators.validateCredentialSubject(payload.vc.credentialSubject)
-  if(payload.nbf) validators.validateTimestamp(payload.nbf)
-  if(payload.exp) validators.validateTimestamp(payload.exp)
+  if (payload.nbf) validators.validateTimestamp(payload.nbf)
+  if (payload.exp) validators.validateTimestamp(payload.exp)
 }
 
 function validatePresentationAttributes(payload: PresentationPayload): void {
@@ -85,6 +56,6 @@ function validatePresentationAttributes(payload: PresentationPayload): void {
   for (const vc of payload.vp.verifiableCredential) {
     validators.validateJwtFormat(vc)
   }
-  if(payload.aud) validators.validateDidFormat(payload.aud)
-  if(payload.exp) validators.validateTimestamp(payload.exp)
+  if (payload.aud) validators.validateDidFormat(payload.aud)
+  if (payload.exp) validators.validateTimestamp(payload.exp)
 }

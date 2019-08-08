@@ -2,10 +2,7 @@ import faker from 'faker'
 
 jest.mock('../validators')
 jest.mock('../index')
-import {
-  VerifiableCredentialBuilder,
-  CredentialSubject
-} from '../VerifiableCredential'
+import { VerifiableCredentialBuilder } from '../VerifiableCredential'
 import {
   validateDidFormat,
   validateCredentialSubject,
@@ -14,6 +11,7 @@ import {
 import { createVerifiableCredential } from '../index'
 import { Signer } from 'did-jwt'
 import { DEFAULT_CONTEXT, DEFAULT_TYPE } from '../constants'
+import { CredentialSubject } from '../types'
 
 const mockedValidateDidFormat = validateDidFormat as jest.Mock<
   typeof validateDidFormat
@@ -24,7 +22,6 @@ const mockedValidateCredentialSubject = validateCredentialSubject as jest.Mock<
 const mockedValidateTimestamp = validateTimestamp as jest.Mock<
   typeof validateTimestamp
 >
-
 const mockedCreateVerifiableCredential = (createVerifiableCredential as unknown) as jest.Mock<
   typeof createVerifiableCredential
 >
@@ -240,7 +237,9 @@ describe('VerifiableCredential', () => {
     it('sets the expires timestamp of the vc to validFrom + duration provided', () => {
       const timestamp = Math.floor(new Date().getTime() / 1000)
       const validFor = 60000
-      expect(vc.setValidFrom(timestamp).expiresIn(validFor).expires).toEqual(timestamp + validFor)
+      expect(vc.setValidFrom(timestamp).expiresIn(validFor).expires).toEqual(
+        timestamp + validFor
+      )
     })
   })
 
