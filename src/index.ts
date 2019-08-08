@@ -1,14 +1,13 @@
 import { createJWT } from 'did-jwt'
 import { JWT_ALG } from './constants'
 import * as validators from './validators'
-import { VerifiableCredentialBuilder } from './VerifiableCredential'
 import {
   VerifiableCredentialPayload,
   Issuer,
   PresentationPayload
 } from './types'
 
-export { VerifiableCredentialBuilder }
+export * from './VerifiableCredential'
 
 export async function createVerifiableCredential(
   payload: VerifiableCredentialPayload,

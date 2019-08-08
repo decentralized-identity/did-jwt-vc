@@ -34,12 +34,15 @@ export const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
 export const EXTRA_CONTEXT_B = 'custom vc context'
 export const EXTRA_TYPE_A = 'UniversityDegreeCredential'
 export const EXTRA_TYPE_B = 'custom vc type'
-const issuerIdentity = {
+export const VC_JWT =
+  // tslint:disable-next-line: max-line-length
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksInN1YiI6ImRpZDpldGhyOjB4MTIzNDU2NzgiLCJuYmYiOjE1NjI5NTAyODI4MDEsInZjIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlEZWdyZWVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRlZ3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQmFjY2FsYXVyw6lhdCBlbiBtdXNpcXVlcyBudW3DqXJpcXVlcyJ9fX0sImlzcyI6ImRpZDpldGhyOjB4ZjEyMzJmODQwZjNhZDdkMjNmY2RhYTg0ZDZjNjZkYWMyNGVmYjE5OCJ9.uYSRgDNmZnz0k5rORCBIIzEahVask5eQ2PFZI2_JAatvrpZ2t_3iTvPmBy6Kzt2W20fw5jUJ7GoZXJqoba4UVQA'
+
+const did = new EthrDID({
   did: DID_A,
   address: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
   privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75'
-}
-const did = new EthrDID(issuerIdentity)
+})
 const verifiableCredentialPayload = {
   sub: DID_B,
   nbf: 1562950282,
@@ -54,9 +57,6 @@ const verifiableCredentialPayload = {
     }
   }
 }
-export const VC_JWT =
-  // tslint:disable-next-line: max-line-length
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksInN1YiI6ImRpZDpldGhyOjB4MTIzNDU2NzgiLCJuYmYiOjE1NjI5NTAyODI4MDEsInZjIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlEZWdyZWVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRlZ3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQmFjY2FsYXVyw6lhdCBlbiBtdXNpcXVlcyBudW3DqXJpcXVlcyJ9fX0sImlzcyI6ImRpZDpldGhyOjB4ZjEyMzJmODQwZjNhZDdkMjNmY2RhYTg0ZDZjNjZkYWMyNGVmYjE5OCJ9.uYSRgDNmZnz0k5rORCBIIzEahVask5eQ2PFZI2_JAatvrpZ2t_3iTvPmBy6Kzt2W20fw5jUJ7GoZXJqoba4UVQA'
 const presentationPayload = {
   vp: {
     '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
