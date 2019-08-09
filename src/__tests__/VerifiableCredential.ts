@@ -88,7 +88,7 @@ describe('VerifiableCredential', () => {
       })
       it('calls createVerifiableCredential with exp in the payload if expires has been set', () => {
         const timestamp = Math.floor(new Date().getTime() / 1000)
-        vc.setExpires(timestamp).build()
+        vc.setValidUntil(timestamp).build()
         expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
           expect.objectContaining({
             exp: timestamp
@@ -217,15 +217,15 @@ describe('VerifiableCredential', () => {
     })
   })
 
-  describe('setExpires', () => {
+  describe('setValidUntil', () => {
     it('calls timestamp validator', () => {
       const value = faker.random.number()
-      vc.setExpires(value)
+      vc.setValidUntil(value)
       expect(mockedValidateTimestamp).toHaveBeenCalledWith(value)
     })
     it('sets the expires timestamp of the vc', () => {
       const value = faker.random.number()
-      expect(vc.setExpires(value).expires).toEqual(value)
+      expect(vc.setValidUntil(value).validUntil).toEqual(value)
     })
   })
 
@@ -237,7 +237,7 @@ describe('VerifiableCredential', () => {
     it('sets the expires timestamp of the vc to validFrom + duration provided', () => {
       const timestamp = Math.floor(new Date().getTime() / 1000)
       const validFor = 60000
-      expect(vc.setValidFrom(timestamp).expiresIn(validFor).expires).toEqual(
+      expect(vc.setValidFrom(timestamp).expiresIn(validFor).validUntil).toEqual(
         timestamp + validFor
       )
     })

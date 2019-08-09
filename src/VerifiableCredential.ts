@@ -12,7 +12,7 @@ export class VerifiableCredentialBuilder {
   private _context: string[] = ['https://www.w3.org/2018/credentials/v1']
   private _type: string[] = ['VerifiableCredential']
   private _validFrom?: number
-  private _expires?: number
+  private _validUntil?: number
   private _id?: string
 
   async build(): Promise<string> {
@@ -29,7 +29,7 @@ export class VerifiableCredentialBuilder {
       }
     }
     if (this._validFrom) payload.nbf = this._validFrom
-    if (this._expires) payload.exp = this._expires
+    if (this._validUntil) payload.exp = this._validUntil
     if (this._id) payload.jti = this._id
     return createVerifiableCredential(payload, {
       did: this._issuer,
@@ -68,14 +68,14 @@ export class VerifiableCredentialBuilder {
     this._validFrom = value
     return this
   }
-  setExpires(value: number): VerifiableCredentialBuilder {
+  setValidUntil(value: number): VerifiableCredentialBuilder {
     validators.validateTimestamp(value)
-    this._expires = value
+    this._validUntil = value
     return this
   }
   expiresIn(value: number): VerifiableCredentialBuilder {
     if(this._validFrom === undefined) throw new Error('validFrom must be set before calling expiresIn()')
-    this.setExpires(this._validFrom + value)
+    this.setValidUntil(this._validFrom + value)
     return this
   }
   setId(value: string): VerifiableCredentialBuilder {
@@ -103,8 +103,8 @@ export class VerifiableCredentialBuilder {
   get validFrom() {
     return this._validFrom
   }
-  get expires() {
-    return this._expires
+  get validUntil() {
+    return this._validUntil
   }
   get id() {
     return this._id
