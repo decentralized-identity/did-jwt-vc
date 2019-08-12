@@ -1,6 +1,5 @@
   // tslint:disable: variable-name
 import { Signer } from 'did-jwt'
-import * as validators from './validators'
 import { createVerifiableCredential } from '.';
 import { CredentialSubject, VerifiableCredentialPayload } from './types';
 
@@ -43,17 +42,14 @@ export class VerifiableCredentialBuilder {
     return this
   }
   setSubject(subject: string): VerifiableCredentialBuilder {
-    validators.validateDidFormat(subject)
     this._subject = subject
     return this
   }
   setIssuer(issuer: string): VerifiableCredentialBuilder {
-    validators.validateDidFormat(issuer)
     this._issuer = issuer
     return this
   }
   setCredentialSubject(credentialSubject: CredentialSubject) {
-    validators.validateCredentialSubject(credentialSubject)
     this._credentialSubject = credentialSubject
     return this
   }
@@ -66,12 +62,10 @@ export class VerifiableCredentialBuilder {
     return this
   }
   setValidFrom(value: number): VerifiableCredentialBuilder {
-    validators.validateTimestamp(value)
     this._validFrom = value
     return this
   }
   setValidUntil(value: number): VerifiableCredentialBuilder {
-    validators.validateTimestamp(value)
     this._validUntil = value
     return this
   }
