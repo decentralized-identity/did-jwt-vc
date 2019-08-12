@@ -13,6 +13,7 @@ export class VerifiableCredentialBuilder {
   private _type: string[] = ['VerifiableCredential']
   private _validFrom?: number
   private _validUntil?: number
+  private _expiresIn?: number
   private _id?: string
 
   async build(): Promise<string> {
@@ -74,8 +75,7 @@ export class VerifiableCredentialBuilder {
     return this
   }
   expiresIn(value: number): VerifiableCredentialBuilder {
-    if(this._validFrom === undefined) throw new Error('validFrom must be set before calling expiresIn()')
-    this.setValidUntil(this._validFrom + value)
+    this._expiresIn = value
     return this
   }
   setId(value: string): VerifiableCredentialBuilder {
