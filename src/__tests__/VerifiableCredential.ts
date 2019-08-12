@@ -30,6 +30,7 @@ const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
 const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
 const SIGNER: Signer = async (data: string) => 'signature'
 const CREDENTIAL_SUBJECT: CredentialSubject = { name: 'test' }
+const now = () => Math.floor(Date.now() / 1000)
 
 describe('VerifiableCredential', () => {
   let vc: VerifiableCredentialBuilder
@@ -77,7 +78,7 @@ describe('VerifiableCredential', () => {
         )
       })
       it('calls createVerifiableCredential with nbf in the payload if validFrom has been set', () => {
-        const timestamp = Math.floor(new Date().getTime() / 1000)
+        const timestamp = now()
         vc.setValidFrom(timestamp).build()
         expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -86,8 +87,8 @@ describe('VerifiableCredential', () => {
           expect.anything()
         )
       })
-      it('calls createVerifiableCredential with exp in the payload if expires has been set', () => {
-        const timestamp = Math.floor(new Date().getTime() / 1000)
+      it('calls createVerifiableCredential with exp in the payload if validUntil has been set', () => {
+        const timestamp = now()
         vc.setValidUntil(timestamp).build()
         expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -102,6 +103,45 @@ describe('VerifiableCredential', () => {
         expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
           expect.objectContaining({
             jti: id
+          }),
+          expect.anything()
+        )
+      })
+      it('calculates exp using validFrom and expiresIn if validUntil has not been set', () => {
+        const timestamp = now()
+        const interval = 60000
+        vc.setValidFrom(timestamp)
+          .expiresIn(interval)
+          .build()
+        expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
+          expect.objectContaining({
+            nbf: timestamp,
+            exp: timestamp + interval
+          }),
+          expect.anything()
+        )
+      })
+      it('does not set exp if expiresIn has been set but validFrom has not', () => {
+        vc.expiresIn(100).build()
+        expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
+          expect.objectContaining({
+            nbf: undefined,
+            exp: undefined
+          }),
+          expect.anything()
+        )
+      })
+      it('sets exp to validUntil over calculating it from expiresIn', () => {
+        const timestamp = now()
+        const validUntil = timestamp + 2000
+        vc.setValidUntil(validUntil)
+          .setValidFrom(timestamp)
+          .expiresIn(1000)
+          .build()
+        expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
+          expect.objectContaining({
+            nbf: timestamp,
+            exp: validUntil
           }),
           expect.anything()
         )
@@ -223,23 +263,9 @@ describe('VerifiableCredential', () => {
       vc.setValidUntil(value)
       expect(mockedValidateTimestamp).toHaveBeenCalledWith(value)
     })
-    it('sets the expires timestamp of the vc', () => {
+    it('sets the validUntil timestamp of the vc', () => {
       const value = faker.random.number()
       expect(vc.setValidUntil(value).validUntil).toEqual(value)
-    })
-  })
-
-  describe('expiresIn', () => {
-    it('throws an error if validFrom has not been set', () => {
-      expect(() => vc.expiresIn(faker.random.number())).toThrow()
-    })
-
-    it('sets the expires timestamp of the vc to validFrom + duration provided', () => {
-      const timestamp = Math.floor(new Date().getTime() / 1000)
-      const validFor = 60000
-      expect(vc.setValidFrom(timestamp).expiresIn(validFor).validUntil).toEqual(
-        timestamp + validFor
-      )
     })
   })
 
