@@ -31,6 +31,7 @@ export class VerifiableCredentialBuilder {
     }
     if (this._validFrom) payload.nbf = this._validFrom
     if (this._validUntil) payload.exp = this._validUntil
+    else if (payload.nbf && this._expiresIn) payload.exp = payload.nbf + this._expiresIn
     if (this._id) payload.jti = this._id
     return createVerifiableCredential(payload, {
       did: this._issuer,
