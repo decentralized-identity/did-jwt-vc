@@ -1,27 +1,12 @@
 import faker from 'faker'
 
-jest.mock('../validators')
 jest.mock('../index')
 import { VerifiableCredentialBuilder } from '../VerifiableCredential'
-import {
-  validateDidFormat,
-  validateCredentialSubject,
-  validateTimestamp
-} from '../validators'
 import { createVerifiableCredential } from '../index'
 import { Signer } from 'did-jwt'
 import { DEFAULT_CONTEXT, DEFAULT_TYPE } from '../constants'
 import { CredentialSubject } from '../types'
 
-const mockedValidateDidFormat = validateDidFormat as jest.Mock<
-  typeof validateDidFormat
->
-const mockedValidateCredentialSubject = validateCredentialSubject as jest.Mock<
-  typeof validateCredentialSubject
->
-const mockedValidateTimestamp = validateTimestamp as jest.Mock<
-  typeof validateTimestamp
->
 const mockedCreateVerifiableCredential = (createVerifiableCredential as unknown) as jest.Mock<
   typeof createVerifiableCredential
 >
@@ -123,13 +108,9 @@ describe('VerifiableCredential', () => {
       })
       it('does not set exp if expiresIn has been set but validFrom has not', () => {
         vc.expiresIn(100).build()
-        expect(mockedCreateVerifiableCredential).toHaveBeenCalledWith(
-          expect.objectContaining({
-            nbf: undefined,
-            exp: undefined
-          }),
-          expect.anything()
-        )
+        const args = mockedCreateVerifiableCredential.mock.calls[0]
+        expect(args[0]).not.toHaveProperty('nbf')
+        expect(args[0]).not.toHaveProperty('exp')
       })
       it('sets exp to validUntil over calculating it from expiresIn', () => {
         const timestamp = now()
@@ -192,33 +173,18 @@ describe('VerifiableCredential', () => {
   })
 
   describe('setSubject', () => {
-    it('calls did format validator', () => {
-      const value = faker.random.alphaNumeric(20)
-      vc.setSubject(value)
-      expect(mockedValidateDidFormat).toHaveBeenCalledWith(value)
-    })
     it('sets the subject of the vc', () => {
       expect(vc.setSubject(DID_A).subject).toEqual(DID_A)
     })
   })
 
   describe('setIssuer', () => {
-    it('calls did format validator', () => {
-      const value = faker.random.alphaNumeric(20)
-      vc.setIssuer(value)
-      expect(mockedValidateDidFormat).toHaveBeenCalledWith(value)
-    })
     it('sets the issuer of the vc', () => {
       expect(vc.setIssuer(DID_A).issuer).toEqual(DID_A)
     })
   })
 
   describe('setCredentialSubject', () => {
-    it('calls credential subject validator', () => {
-      const value = {}
-      vc.setCredentialSubject(value)
-      expect(mockedValidateCredentialSubject).toHaveBeenCalledWith(value)
-    })
     it('sets the credential subject of the vc', () => {
       const value = { [faker.random.word()]: faker.random.word() }
       expect(vc.setCredentialSubject(value).credentialSubject).toEqual(value)
@@ -246,11 +212,6 @@ describe('VerifiableCredential', () => {
   })
 
   describe('setValidFrom', () => {
-    it('calls timestamp validator', () => {
-      const value = faker.random.number()
-      vc.setValidFrom(value)
-      expect(mockedValidateTimestamp).toHaveBeenCalledWith(value)
-    })
     it('sets the validFrom timestamp of the vc', () => {
       const value = faker.random.number()
       expect(vc.setValidFrom(value).validFrom).toEqual(value)
@@ -258,11 +219,6 @@ describe('VerifiableCredential', () => {
   })
 
   describe('setValidUntil', () => {
-    it('calls timestamp validator', () => {
-      const value = faker.random.number()
-      vc.setValidUntil(value)
-      expect(mockedValidateTimestamp).toHaveBeenCalledWith(value)
-    })
     it('sets the validUntil timestamp of the vc', () => {
       const value = faker.random.number()
       expect(vc.setValidUntil(value).validUntil).toEqual(value)
