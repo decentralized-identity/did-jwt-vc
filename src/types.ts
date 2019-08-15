@@ -29,6 +29,7 @@ export interface VP {
 export interface PresentationPayload {
   vp: VP
   aud?: string
+  nbf?: number
   exp?: number
   jti?: string
   [x: string]: any
