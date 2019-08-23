@@ -1,7 +1,7 @@
-  // tslint:disable: variable-name
+// tslint:disable: variable-name
 import { Signer } from 'did-jwt'
-import { createVerifiableCredential } from '.';
-import { CredentialSubject, VerifiableCredentialPayload } from './types';
+import { createVerifiableCredential } from '.'
+import { CredentialSubject, VerifiableCredentialPayload } from './types'
 
 export class VerifiableCredentialBuilder {
   private _signer: Signer
@@ -16,10 +16,18 @@ export class VerifiableCredentialBuilder {
   private _id?: string
 
   async build(): Promise<string> {
-    if (this._signer === undefined) throw new Error('signer must be set before calling build()')
-    if (this._issuer === undefined) throw new Error('issuer must be set before calling build()')
-    if (this._subject === undefined) throw new Error('subject must be set before calling build()')
-    if (this._credentialSubject === undefined) throw new Error('credentialSubject must be set before calling build()')
+    if (this._signer === undefined) {
+      throw new Error('signer must be set before calling build()')
+    }
+    if (this._issuer === undefined) {
+      throw new Error('issuer must be set before calling build()')
+    }
+    if (this._subject === undefined) {
+      throw new Error('subject must be set before calling build()')
+    }
+    if (this._credentialSubject === undefined) {
+      throw new Error('credentialSubject must be set before calling build()')
+    }
     const payload: VerifiableCredentialPayload = {
       sub: this._subject,
       vc: {
@@ -30,7 +38,9 @@ export class VerifiableCredentialBuilder {
     }
     if (this._validFrom) payload.nbf = this._validFrom
     if (this._validUntil) payload.exp = this._validUntil
-    else if (payload.nbf && this._expiresIn) payload.exp = payload.nbf + this._expiresIn
+    else if (payload.nbf && this._expiresIn) {
+      payload.exp = payload.nbf + this._expiresIn
+    }
     if (this._id) payload.jti = this._id
     return createVerifiableCredential(payload, {
       did: this._issuer,

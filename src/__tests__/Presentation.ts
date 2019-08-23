@@ -40,7 +40,7 @@ describe('Presentation', () => {
     describe('when required attributes have been set', () => {
       beforeEach(() => {
         p.setSigner(SIGNER)
-          .setIssuer(DID_A)
+          .setHolder(DID_A)
           .addVerifiableCredential(VC_JWT)
       })
       it('calls createPresentation with required JWT payload', () => {
@@ -137,7 +137,7 @@ describe('Presentation', () => {
     it('rejects with an error if signer has not been set', () => {
       return expect(
         p
-          .setIssuer(DID_A)
+          .setHolder(DID_A)
           .addVerifiableCredential(VC_JWT)
           .build()
       ).rejects.toThrowErrorMatchingSnapshot()
@@ -153,7 +153,7 @@ describe('Presentation', () => {
     it('rejects with an error if no verifiableCredentials have been added', () => {
       return expect(
         p
-          .setIssuer(DID_A)
+          .setHolder(DID_A)
           .setSigner(SIGNER)
           .build()
       ).rejects.toThrowErrorMatchingSnapshot()
@@ -174,7 +174,7 @@ describe('Presentation', () => {
 
   describe('setIssuer', () => {
     it('sets the issuer of the presentation', () => {
-      expect(p.setIssuer(DID_A).issuer).toEqual(DID_A)
+      expect(p.setHolder(DID_A).holder).toEqual(DID_A)
     })
   })
 

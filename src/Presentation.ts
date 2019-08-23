@@ -1,12 +1,12 @@
 // tslint:disable: variable-name
 import { Signer } from 'did-jwt'
-import { DEFAULT_CONTEXT, DEFAULT_TYPE } from './constants';
-import { createPresentation } from '.';
-import { PresentationPayload } from './types';
+import { DEFAULT_CONTEXT, DEFAULT_TYPE } from './constants'
+import { createPresentation } from '.'
+import { PresentationPayload } from './types'
 
 export class PresentationBuilder {
   private _signer: Signer
-  private _issuer: string
+  private _holder: string
   private _verifiableCredentials: string[] = []
   private _context: string[] = [DEFAULT_CONTEXT]
   private _type: string[] = [DEFAULT_TYPE]
@@ -17,9 +17,17 @@ export class PresentationBuilder {
   private _id?: string
 
   async build(): Promise<string> {
-    if (this._signer === undefined) throw new Error('signer must be set before calling build()')
-    if (this._issuer === undefined) throw new Error('issuer must be set before calling build()')
-    if (this._verifiableCredentials.length < 1) throw new Error('at least one verifiableCredential must be added before calling build()')
+    if (this._signer === undefined) {
+      throw new Error('signer must be set before calling build()')
+    }
+    if (this._holder === undefined) {
+      throw new Error('issuer must be set before calling build()')
+    }
+    if (this._verifiableCredentials.length < 1) {
+      throw new Error(
+        'at least one verifiableCredential must be added before calling build()'
+      )
+    }
     const payload: PresentationPayload = {
       vp: {
         '@context': this._context,
@@ -30,10 +38,12 @@ export class PresentationBuilder {
     if (this._audience) payload.aud = this._audience
     if (this._validFrom) payload.nbf = this._validFrom
     if (this._validUntil) payload.exp = this._validUntil
-    else if (payload.nbf && this._expiresIn) payload.exp = payload.nbf + this._expiresIn
+    else if (payload.nbf && this._expiresIn) {
+      payload.exp = payload.nbf + this._expiresIn
+    }
     if (this._id) payload.jti = this._id
     return createPresentation(payload, {
-      did: this._issuer,
+      did: this._holder,
       signer: this._signer
     })
   }
@@ -42,8 +52,8 @@ export class PresentationBuilder {
     this._signer = signer
     return this
   }
-  setIssuer(issuer: string): PresentationBuilder {
-    this._issuer = issuer
+  setHolder(holder: string): PresentationBuilder {
+    this._holder = holder
     return this
   }
   addVerifiableCredential(verifiableCredential: string): PresentationBuilder {
@@ -84,8 +94,8 @@ export class PresentationBuilder {
   get audience() {
     return this._audience
   }
-  get issuer() {
-    return this._issuer
+  get holder() {
+    return this._holder
   }
   get verifiableCredentials() {
     return this._verifiableCredentials
