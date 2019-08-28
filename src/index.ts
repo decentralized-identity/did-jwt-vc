@@ -1,5 +1,5 @@
-import { createJWT } from 'did-jwt'
-import { JWT_ALG } from './constants'
+import { createJWT, verifyJWT } from 'did-jwt'
+import { JWT_ALG, DEFAULT_CONTEXT, DEFAULT_TYPE } from './constants'
 import * as validators from './validators'
 import {
   VerifiableCredentialPayload,
@@ -57,4 +57,34 @@ function validatePresentationAttributes(payload: PresentationPayload): void {
   }
   if (payload.aud) validators.validateDidFormat(payload.aud)
   if (payload.exp) validators.validateTimestamp(payload.exp)
+}
+
+function isLegacyAttestationFormat(payload: any): boolean {
+  // payload is an object and has all the required fields of old attestation format
+  return payload instanceof Object && payload.sub && payload.iss && payload.claim && payload.iat
+}
+
+function attestationToVcFormat(payload: any): VerifiableCredentialPayload {
+  const result:VerifiableCredentialPayload = {
+    sub: payload.sub,
+    iss: payload.iss,
+    iat: payload.iat,
+    nbf: payload.iat,
+    vc: {
+      '@context': [DEFAULT_CONTEXT],
+      type: [DEFAULT_TYPE],
+      credentialSubject: payload.claim
+    }
+  }
+  if (payload.exp) result.exp = payload.exp
+  return result
+}
+
+export async function verifyCredential(vc: string): Promise<any> {
+  const verified = await verifyJWT(vc)
+  if(isLegacyAttestationFormat(verified.payload)) {
+    verified.payload = attestationToVcFormat(verified.payload)
+  }
+  validateVerifiableCredentialAttributes(verified.payload)
+  return verified
 }
