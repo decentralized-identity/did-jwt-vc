@@ -14,7 +14,6 @@ export async function createVerifiableCredential(
   issuer: Issuer
 ): Promise<string> {
   validateVerifiableCredentialAttributes(payload)
-  validators.validateDidFormat(issuer.did)
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
@@ -27,7 +26,6 @@ export async function createPresentation(
   issuer: Issuer
 ): Promise<string> {
   validatePresentationAttributes(payload)
-  validators.validateDidFormat(issuer.did)
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
@@ -38,7 +36,6 @@ export async function createPresentation(
 function validateVerifiableCredentialAttributes(
   payload: VerifiableCredentialPayload
 ): void {
-  validators.validateDidFormat(payload.sub)
   validators.validateContext(payload.vc['@context'])
   validators.validateType(payload.vc.type)
   validators.validateCredentialSubject(payload.vc.credentialSubject)
@@ -55,7 +52,6 @@ function validatePresentationAttributes(payload: PresentationPayload): void {
   for (const vc of payload.vp.verifiableCredential) {
     validators.validateJwtFormat(vc)
   }
-  if (payload.aud) validators.validateDidFormat(payload.aud)
   if (payload.exp) validators.validateTimestamp(payload.exp)
 }
 

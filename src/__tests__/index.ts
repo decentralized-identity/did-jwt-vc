@@ -3,7 +3,6 @@ import { createVerifiableCredential, createPresentation, verifyCredential } from
 import { decodeJWT } from 'did-jwt'
 import { DEFAULT_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
-  validateDidFormat,
   validateContext,
   validateJwtFormat,
   validateTimestamp,
@@ -12,9 +11,6 @@ import {
 } from '../validators'
 jest.mock('../validators')
 
-const mockValidateDidFormat = <jest.Mock<typeof validateDidFormat>>(
-  validateDidFormat
-)
 const mockValidateJwtFormat = <jest.Mock<typeof validateJwtFormat>>(
   validateJwtFormat
 )
@@ -87,10 +83,6 @@ describe('createVerifiableCredential', () => {
   })
   it('calls functions to validate required fields', async () => {
     await createVerifiableCredential(verifiableCredentialPayload, did)
-    expect(mockValidateDidFormat).toHaveBeenCalledWith(
-      verifiableCredentialPayload.sub
-    )
-    expect(mockValidateDidFormat).toHaveBeenCalledWith(did.did)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(
       verifiableCredentialPayload.nbf
     )
@@ -130,7 +122,6 @@ describe('createPresentation', () => {
   })
   it('calls functions to validate required fields', async () => {
     await createPresentation(presentationPayload, did)
-    expect(mockValidateDidFormat).toHaveBeenCalledWith(did.did)
     expect(mockValidateContext).toHaveBeenCalledWith(
       presentationPayload.vp['@context']
     )
@@ -165,7 +156,6 @@ describe('createPresentation', () => {
       },
       did
     )
-    expect(mockValidateDidFormat).toHaveBeenCalledWith(aud)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
   })
 })
