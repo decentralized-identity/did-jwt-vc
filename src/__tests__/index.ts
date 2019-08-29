@@ -146,12 +146,10 @@ describe('createPresentation', () => {
     ).rejects.toThrow(TypeError)
   })
   it('calls functions to validate optional fields if they are present', async () => {
-    const aud = INVALID_DID
     const timestamp = Math.floor(new Date().getTime())
     await createPresentation(
       {
         ...presentationPayload,
-        aud: INVALID_DID,
         exp: timestamp
       },
       did

@@ -61,18 +61,16 @@ function isLegacyAttestationFormat(payload: any): boolean {
 }
 
 function attestationToVcFormat(payload: any): VerifiableCredentialPayload {
+  const { iat, nbf, claim, ...rest } = payload
   const result:VerifiableCredentialPayload = {
-    sub: payload.sub,
-    iss: payload.iss,
-    iat: payload.iat,
-    nbf: payload.nbf ? payload.nbf : payload.iat,
+    ...rest,
+    nbf: nbf ? nbf : iat,
     vc: {
       '@context': [DEFAULT_CONTEXT],
       type: [DEFAULT_TYPE],
       credentialSubject: payload.claim
     }
   }
-  if (payload.exp) result.exp = payload.exp
   return result
 }
 
