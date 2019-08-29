@@ -69,7 +69,7 @@ function attestationToVcFormat(payload: any): VerifiableCredentialPayload {
     sub: payload.sub,
     iss: payload.iss,
     iat: payload.iat,
-    nbf: payload.iat,
+    nbf: payload.nbf ? payload.nbf : payload.iat,
     vc: {
       '@context': [DEFAULT_CONTEXT],
       type: [DEFAULT_TYPE],
