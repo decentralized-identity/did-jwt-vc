@@ -7,8 +7,6 @@ import {
   PresentationPayload
 } from './types'
 
-export * from './VerifiableCredential'
-
 export async function createVerifiableCredential(
   payload: VerifiableCredentialPayload,
   issuer: Issuer

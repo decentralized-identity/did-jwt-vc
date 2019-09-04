@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Presentation build rejects with an error if issuer has not been set 1`] = `"issuer must be set before calling build()"`;
-
-exports[`Presentation build rejects with an error if no verifiableCredentials have been added 1`] = `"at least one verifiableCredential must be added before calling build()"`;
-
-exports[`Presentation build rejects with an error if signer has not been set 1`] = `"signer must be set before calling build()"`;
