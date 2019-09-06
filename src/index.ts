@@ -6,6 +6,11 @@ import {
   Issuer,
   PresentationPayload
 } from './types'
+import { DIDDocument } from 'did-resolver'
+
+interface Resolvable {
+  resolve: (did: string) => Promise<DIDDocument | null>
+}
 
 export async function createVerifiableCredential(
   payload: VerifiableCredentialPayload,
@@ -73,8 +78,8 @@ function attestationToVcFormat(payload: any): VerifiableCredentialPayload {
   return result
 }
 
-export async function verifyCredential(vc: string): Promise<any> {
-  const verified = await verifyJWT(vc)
+export async function verifyCredential(vc: string, resolver: Resolvable): Promise<any> {
+  const verified = await verifyJWT(vc, { resolver })
   if(isLegacyAttestationFormat(verified.payload)) {
     verified.payload = attestationToVcFormat(verified.payload)
   }

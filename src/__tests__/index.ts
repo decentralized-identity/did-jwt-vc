@@ -1,6 +1,6 @@
 import EthrDID from 'ethr-did'
 import { createVerifiableCredential, createPresentation, verifyCredential } from '../index'
-import { decodeJWT } from 'did-jwt'
+import { verifyJWT, decodeJWT } from 'did-jwt'
 import { DEFAULT_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
   validateContext,
@@ -9,6 +9,9 @@ import {
   validateType,
   validateCredentialSubject
 } from '../validators'
+import { Resolver } from 'did-resolver'
+import { getResolver } from 'ethr-did-resolver'
+
 jest.mock('../validators')
 
 const mockValidateJwtFormat = <jest.Mock<typeof validateJwtFormat>>(
@@ -159,25 +162,27 @@ describe('createPresentation', () => {
 })
 
 describe('verifyCredential', () => {
+  const resolver = new Resolver(getResolver())
+
   it('verifies a valid Verifiable Credential', async () => {
-    const verified = await verifyCredential(VC_JWT)
+    const verified = await verifyCredential(VC_JWT, resolver)
     expect(verified.payload.vc).toBeDefined()
   })
 
   it('verifies and converts a legacy format attestation into a Verifiable Credential', async () => {
     // tslint:disable-next-line: max-line-length
     const LEGACY_FORMAT_ATTESTATION = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
-    const verified = await verifyCredential(LEGACY_FORMAT_ATTESTATION)
+    const verified = await verifyCredential(LEGACY_FORMAT_ATTESTATION, resolver)
     expect(verified.payload.vc).toBeDefined()
   })
 
   it('rejects an invalid JWT', () => {
-    expect(verifyCredential('not a jwt')).rejects.toThrow()
+    expect(verifyCredential('not a jwt', resolver)).rejects.toThrow()
   })
 
   it('rejects a valid JWT that is missing VC attributes', () => {
     // tslint:disable-next-line: max-line-length
     const BASIC_JWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjcwMjQ5NzQsIm5hbWUiOiJib2IiLCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.2lP3YDOBj9pirxmPAJojQ-q6Rp7w4wA59ZLm19HdqC2leuxlZEQ5w8y0tzpH8n2I25aQ0vVB6j6TimCNLFasqQE'
-    expect(verifyCredential(BASIC_JWT)).rejects.toThrow()
+    expect(verifyCredential(BASIC_JWT, resolver)).rejects.toThrow()
   })
 })
