@@ -86,3 +86,9 @@ export async function verifyCredential(vc: string, resolver: Resolvable): Promis
   validateVerifiableCredentialAttributes(verified.payload)
   return verified
 }
+
+export async function verifyPresentation(presentation: string, resolver: Resolvable): Promise<any> {
+  const verified = await verifyJWT(presentation, { resolver })
+  validatePresentationAttributes(verified.payload)
+  return verified
+}
