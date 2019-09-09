@@ -6,12 +6,6 @@ import {
 } from './constants'
 import { CredentialSubject } from './types'
 
-export function validateDidFormat(value: string): void {
-  if (!value.match(DID_FORMAT)) {
-    throw new TypeError(`"${value}" is not a valid DID format`)
-  }
-}
-
 export function validateJwtFormat(value: string): void {
   if (!value.match(JWT_FORMAT)) {
     throw new TypeError(`"${value}" is not a valid JWT format`)

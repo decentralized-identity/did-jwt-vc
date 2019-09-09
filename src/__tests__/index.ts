@@ -1,20 +1,19 @@
 import EthrDID from 'ethr-did'
-import { createVerifiableCredential, createPresentation } from '../index'
-import { decodeJWT } from 'did-jwt'
+import { createVerifiableCredential, createPresentation, verifyCredential } from '../index'
+import { verifyJWT, decodeJWT } from 'did-jwt'
 import { DEFAULT_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
-  validateDidFormat,
   validateContext,
   validateJwtFormat,
   validateTimestamp,
   validateType,
   validateCredentialSubject
 } from '../validators'
+import { Resolver } from 'did-resolver'
+import { getResolver } from 'ethr-did-resolver'
+
 jest.mock('../validators')
 
-const mockValidateDidFormat = <jest.Mock<typeof validateDidFormat>>(
-  validateDidFormat
-)
 const mockValidateJwtFormat = <jest.Mock<typeof validateJwtFormat>>(
   validateJwtFormat
 )
@@ -26,17 +25,14 @@ const mockValidateContext = <jest.Mock<typeof validateContext>>validateContext
 const mockValidateType = <jest.Mock<typeof validateType>>validateType
 const mockValidateCredentialSubject = <jest.Mock<typeof validateCredentialSubject>>validateCredentialSubject
 
-export const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
-export const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
-export const INVALID_DID = 'this is not a valid did'
-export const INVALID_TIMESTAMP = 1563905309015
-export const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
-export const EXTRA_CONTEXT_B = 'custom vc context'
-export const EXTRA_TYPE_A = 'UniversityDegreeCredential'
-export const EXTRA_TYPE_B = 'custom vc type'
-export const VC_JWT =
+const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
+const INVALID_DID = 'this is not a valid did'
+const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
+const EXTRA_TYPE_A = 'UniversityDegreeCredential'
+const VC_JWT =
   // tslint:disable-next-line: max-line-length
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksInN1YiI6ImRpZDpldGhyOjB4MTIzNDU2NzgiLCJuYmYiOjE1NjI5NTAyODI4MDEsInZjIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlEZWdyZWVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRlZ3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQmFjY2FsYXVyw6lhdCBlbiBtdXNpcXVlcyBudW3DqXJpcXVlcyJ9fX0sImlzcyI6ImRpZDpldGhyOjB4ZjEyMzJmODQwZjNhZDdkMjNmY2RhYTg0ZDZjNjZkYWMyNGVmYjE5OCJ9.uYSRgDNmZnz0k5rORCBIIzEahVask5eQ2PFZI2_JAatvrpZ2t_3iTvPmBy6Kzt2W20fw5jUJ7GoZXJqoba4UVQA'
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY5MjMyNjksInN1YiI6ImRpZDpldGhyOjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVW5pdmVyc2l0eURlZ3JlZUNyZWRlbnRpYWwiXSwiY3JlZGVudGlhbFN1YmplY3QiOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19fSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.rFRZUCw3Gu0E_I5ZJbrbpuHV1JNAwpXaiFZuJ59iJ-TNqufr4cuGCBEECFbgQF-lpNm51cqSx3Y2IdWaUpatJQA'
 
 const did = new EthrDID({
   did: DID_A,
@@ -90,10 +86,6 @@ describe('createVerifiableCredential', () => {
   })
   it('calls functions to validate required fields', async () => {
     await createVerifiableCredential(verifiableCredentialPayload, did)
-    expect(mockValidateDidFormat).toHaveBeenCalledWith(
-      verifiableCredentialPayload.sub
-    )
-    expect(mockValidateDidFormat).toHaveBeenCalledWith(did.did)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(
       verifiableCredentialPayload.nbf
     )
@@ -133,7 +125,6 @@ describe('createPresentation', () => {
   })
   it('calls functions to validate required fields', async () => {
     await createPresentation(presentationPayload, did)
-    expect(mockValidateDidFormat).toHaveBeenCalledWith(did.did)
     expect(mockValidateContext).toHaveBeenCalledWith(
       presentationPayload.vp['@context']
     )
@@ -158,17 +149,40 @@ describe('createPresentation', () => {
     ).rejects.toThrow(TypeError)
   })
   it('calls functions to validate optional fields if they are present', async () => {
-    const aud = INVALID_DID
     const timestamp = Math.floor(new Date().getTime())
     await createPresentation(
       {
         ...presentationPayload,
-        aud: INVALID_DID,
         exp: timestamp
       },
       did
     )
-    expect(mockValidateDidFormat).toHaveBeenCalledWith(aud)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
+  })
+})
+
+describe('verifyCredential', () => {
+  const resolver = new Resolver(getResolver())
+
+  it('verifies a valid Verifiable Credential', async () => {
+    const verified = await verifyCredential(VC_JWT, resolver)
+    expect(verified.payload.vc).toBeDefined()
+  })
+
+  it('verifies and converts a legacy format attestation into a Verifiable Credential', async () => {
+    // tslint:disable-next-line: max-line-length
+    const LEGACY_FORMAT_ATTESTATION = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
+    const verified = await verifyCredential(LEGACY_FORMAT_ATTESTATION, resolver)
+    expect(verified.payload.vc).toBeDefined()
+  })
+
+  it('rejects an invalid JWT', () => {
+    expect(verifyCredential('not a jwt', resolver)).rejects.toThrow()
+  })
+
+  it('rejects a valid JWT that is missing VC attributes', () => {
+    // tslint:disable-next-line: max-line-length
+    const BASIC_JWT = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjcwMjQ5NzQsIm5hbWUiOiJib2IiLCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.2lP3YDOBj9pirxmPAJojQ-q6Rp7w4wA59ZLm19HdqC2leuxlZEQ5w8y0tzpH8n2I25aQ0vVB6j6TimCNLFasqQE'
+    expect(verifyCredential(BASIC_JWT, resolver)).rejects.toThrow()
   })
 })
