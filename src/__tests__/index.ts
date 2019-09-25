@@ -1,24 +1,55 @@
 import EthrDID from 'ethr-did'
-import { createVerifiableCredential, createPresentation } from '../index'
-import { decodeJWT } from 'did-jwt'
+import { createVerifiableCredential, createPresentation, verifyCredential, verifyPresentation } from '../index'
+import { verifyJWT, decodeJWT } from 'did-jwt'
+import { DEFAULT_TYPE, DEFAULT_CONTEXT } from '../constants'
+import {
+  validateContext,
+  validateJwtFormat,
+  validateTimestamp,
+  validateType,
+  validateCredentialSubject
+} from '../validators'
+import { Resolver } from 'did-resolver'
+import { getResolver } from 'ethr-did-resolver'
 
-const INVALID_DID = 'this is not a valid did'
-const INVALID_TIMESTAMP = 1563905309015
-const issuerIdentity = {
-  did: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+jest.mock('../validators')
+
+const mockValidateJwtFormat = <jest.Mock<typeof validateJwtFormat>>(
+  validateJwtFormat
+)
+const mockValidateTimestamp = <jest.Mock<typeof validateTimestamp>>(
+  validateTimestamp
+)
+
+const mockValidateContext = <jest.Mock<typeof validateContext>>validateContext
+const mockValidateType = <jest.Mock<typeof validateType>>validateType
+const mockValidateCredentialSubject = <jest.Mock<typeof validateCredentialSubject>>validateCredentialSubject
+
+const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
+const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
+const EXTRA_TYPE_A = 'UniversityDegreeCredential'
+const VC_JWT =
+  // tslint:disable-next-line: max-line-length
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY5MjMyNjksInN1YiI6ImRpZDpldGhyOjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVW5pdmVyc2l0eURlZ3JlZUNyZWRlbnRpYWwiXSwiY3JlZGVudGlhbFN1YmplY3QiOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19fSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.rFRZUCw3Gu0E_I5ZJbrbpuHV1JNAwpXaiFZuJ59iJ-TNqufr4cuGCBEECFbgQF-lpNm51cqSx3Y2IdWaUpatJQA'
+const BASIC_JWT =
+  // tslint:disable-next-line: max-line-length
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjcwMjQ5NzQsIm5hbWUiOiJib2IiLCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.2lP3YDOBj9pirxmPAJojQ-q6Rp7w4wA59ZLm19HdqC2leuxlZEQ5w8y0tzpH8n2I25aQ0vVB6j6TimCNLFasqQE'
+const PRESENTATION_JWT =
+  // tslint:disable-next-line: max-line-length
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU5qWTVNak15Tmprc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaUxDSm9kSFJ3Y3pvdkwzZDNkeTUzTXk1dmNtY3ZNakF4T0M5amNtVmtaVzUwYVdGc2N5OWxlR0Z0Y0d4bGN5OTJNU0pkTENKMGVYQmxJanBiSWxabGNtbG1hV0ZpYkdWRGNtVmtaVzUwYVdGc0lpd2lWVzVwZG1WeWMybDBlVVJsWjNKbFpVTnlaV1JsYm5ScFlXd2lYU3dpWTNKbFpHVnVkR2xoYkZOMVltcGxZM1FpT25zaVpHVm5jbVZsSWpwN0luUjVjR1VpT2lKQ1lXTm9aV3h2Y2tSbFozSmxaU0lzSW01aGJXVWlPaUpDWVdOallXeGhkWExEcVdGMElHVnVJRzExYzJseGRXVnpJRzUxYmNPcGNtbHhkV1Z6SW4xOWZTd2lhWE56SWpvaVpHbGtPbVYwYUhJNk1IaG1NVEl6TW1ZNE5EQm1NMkZrTjJReU0yWmpaR0ZoT0RSa05tTTJObVJoWXpJMFpXWmlNVGs0SW4wLnJGUlpVQ3czR3UwRV9JNVpKYnJicHVIVjFKTkF3cFhhaUZadUo1OWlKLVROcXVmcjRjdUdDQkVFQ0ZiZ1FGLWxwTm01MWNxU3gzWTJJZFdhVXBhdEpRQSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.bWZyEpLsx0u6v-UIcQf9TVMde1gTFsn091BY-TViUuRoUNsNQFzN-ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE'
+
+const did = new EthrDID({
+  did: DID_A,
   address: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
   privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75'
-}
-const did = new EthrDID(issuerIdentity)
+})
 const verifiableCredentialPayload = {
-  sub: 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4',
+  sub: DID_B,
   nbf: 1562950282,
   vc: {
-    '@context': [
-      'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1'
-    ],
-    type: ['VerifiableCredential', 'UniversityDegreeCredential'],
+    '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
+    type: [DEFAULT_TYPE, EXTRA_TYPE_A],
     credentialSubject: {
       degree: {
         type: 'BachelorDegree',
@@ -27,19 +58,18 @@ const verifiableCredentialPayload = {
     }
   }
 }
-const exampleVcJwt =
-  // tslint:disable-next-line: max-line-length
-  'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksInN1YiI6ImRpZDpldGhyOjB4MTIzNDU2NzgiLCJuYmYiOjE1NjI5NTAyODI4MDEsInZjIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlVuaXZlcnNpdHlEZWdyZWVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImRlZ3JlZSI6eyJ0eXBlIjoiQmFjaGVsb3JEZWdyZWUiLCJuYW1lIjoiQmFjY2FsYXVyw6lhdCBlbiBtdXNpcXVlcyBudW3DqXJpcXVlcyJ9fX0sImlzcyI6ImRpZDpldGhyOjB4ZjEyMzJmODQwZjNhZDdkMjNmY2RhYTg0ZDZjNjZkYWMyNGVmYjE5OCJ9.uYSRgDNmZnz0k5rORCBIIzEahVask5eQ2PFZI2_JAatvrpZ2t_3iTvPmBy6Kzt2W20fw5jUJ7GoZXJqoba4UVQA'
 const presentationPayload = {
   vp: {
-    '@context': [
-      'https://www.w3.org/2018/credentials/v1',
-      'https://www.w3.org/2018/credentials/examples/v1'
-    ],
-    type: ['VerifiableCredential'],
-    verifiableCredential: [exampleVcJwt]
+    '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
+    type: [DEFAULT_TYPE],
+    verifiableCredential: [VC_JWT]
   }
 }
+const resolver = new Resolver(getResolver())
+
+beforeEach(() => {
+  jest.resetAllMocks()
+})
 
 describe('createVerifiableCredential', () => {
   it('creates a valid Verifiable Credential JWT with required fields', async () => {
@@ -51,91 +81,35 @@ describe('createVerifiableCredential', () => {
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
-  it('throws a TypeError if sub is not a valid did', async () => {
-    await expect(
-      createVerifiableCredential(
-        {
-          ...verifiableCredentialPayload,
-          sub: INVALID_DID
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
+  it('creates a valid Verifiable Credential JWT with extra optional fields', async () => {
+    const vcJwt = await createVerifiableCredential(
+      { ...verifiableCredentialPayload, extra: 42 },
+      did
+    )
+    const decodedVc = await decodeJWT(vcJwt)
+    const { iat, ...payload } = decodedVc.payload
+    expect(payload).toMatchSnapshot()
   })
-  it('throws a TypeError if nbf is not a valid timestamp in seconds', async () => {
-    await expect(
-      createVerifiableCredential(
-        {
-          ...verifiableCredentialPayload,
-          nbf: INVALID_TIMESTAMP
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
+  it('calls functions to validate required fields', async () => {
+    await createVerifiableCredential(verifiableCredentialPayload, did)
+    expect(mockValidateTimestamp).toHaveBeenCalledWith(
+      verifiableCredentialPayload.nbf
+    )
+    expect(mockValidateContext).toHaveBeenCalledWith(
+      verifiableCredentialPayload.vc['@context']
+    )
+    expect(mockValidateType).toHaveBeenCalledWith(
+      verifiableCredentialPayload.vc.type
+    )
+    expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialPayload.vc.credentialSubject)
   })
-  it('throws a TypeError if it does not contain at least the default @context', async () => {
-    await expect(
-      createVerifiableCredential(
-        {
-          ...verifiableCredentialPayload,
-          vc: {
-            '@context': [],
-            type: verifiableCredentialPayload.vc.type,
-            credentialSubject: verifiableCredentialPayload.vc.credentialSubject
-          }
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
-  })
-  it('throws a TypeError if it does not contain at least the default type', async () => {
-    await expect(
-      createVerifiableCredential(
-        {
-          ...verifiableCredentialPayload,
-          vc: {
-            '@context': verifiableCredentialPayload.vc['@context'],
-            type: [],
-            credentialSubject: verifiableCredentialPayload.vc.credentialSubject
-          }
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
-  })
-  it('throws a TypeError if the credentialSubject is empty', async () => {
-    await expect(
-      createVerifiableCredential(
-        {
-          ...verifiableCredentialPayload,
-          vc: {
-            '@context': verifiableCredentialPayload.vc['@context'],
-            type: verifiableCredentialPayload.vc.type,
-            credentialSubject: {}
-          }
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
-  })
-  it('throws a TypeError if exp is present and is not a valid timestamp in seconds', async () => {
-    await expect(
-      createVerifiableCredential(
-        {
-          ...verifiableCredentialPayload,
-          exp: INVALID_TIMESTAMP
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
-  })
-  it('throws a TypeError if iss is not a valid did', async () => {
-    await expect(
-      createVerifiableCredential(verifiableCredentialPayload, {
-        did: INVALID_DID,
-        signer: did.signer
-      })
-    ).rejects.toThrow(TypeError)
+  it('calls functions to validate optional fields if they are present', async () => {
+    const timestamp = Math.floor(new Date().getTime())
+    await createVerifiableCredential(
+      { ...verifiableCredentialPayload, exp: timestamp },
+      did
+    )
+    expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
   })
 })
 
@@ -146,35 +120,24 @@ describe('createPresentation', () => {
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
   })
-  it('throws a TypeError if vp does not contain at least the default @context', async () => {
-    await expect(
-      createPresentation(
-        {
-          ...presentationPayload,
-          vp: {
-            '@context': [],
-            type: presentationPayload.vp.type,
-            verifiableCredential: presentationPayload.vp.verifiableCredential
-          }
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
+  it('creates a valid Presentation JWT with extra optional fields', async () => {
+    const presentationJwt = await createPresentation(
+      { ...presentationPayload, extra: 42 },
+      did
+    )
+    const decodedPresentation = await decodeJWT(presentationJwt)
+    const { iat, ...payload } = decodedPresentation.payload
+    expect(payload).toMatchSnapshot()
   })
-  it('throws a TypeError if vp does not contain at least the default type', async () => {
-    await expect(
-      createPresentation(
-        {
-          ...presentationPayload,
-          vp: {
-            '@context': presentationPayload.vp['@context'],
-            type: [],
-            verifiableCredential: presentationPayload.vp.verifiableCredential
-          }
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
+  it('calls functions to validate required fields', async () => {
+    await createPresentation(presentationPayload, did)
+    expect(mockValidateContext).toHaveBeenCalledWith(
+      presentationPayload.vp['@context']
+    )
+    expect(mockValidateType).toHaveBeenCalledWith(presentationPayload.vp.type)
+    for (const vc of presentationPayload.vp.verifiableCredential) {
+      expect(mockValidateJwtFormat).toHaveBeenCalledWith(vc)
+    }
   })
   it('throws a TypeError if vp.verifiableCredential is empty', async () => {
     await expect(
@@ -191,49 +154,52 @@ describe('createPresentation', () => {
       )
     ).rejects.toThrow(TypeError)
   })
-  it('throws a TypeError if vp.verifiableCredential contains a non-JWT string', async () => {
-    await expect(
-      createPresentation(
-        {
-          ...presentationPayload,
-          vp: {
-            '@context': presentationPayload.vp['@context'],
-            type: presentationPayload.vp.type,
-            verifiableCredential: ['this is not a VC JWT']
-          }
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
+  it('calls functions to validate optional fields if they are present', async () => {
+    const timestamp = Math.floor(new Date().getTime())
+    await createPresentation(
+      {
+        ...presentationPayload,
+        exp: timestamp
+      },
+      did
+    )
+    expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
   })
-  it('throws a TypeError if aud is present and is not a valid did', async () => {
-    await expect(
-      createPresentation(
-        {
-          ...presentationPayload,
-          aud: INVALID_DID
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
+})
+
+describe('verifyCredential', () => {
+  it('verifies a valid Verifiable Credential', async () => {
+    const verified = await verifyCredential(VC_JWT, resolver)
+    expect(verified.payload.vc).toBeDefined()
   })
-  it('throws a TypeError if exp is present and is not a valid timestamp in seconds', async () => {
-    await expect(
-      createPresentation(
-        {
-          ...presentationPayload,
-          exp: INVALID_TIMESTAMP
-        },
-        did
-      )
-    ).rejects.toThrow(TypeError)
+
+  it('verifies and converts a legacy format attestation into a Verifiable Credential', async () => {
+    // tslint:disable-next-line: max-line-length
+    const LEGACY_FORMAT_ATTESTATION = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
+    const verified = await verifyCredential(LEGACY_FORMAT_ATTESTATION, resolver)
+    expect(verified.payload.vc).toBeDefined()
   })
-  it('throws a TypeError if iss is not a valid did', async () => {
-    await expect(
-      createPresentation(presentationPayload, {
-        did: INVALID_DID,
-        signer: did.signer
-      })
-    ).rejects.toThrow(TypeError)
+
+  it('rejects an invalid JWT', () => {
+    expect(verifyCredential('not a jwt', resolver)).rejects.toThrow()
+  })
+
+  it('rejects a valid JWT that is missing VC attributes', () => {
+    expect(verifyCredential(BASIC_JWT, resolver)).rejects.toThrow()
+  })
+})
+
+describe('verifyPresentation', () => {
+  it('verifies a valid Presentation', async () => {
+    const verified = await verifyPresentation(PRESENTATION_JWT, resolver)
+    expect(verified.payload.vp).toBeDefined()
+  })
+
+  it('rejects an invalid JWT', () => {
+    expect(verifyPresentation('not a jwt', resolver)).rejects.toThrow()
+  })
+
+  it('rejects a valid JWT that is missing VP attributes', () => {
+    expect(verifyPresentation(BASIC_JWT, resolver)).rejects.toThrow()
   })
 })

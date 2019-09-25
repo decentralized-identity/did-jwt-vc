@@ -1,6 +1,6 @@
 {
   "name": "did-jwt-vc",
-  "version": "0.0.1-dev.0",
+  "version": "0.1.0",
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
   "main": "lib/index.js",
   "umd:main": "lib/index.umd.js",
@@ -20,7 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^0.2.0"
+    "did-jwt": "^3.0.0"
   },
   "jest": {
     "transform": {
@@ -43,8 +43,12 @@
     "testEnvironment": "node"
   },
   "devDependencies": {
+    "@types/faker": "^4.1.5",
     "@types/jest": "^24.0.15",
+    "did-resolver": "^1.0.0",
     "ethr-did": "^1.1.0",
+    "ethr-did-resolver": "^1.0.1",
+    "faker": "^4.1.0",
     "jest": "^24.8.0",
     "microbundle": "^0.11.0",
     "prettier": "^1.18.2",
