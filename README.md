@@ -4,16 +4,8 @@ Create and verify W3C Verifiable Credentials and Presentations in JWT format
 
 ## Installation
 
-Using NPM:
-
 ```
 npm install did-jwt-vc
-```
-
-Using Yarn:
-
-```
-yarn add did-jwt-vc
 ```
 
 ## Usage
