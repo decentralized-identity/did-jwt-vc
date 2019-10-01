@@ -46,7 +46,7 @@ Specify a `payload` matching the `VerifiableCredentialPayload` interface. Create
 import { VerifiableCredentialPayload, createVerifiableCredential } from 'did-jwt-vc'
 
 const vcPayload: VerifiableCredentialPayload = {
-  sub: '0x435df3eda57154cf8cf7926079881f2912f54db4',
+  sub: 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4',
   nbf: 1562950282,
   vc: {
     '@context': ['https://www.w3.org/2018/credentials/v1'],
