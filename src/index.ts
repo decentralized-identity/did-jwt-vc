@@ -36,7 +36,7 @@ export async function createPresentation(
   })
 }
 
-function validateVerifiableCredentialAttributes(
+export function validateVerifiableCredentialAttributes(
   payload: VerifiableCredentialPayload
 ): void {
   validators.validateContext(payload.vc['@context'])
@@ -46,7 +46,7 @@ function validateVerifiableCredentialAttributes(
   if (payload.exp) validators.validateTimestamp(payload.exp)
 }
 
-function validatePresentationAttributes(payload: PresentationPayload): void {
+export function validatePresentationAttributes(payload: PresentationPayload): void {
   validators.validateContext(payload.vp['@context'])
   validators.validateType(payload.vp.type)
   if (payload.vp.verifiableCredential.length < 1) {
