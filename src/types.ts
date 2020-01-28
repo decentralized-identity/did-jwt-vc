@@ -7,7 +7,11 @@ export interface CredentialSubject {
 export interface VC {
   '@context': string[]
   type: string[]
-  credentialSubject: CredentialSubject
+  credentialSubject: CredentialSubject,
+  issuer: {
+    id: string;
+    name: string;
+  }
 }
 
 export interface VerifiableCredentialPayload {
