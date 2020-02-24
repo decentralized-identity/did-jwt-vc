@@ -1,5 +1,5 @@
 import * as validators from '../validators'
-import { DEFAULT_CONTEXT, DEFAULT_TYPE } from '../constants'
+import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE } from '../constants'
 
 export const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
 export const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
@@ -55,21 +55,40 @@ describe('validators', () => {
     })
   })
 
-  describe('validateType', () => {
+  describe('validateVcType', () => {
     it('does not throw if the value contains only the default type', () => {
-      expect(() => validators.validateType([DEFAULT_TYPE])).not.toThrow()
+      expect(() => validators.validateVcType([DEFAULT_VC_TYPE])).not.toThrow()
     })
     it('does not throw if the value contains the default type and some user-defined ones', () => {
       expect(() =>
-        validators.validateType([DEFAULT_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])
+        validators.validateVcType([DEFAULT_VC_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])
       ).not.toThrow()
     })
     it('throws a TypeError the value contains no types', () => {
-      expect(() => validators.validateType([])).toThrow(TypeError)
+      expect(() => validators.validateVcType([])).toThrow(TypeError)
     })
     it('throws a TypeError the value is missing the default type', () => {
       expect(() =>
-        validators.validateType([EXTRA_TYPE_A, EXTRA_TYPE_B])
+        validators.validateVcType([EXTRA_TYPE_A, EXTRA_TYPE_B])
+      ).toThrow(TypeError)
+    })
+  })
+
+  describe('validateVpType', () => {
+    it('does not throw if the value contains only the default type', () => {
+      expect(() => validators.validateVpType([DEFAULT_VP_TYPE])).not.toThrow()
+    })
+    it('does not throw if the value contains the default type and some user-defined ones', () => {
+      expect(() =>
+        validators.validateVpType([DEFAULT_VP_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])
+      ).not.toThrow()
+    })
+    it('throws a TypeError the value contains no types', () => {
+      expect(() => validators.validateVpType([])).toThrow(TypeError)
+    })
+    it('throws a TypeError the value is missing the default type', () => {
+      expect(() =>
+        validators.validateVpType([EXTRA_TYPE_A, EXTRA_TYPE_B])
       ).toThrow(TypeError)
     })
   })

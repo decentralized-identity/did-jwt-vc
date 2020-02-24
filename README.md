@@ -17,7 +17,7 @@ npm install did-jwt-vc
 Create an `Issuer` object to sign JWTs using [ethr-did](https://github.com/uport-project/ethr-did):
 
 ```typescript
-import EthrDID from 'ethr-did'
+import * as EthrDID from 'ethr-did'
 import { Issuer } from 'did-jwt-vc'
 
 const issuer: Issuer = new EthrDID({
@@ -54,7 +54,7 @@ const vcPayload: VerifiableCredentialPayload = {
 
 const vcJwt = await createVerifiableCredential(vcPayload, issuer)
 console.log(vcJwt)
-// eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1Njk5NDg1NDUsInN1YiI6IjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJjcmVkZW50aWFsU3ViamVjdCI6eyJkZWdyZWUiOnsidHlwZSI6IkJhY2hlbG9yRGVncmVlIiwibmFtZSI6IkJhY2NhbGF1csOpYXQgZW4gbXVzaXF1ZXMgbnVtw6lyaXF1ZXMifX19LCJpc3MiOiJkaWQ6ZXRocjoweGYxMjMyZjg0MGYzYWQ3ZDIzZmNkYWE4NGQ2YzY2ZGFjMjRlZmIxOTgifQ.RynzSF4IqC85-DxRHwUyaagfxjDVV3_WnSl1sA2SYkYEvPLDrK6pgeXVkHCUDOdPiGlMuj2RDbt_yuIPtm1E7gE
+// eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc1OTMsInN1YiI6ImRpZDpldGhyOjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJjcmVkZW50aWFsU3ViamVjdCI6eyJkZWdyZWUiOnsidHlwZSI6IkJhY2hlbG9yRGVncmVlIiwibmFtZSI6IkJhY2NhbGF1csOpYXQgZW4gbXVzaXF1ZXMgbnVtw6lyaXF1ZXMifX19LCJpc3MiOiJkaWQ6ZXRocjoweGYxMjMyZjg0MGYzYWQ3ZDIzZmNkYWE4NGQ2YzY2ZGFjMjRlZmIxOTgifQ.ljTuUW6bcsoBQksMo5l8eFImVdOA-ew993B4ret_p9A8j2DLQ60CQmqB14NnN5XxD0d_glLRs1Myc_LBJjnuNwE
 ```
 
 #### Creating a Verifiable Presentation
@@ -67,14 +67,14 @@ import { PresentationPayload, createPresentation } from 'did-jwt-vc'
 const vpPayload: PresentationPayload = {
   vp: {
     '@context': ['https://www.w3.org/2018/credentials/v1'],
-    type: ['VerifiableCredential'],
+    type: ['VerifiablePresentation'],
     verifiableCredential: [vcJwt]
   }
 }
 
 const vpJwt = await createPresentation(vpPayload, issuer)
 console.log(vpJwt)
-// eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1Njk5NDg1NDUsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlsiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlV6STFOa3N0VWlKOS5leUpwWVhRaU9qRTFOams1TkRnMU5EVXNJbk4xWWlJNklqQjRORE0xWkdZelpXUmhOVGN4TlRSalpqaGpaamM1TWpZd056azRPREZtTWpreE1tWTFOR1JpTkNJc0ltNWlaaUk2TVRVMk1qazFNREk0TWl3aWRtTWlPbnNpUUdOdmJuUmxlSFFpT2xzaWFIUjBjSE02THk5M2QzY3Vkek11YjNKbkx6SXdNVGd2WTNKbFpHVnVkR2xoYkhNdmRqRWlYU3dpZEhsd1pTSTZXeUpXWlhKcFptbGhZbXhsUTNKbFpHVnVkR2xoYkNKZExDSmpjbVZrWlc1MGFXRnNVM1ZpYW1WamRDSTZleUprWldkeVpXVWlPbnNpZEhsd1pTSTZJa0poWTJobGJHOXlSR1ZuY21WbElpd2libUZ0WlNJNklrSmhZMk5oYkdGMWNzT3BZWFFnWlc0Z2JYVnphWEYxWlhNZ2JuVnR3Nmx5YVhGMVpYTWlmWDE5TENKcGMzTWlPaUprYVdRNlpYUm9jam93ZUdZeE1qTXlaamcwTUdZellXUTNaREl6Wm1Oa1lXRTROR1EyWXpZMlpHRmpNalJsWm1JeE9UZ2lmUS5SeW56U0Y0SXFDODUtRHhSSHdVeWFhZ2Z4akRWVjNfV25TbDFzQTJTWWtZRXZQTERySzZwZ2VYVmtIQ1VET2RQaUdsTXVqMlJEYnRfeXVJUHRtMUU3Z0UiXX0sImlzcyI6ImRpZDpldGhyOjB4ZjEyMzJmODQwZjNhZDdkMjNmY2RhYTg0ZDZjNjZkYWMyNGVmYjE5OCJ9.dB0xmcMFhiIGVZByd7Zz7Ocy0DU4XaDhIo-aUoC35Nff2ZwM_Y6qlW5cKs51nuf2Ogs0aMGgQ422L1Tzjm_WrgE
+// eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc1OTMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU9ESTFORGMxT1RNc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaVhTd2lkSGx3WlNJNld5SldaWEpwWm1saFlteGxRM0psWkdWdWRHbGhiQ0pkTENKamNtVmtaVzUwYVdGc1UzVmlhbVZqZENJNmV5SmtaV2R5WldVaU9uc2lkSGx3WlNJNklrSmhZMmhsYkc5eVJHVm5jbVZsSWl3aWJtRnRaU0k2SWtKaFkyTmhiR0YxY3NPcFlYUWdaVzRnYlhWemFYRjFaWE1nYm5WdHc2bHlhWEYxWlhNaWZYMTlMQ0pwYzNNaU9pSmthV1E2WlhSb2Nqb3dlR1l4TWpNeVpqZzBNR1l6WVdRM1pESXpabU5rWVdFNE5HUTJZelkyWkdGak1qUmxabUl4T1RnaWZRLmxqVHVVVzZiY3NvQlFrc01vNWw4ZUZJbVZkT0EtZXc5OTNCNHJldF9wOUE4ajJETFE2MENRbXFCMTRObk41WHhEMGRfZ2xMUnMxTXljX0xCSmpudU53RSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.cFyO-xPMdj0Hg1DaCkm30hzcVcYdnDdgyxXLZr9NAJNMUzZ6naacuWNGdZGuU0ZDwmgpUMUqIzMqFFRmge0R8QA
 ```
 
 ### Verifying JWTs
@@ -100,28 +100,29 @@ import { verifyCredential } from 'did-jwt-vc'
 const verifiedVC = await verifyCredential(vcJwt, resolver)
 console.log(verifiedVC)
 /*
-{ payload:
- { iat: 1569948545,
-   sub: '0x435df3eda57154cf8cf7926079881f2912f54db4',
-   nbf: 1562950282,
-   vc:
-    { '@context': [Array],
-      type: [Array],
-      credentialSubject: [Object] },
-   iss: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198' },
-doc:
- { '@context': 'https://w3id.org/did/v1',
-   id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-   publicKey: [ [Object] ],
-   authentication: [ [Object] ] },
-issuer: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-signer:
- { id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198#owner',
-   type: 'Secp256k1VerificationKey2018',
-   owner: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-   ethereumAddress: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198' },
-jwt:
- 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1Njk5NDg1NDUsInN1YiI6IjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJjcmVkZW50aWFsU3ViamVjdCI6eyJkZWdyZWUiOnsidHlwZSI6IkJhY2hlbG9yRGVncmVlIiwibmFtZSI6IkJhY2NhbGF1csOpYXQgZW4gbXVzaXF1ZXMgbnVtw6lyaXF1ZXMifX19LCJpc3MiOiJkaWQ6ZXRocjoweGYxMjMyZjg0MGYzYWQ3ZDIzZmNkYWE4NGQ2YzY2ZGFjMjRlZmIxOTgifQ.RynzSF4IqC85-DxRHwUyaagfxjDVV3_WnSl1sA2SYkYEvPLDrK6pgeXVkHCUDOdPiGlMuj2RDbt_yuIPtm1E7gE' }
+{
+  payload: {
+    iat: 1582547593,
+    sub: 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4',
+    nbf: 1562950282,
+    vc: { '@context': [Array], type: [Array], credentialSubject: [Object] },
+    iss: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+  },
+  doc: {
+    '@context': 'https://w3id.org/did/v1',
+    id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+    publicKey: [ [Object] ],
+    authentication: [ [Object] ]
+  },
+  issuer: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+  signer: {
+    id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198#owner',
+    type: 'Secp256k1VerificationKey2018',
+    owner: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+    ethereumAddress: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+  },
+  jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc1OTMsInN1YiI6ImRpZDpldGhyOjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJjcmVkZW50aWFsU3ViamVjdCI6eyJkZWdyZWUiOnsidHlwZSI6IkJhY2hlbG9yRGVncmVlIiwibmFtZSI6IkJhY2NhbGF1csOpYXQgZW4gbXVzaXF1ZXMgbnVtw6lyaXF1ZXMifX19LCJpc3MiOiJkaWQ6ZXRocjoweGYxMjMyZjg0MGYzYWQ3ZDIzZmNkYWE4NGQ2YzY2ZGFjMjRlZmIxOTgifQ.ljTuUW6bcsoBQksMo5l8eFImVdOA-ew993B4ret_p9A8j2DLQ60CQmqB14NnN5XxD0d_glLRs1Myc_LBJjnuNwE'
+}
  */
 ```
 
@@ -135,25 +136,30 @@ import { verifyPresentation } from 'did-jwt-vc'
 const verifiedVP = await verifyPresentation(vpJwt, resolver)
 console.log(verifiedVP)
 /*
-{ payload:
- { iat: 1569948545,
-   vp:
-    { '@context': [Array],
+{
+  payload: {
+    iat: 1582547593,
+    vp: {
+      '@context': [Array],
       type: [Array],
-      verifiableCredential: [Array] },
-   iss: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198' },
-doc:
- { '@context': 'https://w3id.org/did/v1',
-   id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-   publicKey: [ [Object] ],
-   authentication: [ [Object] ] },
-issuer: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-signer:
- { id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198#owner',
-   type: 'Secp256k1VerificationKey2018',
-   owner: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-   ethereumAddress: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198' },
-jwt:
- 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1Njk5NDg1NDUsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlsiZXlKMGVYQWlPaUpLVjFRaUxDSmhiR2NpT2lKRlV6STFOa3N0VWlKOS5leUpwWVhRaU9qRTFOams1TkRnMU5EVXNJbk4xWWlJNklqQjRORE0xWkdZelpXUmhOVGN4TlRSalpqaGpaamM1TWpZd056azRPREZtTWpreE1tWTFOR1JpTkNJc0ltNWlaaUk2TVRVMk1qazFNREk0TWl3aWRtTWlPbnNpUUdOdmJuUmxlSFFpT2xzaWFIUjBjSE02THk5M2QzY3Vkek11YjNKbkx6SXdNVGd2WTNKbFpHVnVkR2xoYkhNdmRqRWlYU3dpZEhsd1pTSTZXeUpXWlhKcFptbGhZbXhsUTNKbFpHVnVkR2xoYkNKZExDSmpjbVZrWlc1MGFXRnNVM1ZpYW1WamRDSTZleUprWldkeVpXVWlPbnNpZEhsd1pTSTZJa0poWTJobGJHOXlSR1ZuY21WbElpd2libUZ0WlNJNklrSmhZMk5oYkdGMWNzT3BZWFFnWlc0Z2JYVnphWEYxWlhNZ2JuVnR3Nmx5YVhGMVpYTWlmWDE5TENKcGMzTWlPaUprYVdRNlpYUm9jam93ZUdZeE1qTXlaamcwTUdZellXUTNaREl6Wm1Oa1lXRTROR1EyWXpZMlpHRmpNalJsWm1JeE9UZ2lmUS5SeW56U0Y0SXFDODUtRHhSSHdVeWFhZ2Z4akRWVjNfV25TbDFzQTJTWWtZRXZQTERySzZwZ2VYVmtIQ1VET2RQaUdsTXVqMlJEYnRfeXVJUHRtMUU3Z0UiXX0sImlzcyI6ImRpZDpldGhyOjB4ZjEyMzJmODQwZjNhZDdkMjNmY2RhYTg0ZDZjNjZkYWMyNGVmYjE5OCJ9.dB0xmcMFhiIGVZByd7Zz7Ocy0DU4XaDhIo-aUoC35Nff2ZwM_Y6qlW5cKs51nuf2Ogs0aMGgQ422L1Tzjm_WrgE' }
+      verifiableCredential: [Array]
+    },
+    iss: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+  },
+  doc: {
+    '@context': 'https://w3id.org/did/v1',
+    id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+    publicKey: [ [Object] ],
+    authentication: [ [Object] ]
+  },
+  issuer: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+  signer: {
+    id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198#owner',
+    type: 'Secp256k1VerificationKey2018',
+    owner: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+    ethereumAddress: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+  },
+  jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc1OTMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU9ESTFORGMxT1RNc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaVhTd2lkSGx3WlNJNld5SldaWEpwWm1saFlteGxRM0psWkdWdWRHbGhiQ0pkTENKamNtVmtaVzUwYVdGc1UzVmlhbVZqZENJNmV5SmtaV2R5WldVaU9uc2lkSGx3WlNJNklrSmhZMmhsYkc5eVJHVm5jbVZsSWl3aWJtRnRaU0k2SWtKaFkyTmhiR0YxY3NPcFlYUWdaVzRnYlhWemFYRjFaWE1nYm5WdHc2bHlhWEYxWlhNaWZYMTlMQ0pwYzNNaU9pSmthV1E2WlhSb2Nqb3dlR1l4TWpNeVpqZzBNR1l6WVdRM1pESXpabU5rWVdFNE5HUTJZelkyWkdGak1qUmxabUl4T1RnaWZRLmxqVHVVVzZiY3NvQlFrc01vNWw4ZUZJbVZkT0EtZXc5OTNCNHJldF9wOUE4ajJETFE2MENRbXFCMTRObk41WHhEMGRfZ2xMUnMxTXljX0xCSmpudU53RSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.cFyO-xPMdj0Hg1DaCkm30hzcVcYdnDdgyxXLZr9NAJNMUzZ6naacuWNGdZGuU0ZDwmgpUMUqIzMqFFRmge0R8QA'
+}
  */
 ```
