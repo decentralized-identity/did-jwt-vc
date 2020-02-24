@@ -1,12 +1,13 @@
 import EthrDID from 'ethr-did'
 import { createVerifiableCredential, createPresentation, verifyCredential, verifyPresentation } from '../index'
 import { verifyJWT, decodeJWT } from 'did-jwt'
-import { DEFAULT_TYPE, DEFAULT_CONTEXT } from '../constants'
+import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
   validateContext,
   validateJwtFormat,
   validateTimestamp,
-  validateType,
+  validateVcType,
+  validateVpType,
   validateCredentialSubject
 } from '../validators'
 import { Resolver } from 'did-resolver'
@@ -22,7 +23,8 @@ const mockValidateTimestamp = <jest.Mock<typeof validateTimestamp>>(
 )
 
 const mockValidateContext = <jest.Mock<typeof validateContext>>validateContext
-const mockValidateType = <jest.Mock<typeof validateType>>validateType
+const mockValidateVcType = <jest.Mock<typeof validateVcType>>validateVcType
+const mockValidateVpType = <jest.Mock<typeof validateVpType>>validateVpType
 const mockValidateCredentialSubject = <jest.Mock<typeof validateCredentialSubject>>validateCredentialSubject
 
 const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
@@ -49,7 +51,7 @@ const verifiableCredentialPayload = {
   nbf: 1562950282,
   vc: {
     '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
-    type: [DEFAULT_TYPE, EXTRA_TYPE_A],
+    type: [DEFAULT_VC_TYPE, EXTRA_TYPE_A],
     credentialSubject: {
       degree: {
         type: 'BachelorDegree',
@@ -61,7 +63,7 @@ const verifiableCredentialPayload = {
 const presentationPayload = {
   vp: {
     '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
-    type: [DEFAULT_TYPE],
+    type: [DEFAULT_VP_TYPE],
     verifiableCredential: [VC_JWT]
   }
 }
@@ -98,7 +100,7 @@ describe('createVerifiableCredential', () => {
     expect(mockValidateContext).toHaveBeenCalledWith(
       verifiableCredentialPayload.vc['@context']
     )
-    expect(mockValidateType).toHaveBeenCalledWith(
+    expect(mockValidateVcType).toHaveBeenCalledWith(
       verifiableCredentialPayload.vc.type
     )
     expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialPayload.vc.credentialSubject)
@@ -134,7 +136,7 @@ describe('createPresentation', () => {
     expect(mockValidateContext).toHaveBeenCalledWith(
       presentationPayload.vp['@context']
     )
-    expect(mockValidateType).toHaveBeenCalledWith(presentationPayload.vp.type)
+    expect(mockValidateVpType).toHaveBeenCalledWith(presentationPayload.vp.type)
     for (const vc of presentationPayload.vp.verifiableCredential) {
       expect(mockValidateJwtFormat).toHaveBeenCalledWith(vc)
     }
