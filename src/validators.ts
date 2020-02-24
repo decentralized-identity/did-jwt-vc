@@ -1,7 +1,8 @@
 import {
   DID_FORMAT,
   DEFAULT_CONTEXT,
-  DEFAULT_TYPE,
+  DEFAULT_VC_TYPE,
+  DEFAULT_VP_TYPE,
   JWT_FORMAT
 } from './constants'
 import { CredentialSubject } from './types'
@@ -33,9 +34,15 @@ export function validateContext(value: string[]): void {
   }
 }
 
-export function validateType(value: string[]): void {
-  if (value.length < 1 || !value.includes(DEFAULT_TYPE)) {
-    throw new TypeError(`type is missing default "${DEFAULT_TYPE}"`)
+export function validateVcType(value: string[]): void {
+  if (value.length < 1 || !value.includes(DEFAULT_VC_TYPE)) {
+    throw new TypeError(`type is missing default "${DEFAULT_VC_TYPE}"`)
+  }
+}
+
+export function validateVpType(value: string[]): void {
+  if (value.length < 1 || !value.includes(DEFAULT_VP_TYPE)) {
+    throw new TypeError(`type is missing default "${DEFAULT_VP_TYPE}"`)
   }
 }
 
