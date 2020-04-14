@@ -87,8 +87,9 @@ Create a `Resolver` using [did-resolver](https://github.com/decentralized-identi
 import { Resolver } from 'did-resolver'
 import { getResolver } from 'ethr-did-resolver'
 
+// see also https://github.com/decentralized-identity/ethr-did-resolver#multi-network-configuration
 const providerConfig = {
-  rpcUrl: 'https://rinkeby.infura.io/ethr-did',
+  rpcUrl: 'https://mainnet.infura.io/v3/<YOUR Infura.io PROJECT ID>',
   registry: '0xdca7ef03e98e0dc2b855be647c39abe984fcf21b'
 }
 const resolver = new Resolver(getResolver(providerConfig))
