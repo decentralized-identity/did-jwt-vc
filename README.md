@@ -87,7 +87,11 @@ Create a `Resolver` using [did-resolver](https://github.com/decentralized-identi
 import { Resolver } from 'did-resolver'
 import { getResolver } from 'ethr-did-resolver'
 
-const resolver = new Resolver(getResolver())
+const providerConfig = {
+  rpcUrl: 'https://rinkeby.infura.io/ethr-did',
+  registry: '0xdca7ef03e98e0dc2b855be647c39abe984fcf21b'
+}
+const resolver = new Resolver(getResolver(providerConfig))
 ```
 
 #### Verifying a Verifiable Credential
