@@ -26,7 +26,7 @@ export async function createVerifiableCredential(
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
-    alg: JWT_ALG
+    alg: issuer.alg || JWT_ALG
   })
 }
 
@@ -38,7 +38,7 @@ export async function createPresentation(
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
-    alg: JWT_ALG
+    alg: issuer.alg || JWT_ALG
   })
 }
 
