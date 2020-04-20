@@ -11,7 +11,7 @@ import { DIDDocument } from 'did-resolver'
 export {
   Issuer,
   VerifiableCredentialPayload,
-  PresentationPayload,
+  PresentationPayload
 }
 
 interface Resolvable {

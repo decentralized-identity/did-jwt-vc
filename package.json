@@ -15,9 +15,14 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "microbundle"
+    "build": "npm run format && npm test && npm run build:js",
+    "build:js": "microbundle",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint"
   },
-  "author": "",
+  "author": "mi-xu",
   "license": "ISC",
   "dependencies": {
     "did-jwt": "^3.0.0"
