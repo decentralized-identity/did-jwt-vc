@@ -15,12 +15,8 @@ import { getResolver } from 'ethr-did-resolver'
 
 jest.mock('../validators')
 
-const mockValidateJwtFormat = <jest.Mock<typeof validateJwtFormat>>(
-  validateJwtFormat
-)
-const mockValidateTimestamp = <jest.Mock<typeof validateTimestamp>>(
-  validateTimestamp
-)
+const mockValidateJwtFormat = <jest.Mock<typeof validateJwtFormat>>validateJwtFormat
+const mockValidateTimestamp = <jest.Mock<typeof validateTimestamp>>validateTimestamp
 
 const mockValidateContext = <jest.Mock<typeof validateContext>>validateContext
 const mockValidateVcType = <jest.Mock<typeof validateVcType>>validateVcType
@@ -75,42 +71,27 @@ beforeEach(() => {
 
 describe('createVerifiableCredential', () => {
   it('creates a valid Verifiable Credential JWT with required fields', async () => {
-    const vcJwt = await createVerifiableCredential(
-      verifiableCredentialPayload,
-      did
-    )
+    const vcJwt = await createVerifiableCredential(verifiableCredentialPayload, did)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
   it('creates a valid Verifiable Credential JWT with extra optional fields', async () => {
-    const vcJwt = await createVerifiableCredential(
-      { ...verifiableCredentialPayload, extra: 42 },
-      did
-    )
+    const vcJwt = await createVerifiableCredential({ ...verifiableCredentialPayload, extra: 42 }, did)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
   it('calls functions to validate required fields', async () => {
     await createVerifiableCredential(verifiableCredentialPayload, did)
-    expect(mockValidateTimestamp).toHaveBeenCalledWith(
-      verifiableCredentialPayload.nbf
-    )
-    expect(mockValidateContext).toHaveBeenCalledWith(
-      verifiableCredentialPayload.vc['@context']
-    )
-    expect(mockValidateVcType).toHaveBeenCalledWith(
-      verifiableCredentialPayload.vc.type
-    )
+    expect(mockValidateTimestamp).toHaveBeenCalledWith(verifiableCredentialPayload.nbf)
+    expect(mockValidateContext).toHaveBeenCalledWith(verifiableCredentialPayload.vc['@context'])
+    expect(mockValidateVcType).toHaveBeenCalledWith(verifiableCredentialPayload.vc.type)
     expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialPayload.vc.credentialSubject)
   })
   it('calls functions to validate optional fields if they are present', async () => {
     const timestamp = Math.floor(new Date().getTime())
-    await createVerifiableCredential(
-      { ...verifiableCredentialPayload, exp: timestamp },
-      did
-    )
+    await createVerifiableCredential({ ...verifiableCredentialPayload, exp: timestamp }, did)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
   })
 })
@@ -123,19 +104,14 @@ describe('createPresentation', () => {
     expect(payload).toMatchSnapshot()
   })
   it('creates a valid Presentation JWT with extra optional fields', async () => {
-    const presentationJwt = await createPresentation(
-      { ...presentationPayload, extra: 42 },
-      did
-    )
+    const presentationJwt = await createPresentation({ ...presentationPayload, extra: 42 }, did)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
   })
   it('calls functions to validate required fields', async () => {
     await createPresentation(presentationPayload, did)
-    expect(mockValidateContext).toHaveBeenCalledWith(
-      presentationPayload.vp['@context']
-    )
+    expect(mockValidateContext).toHaveBeenCalledWith(presentationPayload.vp['@context'])
     expect(mockValidateVpType).toHaveBeenCalledWith(presentationPayload.vp.type)
     for (const vc of presentationPayload.vp.verifiableCredential) {
       expect(mockValidateJwtFormat).toHaveBeenCalledWith(vc)
@@ -177,7 +153,8 @@ describe('verifyCredential', () => {
 
   it('verifies and converts a legacy format attestation into a Verifiable Credential', async () => {
     // tslint:disable-next-line: max-line-length
-    const LEGACY_FORMAT_ATTESTATION = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
+    const LEGACY_FORMAT_ATTESTATION =
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
     const verified = await verifyCredential(LEGACY_FORMAT_ATTESTATION, resolver)
     expect(verified.payload.vc).toBeDefined()
   })

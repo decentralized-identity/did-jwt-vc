@@ -1,10 +1,4 @@
-import {
-  DID_FORMAT,
-  DEFAULT_CONTEXT,
-  DEFAULT_VC_TYPE,
-  DEFAULT_VP_TYPE,
-  JWT_FORMAT
-} from './constants'
+import { DID_FORMAT, DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './constants'
 import { CredentialSubject } from './types'
 
 export function validateJwtFormat(value: string): void {
@@ -28,9 +22,7 @@ export function validateTimestamp(value: number): void {
 
 export function validateContext(value: string[]): void {
   if (value.length < 1 || !value.includes(DEFAULT_CONTEXT)) {
-    throw new TypeError(
-      `@context is missing default context "${DEFAULT_CONTEXT}"`
-    )
+    throw new TypeError(`@context is missing default context "${DEFAULT_CONTEXT}"`)
   }
 }
 
