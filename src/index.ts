@@ -1,18 +1,10 @@
 import { createJWT, verifyJWT } from 'did-jwt'
 import { JWT_ALG, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 import * as validators from './validators'
-import {
-  VerifiableCredentialPayload,
-  Issuer,
-  PresentationPayload
-} from './types'
+import { VerifiableCredentialPayload, Issuer, PresentationPayload } from './types'
 import { DIDDocument } from 'did-resolver'
 
-export {
-  Issuer,
-  VerifiableCredentialPayload,
-  PresentationPayload
-}
+export { Issuer, VerifiableCredentialPayload, PresentationPayload }
 
 interface Resolvable {
   resolve: (did: string) => Promise<DIDDocument | null>
@@ -30,10 +22,7 @@ export async function createVerifiableCredential(
   })
 }
 
-export async function createPresentation(
-  payload: PresentationPayload,
-  issuer: Issuer
-): Promise<string> {
+export async function createPresentation(payload: PresentationPayload, issuer: Issuer): Promise<string> {
   validatePresentationAttributes(payload)
   return createJWT(payload, {
     issuer: issuer.did,
@@ -42,9 +31,7 @@ export async function createPresentation(
   })
 }
 
-export function validateVerifiableCredentialAttributes(
-  payload: VerifiableCredentialPayload
-): void {
+export function validateVerifiableCredentialAttributes(payload: VerifiableCredentialPayload): void {
   validators.validateContext(payload.vc['@context'])
   validators.validateVcType(payload.vc.type)
   validators.validateCredentialSubject(payload.vc.credentialSubject)
@@ -71,7 +58,7 @@ function isLegacyAttestationFormat(payload: any): boolean {
 
 function attestationToVcFormat(payload: any): VerifiableCredentialPayload {
   const { iat, nbf, claim, vc, ...rest } = payload
-  const result:VerifiableCredentialPayload = {
+  const result: VerifiableCredentialPayload = {
     ...rest,
     nbf: nbf ? nbf : iat,
     vc: {
@@ -86,7 +73,7 @@ function attestationToVcFormat(payload: any): VerifiableCredentialPayload {
 
 export async function verifyCredential(vc: string, resolver: Resolvable): Promise<any> {
   const verified = await verifyJWT(vc, { resolver })
-  if(isLegacyAttestationFormat(verified.payload)) {
+  if (isLegacyAttestationFormat(verified.payload)) {
     verified.payload = attestationToVcFormat(verified.payload)
   }
   validateVerifiableCredentialAttributes(verified.payload)

@@ -37,6 +37,6 @@ export interface PresentationPayload {
 
 export interface Issuer {
   did: string
-  signer: Signer,
+  signer: Signer
   alg: string
 }

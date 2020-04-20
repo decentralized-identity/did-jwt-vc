@@ -16,19 +16,13 @@ export const VC_JWT =
 describe('validators', () => {
   describe('validateTimestamp', () => {
     it('does not throw if the value is a valid unix timestamp in seconds', () => {
-      expect(() =>
-        validators.validateTimestamp(Math.floor(new Date().getTime() / 1000))
-      ).not.toThrow()
+      expect(() => validators.validateTimestamp(Math.floor(new Date().getTime() / 1000))).not.toThrow()
     })
     it('throws a TypeError if the value is a millisecond timestamp', () => {
-      expect(() => validators.validateTimestamp(new Date().getTime())).toThrow(
-        TypeError
-      )
+      expect(() => validators.validateTimestamp(new Date().getTime())).toThrow(TypeError)
     })
     it('throws a TypeError if the value is not an integer', () => {
-      expect(() =>
-        validators.validateTimestamp(new Date().getTime() / 1000)
-      ).toThrow(TypeError)
+      expect(() => validators.validateTimestamp(new Date().getTime() / 1000)).toThrow(TypeError)
     })
   })
 
@@ -37,21 +31,13 @@ describe('validators', () => {
       expect(() => validators.validateContext([DEFAULT_CONTEXT])).not.toThrow()
     })
     it('does not throw if the value contains the default context and some user-defined ones', () => {
-      expect(() =>
-        validators.validateContext([
-          DEFAULT_CONTEXT,
-          EXTRA_CONTEXT_A,
-          EXTRA_CONTEXT_B
-        ])
-      ).not.toThrow()
+      expect(() => validators.validateContext([DEFAULT_CONTEXT, EXTRA_CONTEXT_A, EXTRA_CONTEXT_B])).not.toThrow()
     })
     it('throws a TypeError the value contains no contexts', () => {
       expect(() => validators.validateContext([])).toThrow(TypeError)
     })
     it('throws a TypeError the value is missing the default context', () => {
-      expect(() =>
-        validators.validateContext([EXTRA_CONTEXT_A, EXTRA_CONTEXT_B])
-      ).toThrow(TypeError)
+      expect(() => validators.validateContext([EXTRA_CONTEXT_A, EXTRA_CONTEXT_B])).toThrow(TypeError)
     })
   })
 
@@ -60,17 +46,13 @@ describe('validators', () => {
       expect(() => validators.validateVcType([DEFAULT_VC_TYPE])).not.toThrow()
     })
     it('does not throw if the value contains the default type and some user-defined ones', () => {
-      expect(() =>
-        validators.validateVcType([DEFAULT_VC_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])
-      ).not.toThrow()
+      expect(() => validators.validateVcType([DEFAULT_VC_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])).not.toThrow()
     })
     it('throws a TypeError the value contains no types', () => {
       expect(() => validators.validateVcType([])).toThrow(TypeError)
     })
     it('throws a TypeError the value is missing the default type', () => {
-      expect(() =>
-        validators.validateVcType([EXTRA_TYPE_A, EXTRA_TYPE_B])
-      ).toThrow(TypeError)
+      expect(() => validators.validateVcType([EXTRA_TYPE_A, EXTRA_TYPE_B])).toThrow(TypeError)
     })
   })
 
@@ -79,17 +61,13 @@ describe('validators', () => {
       expect(() => validators.validateVpType([DEFAULT_VP_TYPE])).not.toThrow()
     })
     it('does not throw if the value contains the default type and some user-defined ones', () => {
-      expect(() =>
-        validators.validateVpType([DEFAULT_VP_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])
-      ).not.toThrow()
+      expect(() => validators.validateVpType([DEFAULT_VP_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])).not.toThrow()
     })
     it('throws a TypeError the value contains no types', () => {
       expect(() => validators.validateVpType([])).toThrow(TypeError)
     })
     it('throws a TypeError the value is missing the default type', () => {
-      expect(() =>
-        validators.validateVpType([EXTRA_TYPE_A, EXTRA_TYPE_B])
-      ).toThrow(TypeError)
+      expect(() => validators.validateVpType([EXTRA_TYPE_A, EXTRA_TYPE_B])).toThrow(TypeError)
     })
   })
 
@@ -104,9 +82,7 @@ describe('validators', () => {
 
   describe('validateCredentialSubject', () => {
     it('does not throw if the value is an object with at least one attribute', () => {
-      expect(() =>
-        validators.validateCredentialSubject({ name: 'test' })
-      ).not.toThrow()
+      expect(() => validators.validateCredentialSubject({ name: 'test' })).not.toThrow()
     })
     it('throws a TypeError if the value is an object with no attributes', () => {
       expect(() => validators.validateCredentialSubject({})).toThrow(TypeError)
