@@ -15,7 +15,8 @@
   ],
   "scripts": {
     "test": "jest",
-    "build": "microbundle"
+    "build": "microbundle",
+    "preinstall": "npm run build"
   },
   "author": "",
   "license": "ISC",
