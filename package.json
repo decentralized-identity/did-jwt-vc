@@ -19,6 +19,8 @@
     "build:js": "microbundle",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
+    "release": "semantic-release --debug",
+    "test-with-coverage": "jest --coverage && codecov",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint"
   },
@@ -52,8 +54,11 @@
     "testEnvironment": "node"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/git": "^9.0.0",
     "@types/faker": "^4.1.11",
     "@types/jest": "^24.9.1",
+    "codecov": "^3.6.5",
     "did-resolver": "^1.1.0",
     "ethr-did": "^1.1.0",
     "ethr-did-resolver": "^1.0.3",
@@ -61,6 +66,7 @@
     "jest": "^24.9.0",
     "microbundle": "^0.11.0",
     "prettier": "^1.19.1",
+    "semantic-release": "^17.0.7",
     "ts-jest": "^24.3.0",
     "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
