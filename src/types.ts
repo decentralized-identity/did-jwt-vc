@@ -4,10 +4,16 @@ export interface CredentialSubject {
   [x: string]: any
 }
 
+export interface CredentialStatus {
+  id: string
+  type: string
+}
+
 export interface VC {
   '@context': string[]
   type: string[]
   credentialSubject: CredentialSubject
+  credentialStatus?: CredentialStatus
 }
 
 export interface VerifiableCredentialPayload {
