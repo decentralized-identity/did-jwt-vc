@@ -13,7 +13,6 @@ export interface VC {
   '@context': string[]
   type: string[]
   credentialSubject: CredentialSubject
-  credentialStatus?: CredentialStatus
 }
 
 export interface VerifiableCredentialPayload {
