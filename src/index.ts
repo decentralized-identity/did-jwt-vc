@@ -7,7 +7,7 @@ import { DIDDocument } from 'did-resolver'
 export { Issuer, VerifiableCredentialPayload, PresentationPayload }
 
 interface Resolvable {
-  resolve: (did: string) => Promise<DIDDocument | null>
+  resolve: (did: string) => Promise<DIDDocument>
 }
 
 export async function createVerifiableCredential(
