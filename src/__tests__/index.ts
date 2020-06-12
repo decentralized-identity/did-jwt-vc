@@ -10,8 +10,7 @@ import {
   validateVpType,
   validateCredentialSubject
 } from '../validators'
-import { Resolver } from 'did-resolver'
-import { getResolver } from 'ethr-did-resolver'
+import { DIDDocument } from 'did-resolver'
 
 jest.mock('../validators')
 
@@ -63,7 +62,21 @@ const presentationPayload = {
     verifiableCredential: [VC_JWT]
   }
 }
-const resolver = new Resolver(getResolver())
+const resolver = {
+  resolve: (did: string) =>
+    Promise.resolve({
+      '@context': 'https://w3id.org/did/v1',
+      id: `${did}`,
+      publicKey: [
+        {
+          id: `${did}#owner`,
+          type: 'Secp256k1VerificationKey2018',
+          ethereumAddress: `${did.substring(9)}`,
+          owner: did
+        }
+      ]
+    } as DIDDocument)
+}
 
 beforeEach(() => {
   jest.resetAllMocks()

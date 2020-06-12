@@ -4,7 +4,6 @@ esm
 dist
 .vscode/settings.json
 coverage
-yarn.lock
 
 *.log
 

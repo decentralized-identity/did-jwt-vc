@@ -17,10 +17,10 @@
     "test": "jest",
     "build": "npm run format && npm test && npm run build:js",
     "build:js": "microbundle",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "release": "semantic-release --debug",
-    "test-with-coverage": "jest --coverage && codecov",
+    "test:ci": "jest --coverage && codecov",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint"
   },
@@ -57,20 +57,22 @@
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
     "@types/faker": "^4.1.11",
-    "@types/jest": "^24.9.1",
+    "@types/jest": "^26.0.0",
     "codecov": "^3.6.5",
-    "did-resolver": "^1.1.0",
+    "did-resolver": "^2.0.1",
     "ethr-did": "^1.1.0",
-    "ethr-did-resolver": "^1.0.3",
     "faker": "^4.1.0",
-    "jest": "^24.9.0",
-    "microbundle": "^0.11.0",
-    "prettier": "^1.19.1",
+    "jest": "^26.0.1",
+    "microbundle": "^0.12.0",
+    "prettier": "^2.0.5",
     "semantic-release": "^17.0.7",
-    "ts-jest": "^24.3.0",
-    "tslint": "^5.20.1",
+    "ts-jest": "^26.1.0",
+    "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.8.3"
+  },
+  "resolutions": {
+    "@babel/core": "7.10.2"
   }
 }
