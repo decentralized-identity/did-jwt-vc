@@ -40,6 +40,8 @@ export interface JwtPresentationPayload {
   [x: string]: any
 }
 
+export type JWT = string
+
 export interface Issuer {
   did: string
   signer: Signer

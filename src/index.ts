@@ -1,7 +1,7 @@
 import { createJWT, verifyJWT } from 'did-jwt'
 import { JWT_ALG, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 import * as validators from './validators'
-import { JwtVerifiableCredentialPayload, Issuer, JwtPresentationPayload } from './types'
+import { JwtVerifiableCredentialPayload, Issuer, JwtPresentationPayload, JWT } from './types'
 import { DIDDocument } from 'did-resolver'
 
 export { Issuer, JwtVerifiableCredentialPayload as VerifiableCredentialPayload, JwtPresentationPayload as PresentationPayload }
@@ -10,11 +10,11 @@ interface Resolvable {
   resolve: (did: string) => Promise<DIDDocument>
 }
 
-export async function createVerifiableCredential(
+export async function createVerifiableCredentialJwt(
   payload: JwtVerifiableCredentialPayload,
   issuer: Issuer
-): Promise<string> {
-  validateVerifiableCredentialAttributes(payload)
+): Promise<JWT> {
+  validateJwtVerifiableCredentialPayload(payload)
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
@@ -22,8 +22,8 @@ export async function createVerifiableCredential(
   })
 }
 
-export async function createPresentation(payload: JwtPresentationPayload, issuer: Issuer): Promise<string> {
-  validatePresentationAttributes(payload)
+export async function createPresentationJwt(payload: JwtPresentationPayload, issuer: Issuer): Promise<JWT> {
+  validateJwtPresentationPayload(payload)
   return createJWT(payload, {
     issuer: issuer.did,
     signer: issuer.signer,
@@ -31,7 +31,7 @@ export async function createPresentation(payload: JwtPresentationPayload, issuer
   })
 }
 
-export function validateVerifiableCredentialAttributes(payload: JwtVerifiableCredentialPayload): void {
+export function validateJwtVerifiableCredentialPayload(payload: JwtVerifiableCredentialPayload): void {
   validators.validateContext(payload.vc['@context'])
   validators.validateVcType(payload.vc.type)
   validators.validateCredentialSubject(payload.vc.credentialSubject)
@@ -39,7 +39,7 @@ export function validateVerifiableCredentialAttributes(payload: JwtVerifiableCre
   if (payload.exp) validators.validateTimestamp(payload.exp)
 }
 
-export function validatePresentationAttributes(payload: JwtPresentationPayload): void {
+export function validateJwtPresentationPayload(payload: JwtPresentationPayload): void {
   validators.validateContext(payload.vp['@context'])
   validators.validateVpType(payload.vp.type)
   if (payload.vp.verifiableCredential.length < 1) {
@@ -71,17 +71,17 @@ function attestationToVcFormat(payload: any): JwtVerifiableCredentialPayload {
   return result
 }
 
-export async function verifyCredential(vc: string, resolver: Resolvable): Promise<any> {
+export async function verifyCredential(vc: JWT, resolver: Resolvable): Promise<any> {
   const verified = await verifyJWT(vc, { resolver })
   if (isLegacyAttestationFormat(verified.payload)) {
     verified.payload = attestationToVcFormat(verified.payload)
   }
-  validateVerifiableCredentialAttributes(verified.payload)
+  validateJwtVerifiableCredentialPayload(verified.payload)
   return verified
 }
 
-export async function verifyPresentation(presentation: string, resolver: Resolvable): Promise<any> {
+export async function verifyPresentation(presentation: JWT, resolver: Resolvable): Promise<any> {
   const verified = await verifyJWT(presentation, { resolver })
-  validatePresentationAttributes(verified.payload)
+  validateJwtPresentationPayload(verified.payload)
   return verified
 }
