@@ -1,5 +1,5 @@
 import EthrDID from 'ethr-did'
-import { createVerifiableCredential, createPresentation, verifyCredential, verifyPresentation } from '../index'
+import { createVerifiableCredentialJwt, createPresentationJwt, verifyCredential, verifyPresentation } from '../index'
 import { verifyJWT, decodeJWT } from 'did-jwt'
 import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
@@ -84,19 +84,19 @@ beforeEach(() => {
 
 describe('createVerifiableCredential', () => {
   it('creates a valid Verifiable Credential JWT with required fields', async () => {
-    const vcJwt = await createVerifiableCredential(verifiableCredentialPayload, did)
+    const vcJwt = await createVerifiableCredentialJwt(verifiableCredentialPayload, did)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
   it('creates a valid Verifiable Credential JWT with extra optional fields', async () => {
-    const vcJwt = await createVerifiableCredential({ ...verifiableCredentialPayload, extra: 42 }, did)
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, did)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
   it('calls functions to validate required fields', async () => {
-    await createVerifiableCredential(verifiableCredentialPayload, did)
+    await createVerifiableCredentialJwt(verifiableCredentialPayload, did)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(verifiableCredentialPayload.nbf)
     expect(mockValidateContext).toHaveBeenCalledWith(verifiableCredentialPayload.vc['@context'])
     expect(mockValidateVcType).toHaveBeenCalledWith(verifiableCredentialPayload.vc.type)
@@ -104,26 +104,26 @@ describe('createVerifiableCredential', () => {
   })
   it('calls functions to validate optional fields if they are present', async () => {
     const timestamp = Math.floor(new Date().getTime())
-    await createVerifiableCredential({ ...verifiableCredentialPayload, exp: timestamp }, did)
+    await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, exp: timestamp }, did)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
   })
 })
 
 describe('createPresentation', () => {
   it('creates a valid Presentation JWT with required fields', async () => {
-    const presentationJwt = await createPresentation(presentationPayload, did)
+    const presentationJwt = await createPresentationJwt(presentationPayload, did)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
   })
   it('creates a valid Presentation JWT with extra optional fields', async () => {
-    const presentationJwt = await createPresentation({ ...presentationPayload, extra: 42 }, did)
+    const presentationJwt = await createPresentationJwt({ ...presentationPayload, extra: 42 }, did)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
   })
   it('calls functions to validate required fields', async () => {
-    await createPresentation(presentationPayload, did)
+    await createPresentationJwt(presentationPayload, did)
     expect(mockValidateContext).toHaveBeenCalledWith(presentationPayload.vp['@context'])
     expect(mockValidateVpType).toHaveBeenCalledWith(presentationPayload.vp.type)
     for (const vc of presentationPayload.vp.verifiableCredential) {
@@ -132,7 +132,7 @@ describe('createPresentation', () => {
   })
   it('throws a TypeError if vp.verifiableCredential is empty', async () => {
     await expect(
-      createPresentation(
+      createPresentationJwt(
         {
           ...presentationPayload,
           vp: {
@@ -147,7 +147,7 @@ describe('createPresentation', () => {
   })
   it('calls functions to validate optional fields if they are present', async () => {
     const timestamp = Math.floor(new Date().getTime())
-    await createPresentation(
+    await createPresentationJwt(
       {
         ...presentationPayload,
         exp: timestamp
