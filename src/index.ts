@@ -1,17 +1,17 @@
 import { createJWT, verifyJWT } from 'did-jwt'
 import { JWT_ALG, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 import * as validators from './validators'
-import { VerifiableCredentialPayload, Issuer, PresentationPayload } from './types'
+import { JwtVerifiableCredentialPayload, Issuer, JwtPresentationPayload } from './types'
 import { DIDDocument } from 'did-resolver'
 
-export { Issuer, VerifiableCredentialPayload, PresentationPayload }
+export { Issuer, JwtVerifiableCredentialPayload as VerifiableCredentialPayload, JwtPresentationPayload as PresentationPayload }
 
 interface Resolvable {
   resolve: (did: string) => Promise<DIDDocument>
 }
 
 export async function createVerifiableCredential(
-  payload: VerifiableCredentialPayload,
+  payload: JwtVerifiableCredentialPayload,
   issuer: Issuer
 ): Promise<string> {
   validateVerifiableCredentialAttributes(payload)
@@ -22,7 +22,7 @@ export async function createVerifiableCredential(
   })
 }
 
-export async function createPresentation(payload: PresentationPayload, issuer: Issuer): Promise<string> {
+export async function createPresentation(payload: JwtPresentationPayload, issuer: Issuer): Promise<string> {
   validatePresentationAttributes(payload)
   return createJWT(payload, {
     issuer: issuer.did,
@@ -31,7 +31,7 @@ export async function createPresentation(payload: PresentationPayload, issuer: I
   })
 }
 
-export function validateVerifiableCredentialAttributes(payload: VerifiableCredentialPayload): void {
+export function validateVerifiableCredentialAttributes(payload: JwtVerifiableCredentialPayload): void {
   validators.validateContext(payload.vc['@context'])
   validators.validateVcType(payload.vc.type)
   validators.validateCredentialSubject(payload.vc.credentialSubject)
@@ -39,7 +39,7 @@ export function validateVerifiableCredentialAttributes(payload: VerifiableCreden
   if (payload.exp) validators.validateTimestamp(payload.exp)
 }
 
-export function validatePresentationAttributes(payload: PresentationPayload): void {
+export function validatePresentationAttributes(payload: JwtPresentationPayload): void {
   validators.validateContext(payload.vp['@context'])
   validators.validateVpType(payload.vp.type)
   if (payload.vp.verifiableCredential.length < 1) {
@@ -56,9 +56,9 @@ function isLegacyAttestationFormat(payload: any): boolean {
   return payload instanceof Object && payload.sub && payload.iss && payload.claim && payload.iat
 }
 
-function attestationToVcFormat(payload: any): VerifiableCredentialPayload {
+function attestationToVcFormat(payload: any): JwtVerifiableCredentialPayload {
   const { iat, nbf, claim, vc, ...rest } = payload
-  const result: VerifiableCredentialPayload = {
+  const result: JwtVerifiableCredentialPayload = {
     ...rest,
     nbf: nbf ? nbf : iat,
     vc: {
