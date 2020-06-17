@@ -36,18 +36,20 @@ export interface JwtPresentationPayload {
   [x: string]: any
 }
 
+export type IssuerType = { id: string; [x: string]: any } | string
+export type DateType = string | Date
 /**
  * used as input when creating Verifiable Credentials
  */
-export interface CredentialPayload {
+export interface CredentialPayloadInput {
   '@context': string[]
   id?: string
   type: string[]
-  issuer: string
-  issuanceDate: Date | string
-  expirationDate?: Date | string
+  issuer: IssuerType
+  issuanceDate: DateType
+  expirationDate?: DateType
   credentialSubject: {
-    id: string,
+    id: string
     [x: string]: any
   }
   credentialStatus?: CredentialStatus
@@ -56,8 +58,24 @@ export interface CredentialPayload {
 }
 
 /**
-* used as input when creating Verifiable Presentations
-*/
+ * This is meant to reflect unambiguous types for the properties in `CredentialPayloadInput`
+ */
+interface NarrowDefinitions {
+  issuer: Exclude<IssuerType, string>
+  issuanceDate: string
+  expirationDate?: string
+}
+
+/**
+ * Replaces the matching property types of T with the ones in U
+ */
+type Replace<T, U> = Omit<T, keyof U> & U
+
+export type Credential = Replace<CredentialPayloadInput, NarrowDefinitions>
+
+/**
+ * used as input when creating Verifiable Presentations
+ */
 export interface PresentationPayload {
   '@context': string[]
   type: string[]
@@ -71,11 +89,11 @@ export interface Proof {
   [x: string]: any
 }
 
-export type Verifiable<T> = T & { proof: Proof }
+export type Verifiable<T> = Readonly<T> & { proof: Proof }
 export type JWT = string
 
 export type VerifiablePresentation = Verifiable<PresentationPayload> | JWT
-export type VerifiableCredential = Verifiable<CredentialPayload> | JWT
+export type VerifiableCredential = Verifiable<CredentialPayloadInput> | JWT
 
 export interface Issuer {
   did: string

@@ -4,7 +4,11 @@ import * as validators from './validators'
 import { JwtVerifiableCredentialPayload, Issuer, JwtPresentationPayload, JWT } from './types'
 import { DIDDocument } from 'did-resolver'
 
-export { Issuer, JwtVerifiableCredentialPayload as VerifiableCredentialPayload, JwtPresentationPayload as PresentationPayload }
+export {
+  Issuer,
+  JwtVerifiableCredentialPayload as VerifiableCredentialPayload,
+  JwtPresentationPayload as PresentationPayload
+}
 
 interface Resolvable {
   resolve: (did: string) => Promise<DIDDocument>
