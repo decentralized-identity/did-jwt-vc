@@ -1,5 +1,5 @@
 import { DID_FORMAT, DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './constants'
-import { CredentialSubject } from './types'
+import { JwtCredentialSubject } from './types'
 
 export function validateJwtFormat(value: string): void {
   if (!value.match(JWT_FORMAT)) {
@@ -38,7 +38,7 @@ export function validateVpType(value: string[]): void {
   }
 }
 
-export function validateCredentialSubject(value: CredentialSubject): void {
+export function validateCredentialSubject(value: JwtCredentialSubject): void {
   if (Object.keys(value).length === 0) {
     throw new TypeError('credentialSubject must not be empty')
   }

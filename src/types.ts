@@ -1,6 +1,6 @@
 import { Signer } from 'did-jwt'
 
-export interface CredentialSubject {
+export interface JwtCredentialSubject {
   [x: string]: any
 }
 
@@ -12,10 +12,10 @@ export interface CredentialStatus {
 export interface VC {
   '@context': string[]
   type: string[]
-  credentialSubject: CredentialSubject
+  credentialSubject: JwtCredentialSubject
 }
 
-export interface VerifiableCredentialPayload {
+export interface JwtVerifiableCredentialPayload {
   sub: string
   vc: VC
   nbf?: number
@@ -31,7 +31,7 @@ export interface VP {
   verifiableCredential: string[]
 }
 
-export interface PresentationPayload {
+export interface JwtPresentationPayload {
   vp: VP
   aud?: string
   nbf?: number
