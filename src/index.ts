@@ -1,13 +1,15 @@
 import { createJWT, verifyJWT } from 'did-jwt'
 import { JWT_ALG, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 import * as validators from './validators'
-import { JwtVerifiableCredentialPayload, Issuer, JwtPresentationPayload, JWT } from './types'
+import { JwtCredentialPayload, Issuer, JwtPresentationPayload, JWT, VerifiablePresentation, VerifiableCredential } from './types'
 import { DIDDocument } from 'did-resolver'
 
 export {
   Issuer,
-  JwtVerifiableCredentialPayload as VerifiableCredentialPayload,
-  JwtPresentationPayload as PresentationPayload
+  JwtCredentialPayload,
+  JwtPresentationPayload,
+  VerifiableCredential,
+  VerifiablePresentation
 }
 
 interface Resolvable {
@@ -15,7 +17,7 @@ interface Resolvable {
 }
 
 export async function createVerifiableCredentialJwt(
-  payload: JwtVerifiableCredentialPayload,
+  payload: JwtCredentialPayload,
   issuer: Issuer
 ): Promise<JWT> {
   validateJwtVerifiableCredentialPayload(payload)
@@ -35,7 +37,7 @@ export async function createPresentationJwt(payload: JwtPresentationPayload, iss
   })
 }
 
-export function validateJwtVerifiableCredentialPayload(payload: JwtVerifiableCredentialPayload): void {
+export function validateJwtVerifiableCredentialPayload(payload: JwtCredentialPayload): void {
   validators.validateContext(payload.vc['@context'])
   validators.validateVcType(payload.vc.type)
   validators.validateCredentialSubject(payload.vc.credentialSubject)
@@ -60,9 +62,9 @@ function isLegacyAttestationFormat(payload: any): boolean {
   return payload instanceof Object && payload.sub && payload.iss && payload.claim && payload.iat
 }
 
-function attestationToVcFormat(payload: any): JwtVerifiableCredentialPayload {
+function attestationToVcFormat(payload: any): JwtCredentialPayload {
   const { iat, nbf, claim, vc, ...rest } = payload
-  const result: JwtVerifiableCredentialPayload = {
+  const result: JwtCredentialPayload = {
     ...rest,
     nbf: nbf ? nbf : iat,
     vc: {
