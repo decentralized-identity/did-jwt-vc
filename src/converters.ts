@@ -6,7 +6,8 @@ import {
   CredentialPayload,
   Credential,
   Verifiable,
-  PresentationPayload
+  PresentationPayload,
+  Presentation
 } from './types'
 import { decodeJWT } from 'did-jwt'
 
@@ -140,4 +141,136 @@ export function transformCredentialInput(
   }
 
   return result as JwtCredentialPayload
+}
+
+function normalizeJwtPresentationPayload(input: Partial<JwtPresentationPayload>): Presentation {
+  let result: Partial<PresentationPayload> = { ...input }
+
+  result.verifiableCredential = [...asArray(input.verifiableCredential), ...asArray(input.vp?.verifiableCredential)]
+  result.verifiableCredential = result.verifiableCredential.map(normalizeCredential)
+
+  if (input.iss) {
+    result.holder = input.holder || input.iss
+    delete result.iss
+  }
+
+  if (input.aud) {
+    result.verifier = [...asArray(input.verifier), ...asArray(input.aud)]
+    delete result.aud
+  }
+
+  if (input.jti) {
+    result.id = input.id || input.jti
+    delete result.jti
+  }
+
+  result.type = [...asArray(input.type), ...asArray(input.vp.type)]
+  result['@context'] = [...asArray(input.context), ...asArray(input['@context']), ...asArray(input.vp['@context'])]
+  delete result.context
+  //TODO: figure out if the whole vp property should be deleted
+  delete result.vp.context
+  delete result.vp.type
+
+  //TODO: test parsing Date strings into Date objects
+  if (input.iat || input.nbf) {
+    result.issuanceDate = input.issuanceDate || new Date(input.nbf || input.iat).toISOString()
+    delete result.nbf
+    delete result.iat
+  }
+
+  if (input.exp) {
+    result.expirationDate = input.expirationDate || new Date(input.exp).toISOString()
+    delete result.exp
+  }
+
+  return result as Presentation
+}
+
+function normalizeJwtPresentation(input: JWT): Verifiable<Presentation> {
+  return {
+    ...normalizeJwtPresentationPayload(decodeJWT(input)),
+    proof: {
+      type: 'JwtProof2020',
+      jwt: input
+    }
+  }
+}
+
+/**
+ * Normalizes a presentation payload into an unambiguous W3C Presentation data type
+ * @param input either a JWT or JWT payload, or a VerifiablePresentation
+ */
+export function normalizePresentation(
+  input: Partial<PresentationPayload> | Partial<JwtPresentationPayload>
+): Verifiable<Presentation> {
+  if (typeof input === 'string') {
+    //FIXME: attempt to deserialize as JSON before assuming it is a JWT
+    return normalizeJwtPresentation(input)
+  } else if (input.proof?.jwt) {
+    //TODO: test that it correctly propagates app specific proof properties
+    return { ...normalizeJwtPresentation(input.proof.jwt), proof: input.proof }
+  } else {
+    //TODO: test that it accepts JWT payload, PresentationPayload, VerifiablePresentation
+    //TODO: test that it correctly propagates proof, if any
+    return { proof: {}, ...normalizeJwtPresentationPayload(input) }
+  }
+}
+
+export function transformPresentationInput(
+  input: Partial<PresentationPayload> | Partial<JwtPresentationPayload>
+): JwtPresentationPayload {
+  //TODO: test that app specific input.vp properties are preserved
+  const result: Partial<JwtPresentationPayload> = { vp: { ...input.vp }, ...input }
+
+  //TODO: check that all context combos are preserved
+  result.vp['@context'] = [...asArray(input.context), ...asArray(input['@context']), ...asArray(input.vp['@context'])]
+  delete result.context
+  delete result['@context']
+
+  //TODO: check that all type combos are preserved
+  result.vc.type = [...asArray(input.type), ...asArray(input.vp?.type)]
+  delete result.type
+
+  result.vp.verifiableCredential = [...asArray(result.verifiableCredential), ...asArray(result.vp?.verifiableCredential)]
+    .map((credential: VerifiableCredential) => {
+      if (typeof credential === 'object' && credential.proof?.jwt) {
+        return credential.proof.jwt
+      } else {
+        return credential
+      }
+    })
+  delete result.verifiableCredential
+
+  //TODO: check that existing jti is preserved and that id is used if not
+  if (input.id) {
+    result.jti = input.jti || input.id
+    delete result.id
+  }
+
+  //TODO: check that issuanceDate is used if present and that nbf is preserved if present
+  if (input.issuanceDate) {
+    result.nbf = input.nbf || Date.parse(input.issuanceDate) / 1000
+    delete result.issuanceDate
+  }
+
+  //TODO: check that expiryDate is used if present and that exp is preserved if present
+  if (input.expirationDate) {
+    result.exp = input.exp || Date.parse(input.expirationDate) / 1000
+    delete result.expirationDate
+  }
+
+  //TODO: check that iss is preserved, if present
+  //TODO: check that issuer is used as string if present
+  if (input.holder) {
+    result.iss = input.iss || input.holder
+    delete result.issuer
+  }
+
+  //TODO: check that aud members are preserved, if present
+  if (input.verifier) {
+    result.aud = [...asArray(input.verifier), ...asArray(input.aud)]
+    delete result.verifier
+  }
+
+  return result as JwtPresentationPayload
 }

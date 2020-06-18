@@ -27,9 +27,9 @@ export interface JwtPresentationPayload {
   vp: {
     '@context': string[]
     type: string[]
-    verifiableCredential: string[]
+    verifiableCredential: VerifiableCredential[]
   }
-  aud?: string
+  aud?: string | string[]
   nbf?: number
   exp?: number
   jti?: string
@@ -119,7 +119,7 @@ export type Verifiable<T> = Readonly<T> & { proof: Proof }
 export type JWT = string
 
 export type VerifiablePresentation = Verifiable<Presentation> | JWT
-export type VerifiableCredential = Verifiable<Credential> | JWT
+export type VerifiableCredential = JWT | Verifiable<Credential>
 
 export interface Issuer {
   did: string
