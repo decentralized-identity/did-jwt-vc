@@ -52,8 +52,8 @@ function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): Cr
     delete result.jti
   }
 
-  result.type = [...asArray(result.type), ...asArray(result.vc?.type)].filter(notEmpty)
-  result.type = [...new Set(result.type)]
+  const types = [...asArray(result.type), ...asArray(result.vc?.type)].filter(notEmpty)
+  result.type = [...new Set(types)]
   delete result.vc?.type
 
   const contextArray: string[] = [
@@ -140,64 +140,77 @@ export function normalizeCredential(
 }
 
 /**
+ * type used to signal a very loose input is accepted
+ */
+type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T
+
+/**
  * Transforms a W3C Credential payload into a JWT compatible encoding.
  * The method accepts app specific fields and in case of collision, existing JWT properties will take precedence.
+ * Also, `nbf`, `exp` and `jti` properties can be explicitly set to `undefined` and they will be kept intact.
  * @param input either a JWT payload or a CredentialPayloadInput
  */
 export function transformCredentialInput(
-  input: Partial<CredentialPayload> | Partial<JwtCredentialPayload>
+  input: Partial<CredentialPayload> | DeepPartial<JwtCredentialPayload>
 ): JwtCredentialPayload {
   if (Array.isArray(input.credentialSubject)) throw Error('credentialSubject of type array not supported')
 
-  //TODO: test that app specific input.vc properties are preserved
   const result: Partial<JwtCredentialPayload> = { vc: { ...input.vc }, ...input }
 
-  //TODO: test credentialSubject.id becomes sub and that original sub takes precedence
-  result.sub = input.sub || input.credentialSubject?.id
   const credentialSubject = { ...input.credentialSubject, ...input.vc?.credentialSubject }
   if (!input.sub) {
+    result.sub = input.credentialSubject?.id
     delete credentialSubject.id
   }
   result.vc.credentialSubject = credentialSubject
+  delete result.credentialSubject
 
-  //TODO: check that all context combos are preserved
-  result.vc['@context'] = [...asArray(input.context), ...asArray(input['@context']), ...asArray(input.vc['@context'])]
+  const contextEntries = [
+    ...asArray(input.context),
+    ...asArray(input['@context']),
+    ...asArray(input.vc?.['@context'])
+  ].filter(notEmpty)
+  result.vc['@context'] = [...new Set(contextEntries)]
   delete result.context
   delete result['@context']
 
-  //TODO: check that all type combos are preserved
-  result.vc.type = [...asArray(input.type), ...asArray(input.vc?.type)]
+  const types = [...asArray(input.type), ...asArray(input.vc?.type)].filter(notEmpty)
+  result.vc.type = [...new Set(types)]
   delete result.type
 
-  //TODO: check that existing jti is preserved and that id is used if not
-  if (input.id) {
-    result.jti = input.jti || input.id
+  if (input.id && Object.getOwnPropertyNames(input).indexOf('jti') == -1) {
+    result.jti = input.id
     delete result.id
   }
 
-  //TODO: check that issuanceDate is used if present and that nbf is preserved if present
-  if (input.issuanceDate) {
-    result.nbf = input.nbf || Date.parse(input.issuanceDate) / 1000
-    delete result.issuanceDate
+  if (input.issuanceDate && Object.getOwnPropertyNames(input).indexOf('nbf') == -1) {
+    const converted = Date.parse(input.issuanceDate)
+    if (!isNaN(converted)) {
+      result.nbf = converted / 1000
+      delete result.issuanceDate
+    }
   }
 
-  //TODO: check that expiryDate is used if present and that exp is preserved if present
-  if (input.expirationDate) {
-    result.exp = input.exp || Date.parse(input.expirationDate) / 1000
-    delete result.expirationDate
+  if (input.expirationDate && Object.getOwnPropertyNames(input).indexOf('exp') == -1) {
+    const converted = Date.parse(input.expirationDate)
+    if (!isNaN(converted)) {
+      result.exp = converted / 1000
+      delete result.expirationDate
+    }
   }
 
-  //TODO: check that iss is preserved, if present
-  //TODO: check that issuer is used as string if present
-  //TODO: check that issuer.id is used if iss is missing
-  //TODO: check that issuer claims are preserved, no matter what
-  if (input.issuer) {
+  if (input.issuer && Object.getOwnPropertyNames(input).indexOf('iss') == -1) {
     if (typeof input.issuer === 'object') {
-      result.iss = input.iss || input.issuer?.id
+      result.iss = input.issuer?.id
       delete result.issuer.id
-    } else {
+      if (Object.keys(result.issuer).length == 0) {
+        delete result.issuer
+      }
+    } else if (typeof input.issuer === 'string') {
       result.iss = input.iss || '' + input.issuer
       delete result.issuer
+    } else {
+      //nop
     }
   }
 
