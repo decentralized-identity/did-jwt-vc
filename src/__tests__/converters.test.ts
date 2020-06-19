@@ -1,8 +1,8 @@
-import { normalizeCredential } from '../converters'
+import { normalizeCredential, transformCredentialInput } from '../converters'
 import { DEFAULT_JWT_PROOF_TYPE } from '../constants'
 
 describe('credential', () => {
-  describe('transform payload to W3C', () => {
+  describe('transform JWT or W3C VC => to W3C VC', () => {
     it('passes through empty payload', () => {
       const result = normalizeCredential({})
       expect(result).toMatchObject({})
@@ -288,6 +288,194 @@ describe('credential', () => {
         expect(result.vc).not.toHaveProperty('@context')
         expect(result.vc).not.toHaveProperty('type')
         expect(result.vc).not.toHaveProperty('credentialSubject')
+      })
+    })
+  })
+
+  describe('transform JWT/W3C VC => JWT payload', () => {
+    it('passes through empty payload with empty vc field', () => {
+      const result = transformCredentialInput({})
+      expect(result).toMatchObject({ vc: {} })
+    })
+
+    it('passes through app specific properties', () => {
+      const result = transformCredentialInput({ foo: 'bar' })
+      expect(result).toMatchObject({ foo: 'bar' })
+    })
+
+    it('passes through app specific vc properties', () => {
+      const result = transformCredentialInput({ vc: { foo: 'bar' } })
+      expect(result).toMatchObject({ vc: { foo: 'bar' } })
+    })
+
+    describe('credentialSubject', () => {
+      it('uses credentialSubject.id as sub', () => {
+        const result = transformCredentialInput({ credentialSubject: { id: 'foo' } })
+        expect(result).toMatchObject({ sub: 'foo', vc: { credentialSubject: {} } })
+        expect(result.vc.credentialSubject).not.toHaveProperty('id')
+      })
+
+      it('preserves existing sub property if present', () => {
+        const result = transformCredentialInput({ sub: 'bar', credentialSubject: { id: 'foo' } })
+        expect(result).toMatchObject({ sub: 'bar', vc: { credentialSubject: { id: 'foo' } } })
+      })
+
+      it('merges credentialSubject properties', () => {
+        const result = transformCredentialInput({
+          vc: { credentialSubject: { foo: 'bar' } },
+          credentialSubject: { bar: 'baz' }
+        })
+        expect(result).toMatchObject({ vc: { credentialSubject: { foo: 'bar', bar: 'baz' } } })
+      })
+    })
+
+    describe('context', () => {
+      it('merges @context fields', () => {
+        const result = transformCredentialInput({ context: ['AA'], '@context': ['BB'], vc: { '@context': ['CC'] } })
+        expect(result).toMatchObject({ vc: { '@context': ['AA', 'BB', 'CC'] } })
+        expect(result).not.toHaveProperty('context')
+        expect(result).not.toHaveProperty('@context')
+      })
+
+      it('merges @context fields when not array types', () => {
+        const result = transformCredentialInput({ context: 'AA', '@context': 'BB', vc: { '@context': ['CC'] } })
+        expect(result).toMatchObject({ vc: { '@context': ['AA', 'BB', 'CC'] } })
+        expect(result).not.toHaveProperty('context')
+        expect(result).not.toHaveProperty('@context')
+      })
+
+      it('keeps only unique entries in vc.@context', () => {
+        const result = transformCredentialInput({
+          context: ['AA', 'BB'],
+          '@context': ['BB', 'CC'],
+          vc: { '@context': ['CC', 'DD'] }
+        })
+        expect(result).toMatchObject({ vc: { '@context': ['AA', 'BB', 'CC', 'DD'] } })
+        expect(result).not.toHaveProperty('context')
+        expect(result).not.toHaveProperty('@context')
+      })
+
+      it('removes undefined entries from @context', () => {
+        const result = transformCredentialInput({})
+        expect(result.vc['@context'].length).toBe(0)
+      })
+    })
+
+    describe('type', () => {
+      it('merges type fields', () => {
+        const result = transformCredentialInput({ type: ['AA'], vc: { type: ['BB'] } })
+        expect(result).toMatchObject({ vc: { type: ['AA', 'BB'] } })
+        expect(result).not.toHaveProperty('type')
+      })
+
+      it('merges type fields when not array types', () => {
+        const result = transformCredentialInput({ type: 'AA', vc: { type: ['BB'] } })
+        expect(result).toMatchObject({ vc: { type: ['AA', 'BB'] } })
+        expect(result).not.toHaveProperty('type')
+      })
+
+      it('keeps only unique entries in vc.type', () => {
+        const result = transformCredentialInput({ type: ['AA', 'BB'], vc: { type: ['BB', 'CC'] } })
+        expect(result).toMatchObject({ vc: { type: ['AA', 'BB', 'CC'] } })
+      })
+
+      it('removes undefined entries from vc.type', () => {
+        const result = transformCredentialInput({})
+        expect(result.vc.type.length).toBe(0)
+      })
+    })
+
+    describe('jti', () => {
+      it('uses the id property as jti', () => {
+        const result = transformCredentialInput({ id: 'foo' })
+        expect(result).toMatchObject({ jti: 'foo' })
+        expect(result).not.toHaveProperty('id')
+      })
+
+      it('preserves jti entry if present', () => {
+        const result = transformCredentialInput({ jti: 'bar', id: 'foo' })
+        expect(result).toMatchObject({ jti: 'bar', id: 'foo' })
+      })
+    })
+
+    describe('issuanceDate', () => {
+      it('transforms the issuanceDate property to nbf', () => {
+        const result = transformCredentialInput({ issuanceDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ nbf: 1234567890 })
+        expect(result).not.toHaveProperty('issuanceDate')
+      })
+
+      it('preserves the issuanceDate property if it fails to be parsed as a Date', () => {
+        const result = transformCredentialInput({ issuanceDate: 'tomorrow' })
+        expect(result).toMatchObject({ issuanceDate: 'tomorrow' })
+      })
+
+      it('preserves nbf entry if present', () => {
+        const result = transformCredentialInput({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' })
+      })
+
+      it('preserves nbf entry if explicitly undefined', () => {
+        const result = transformCredentialInput({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' })
+      })
+    })
+
+    describe('expirationDate', () => {
+      it('transforms the expirationDate property to exp', () => {
+        const result = transformCredentialInput({ expirationDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ exp: 1234567890 })
+        expect(result).not.toHaveProperty('expirationDate')
+      })
+
+      it('preserves the expirationDate property if it fails to be parsed as a Date', () => {
+        const result = transformCredentialInput({ expirationDate: 'tomorrow' })
+        expect(result).toMatchObject({ expirationDate: 'tomorrow' })
+      })
+
+      it('preserves exp entry if present', () => {
+        const result = transformCredentialInput({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' })
+      })
+
+      it('preserves exp entry if explicitly undefined', () => {
+        const result = transformCredentialInput({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' })
+      })
+    })
+
+    describe('issuer', () => {
+      it('uses issuer.id as iss', () => {
+        const result = transformCredentialInput({ issuer: { id: 'foo' } })
+        expect(result).toMatchObject({ iss: 'foo' })
+        expect(result).not.toHaveProperty('issuer')
+      })
+
+      it('uses issuer as iss when of type string', () => {
+        const result = transformCredentialInput({ issuer: 'foo' })
+        expect(result).toMatchObject({ iss: 'foo' })
+        expect(result).not.toHaveProperty('issuer')
+      })
+
+      it('ignores issuer property if neither string or object', () => {
+        const result = transformCredentialInput({ issuer: 12 })
+        expect(result).toMatchObject({ issuer: 12 })
+      })
+
+      it('ignores issuer property if iss is present', () => {
+        const result = transformCredentialInput({ iss: 'foo', issuer: 'bar' })
+        expect(result).toMatchObject({ iss: 'foo', issuer: 'bar' })
+      })
+
+      it('ignores issuer.id property if iss is present', () => {
+        const result = transformCredentialInput({ iss: 'foo', issuer: { id: 'bar' } })
+        expect(result).toMatchObject({ iss: 'foo', issuer: { id: 'bar' } })
+      })
+
+      it('preserves issuer claims if present', () => {
+        const result = transformCredentialInput({ issuer: { id: 'foo', bar: 'baz' } })
+        expect(result).toMatchObject({ iss: 'foo', issuer: { bar: 'baz' } })
+        expect(result.issuer).not.toHaveProperty('id')
       })
     })
   })
