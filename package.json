@@ -73,6 +73,6 @@
     "typescript": "3.9.5"
   },
   "resolutions": {
-    "@babel/core": "7.10.2"
+    "@babel/core": "7.10.3"
   }
 }
