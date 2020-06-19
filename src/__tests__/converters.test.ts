@@ -1,8 +1,12 @@
-import { normalizeCredential, transformCredentialInput, normalizePresentation } from '../converters'
+import { normalizeCredential, transformCredentialInput, normalizePresentation, transformPresentationInput } from '../converters'
 import { DEFAULT_JWT_PROOF_TYPE } from '../constants'
 
+function encodeBase64Url(input: string): string {
+  return Buffer.from(input, 'utf-8').toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+}
+
 describe('credential', () => {
-  describe('transform JWT or W3C VC => to W3C VC', () => {
+  describe('transform W3C/JWT VC => W3C VC', () => {
     it('passes through empty payload', () => {
       const result = normalizeCredential({})
       expect(result).toMatchObject({})
@@ -11,6 +15,17 @@ describe('credential', () => {
     it('passes through app specific properties', () => {
       const result = normalizeCredential({ foo: 'bar' })
       expect(result).toMatchObject({ foo: 'bar' })
+    })
+
+    it('clears empty vc property', () => {
+      const result = normalizeCredential({ foo: 'bar', vc: {} })
+      expect(result).toMatchObject({ foo: 'bar' })
+      expect(result).not.toHaveProperty('vc')
+    })
+
+    it('passes through app specific properties in vc', () => {
+      const result = normalizeCredential({ foo: 'bar', vc: { bar: 'baz' } })
+      expect(result).toMatchObject({ foo: 'bar', vc: { bar: 'baz' } })
     })
 
     describe('credentialSubject', () => {
@@ -266,10 +281,6 @@ describe('credential', () => {
         expect(result.vc).not.toHaveProperty('credentialSubject')
       })
 
-      function encodeBase64Url(input: string): string {
-        return Buffer.from(input, 'utf-8').toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
-      }
-
       it('accepts VerifiableCredential as JWT', () => {
         const payload = JSON.stringify(complexInput)
         const header = '{}'
@@ -292,7 +303,7 @@ describe('credential', () => {
     })
   })
 
-  describe('transform JWT/W3C VC => JWT payload', () => {
+  describe('transform W3C/JWT VC => JWT payload', () => {
     it('passes through empty payload with empty vc field', () => {
       const result = transformCredentialInput({})
       expect(result).toMatchObject({ vc: {} })
@@ -482,7 +493,7 @@ describe('credential', () => {
 })
 
 describe('presentation', () => {
-  describe('transform JWT or W3C VP => to W3C VP', () => {
+  describe('transform JWT/W3C VP => W3C VP', () => {
     it('passes through empty payload', () => {
       const result = normalizePresentation({})
       expect(result).toMatchObject({})
@@ -670,6 +681,225 @@ describe('presentation', () => {
         const result = normalizePresentation({ exp: 1222222222 })
         expect(result).toMatchObject({ expirationDate: '2008-09-24T02:10:22.000Z' })
         expect(result).not.toHaveProperty('exp')
+      })
+    })
+
+    describe('JWT payload', () => {
+      it('rejects unknown JSON string payload', () => {
+        expect(() => {
+          normalizePresentation('aaa')
+        }).toThrowError(/unknown presentation format/)
+      })
+
+      it('rejects malformed JWT string payload 1', () => {
+        expect(() => {
+          normalizePresentation('a.b.c')
+        }).toThrowError(/unknown presentation format/)
+      })
+
+      it('rejects malformed JWT string payload 2', () => {
+        expect(() => {
+          normalizePresentation('aaa.b.c')
+        }).toThrowError(/unknown presentation format/)
+      })
+    })
+  })
+
+  describe('transform W3C/JWT VP => JWT payload', () => {
+    it('passes through empty payload with empty vp field', () => {
+      const result = transformPresentationInput({})
+      expect(result).toMatchObject({ vp: {} })
+    })
+
+    it('passes through app specific properties', () => {
+      const result = transformPresentationInput({ foo: 'bar' })
+      expect(result).toMatchObject({ foo: 'bar' })
+    })
+
+    it('passes through app specific vp properties', () => {
+      const result = transformPresentationInput({ vp: { foo: 'bar' } })
+      expect(result).toMatchObject({ vp: { foo: 'bar' } })
+    })
+
+    describe('verifiableCredential', () => {
+      it('merges verifiableCredentials arrays', () => {
+        const result = transformPresentationInput({ verifiableCredential: [{ id: 'foo' }], vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] } } as any)
+        expect(result).toMatchObject({ vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] } })
+        expect(result).not.toHaveProperty('verifiableCredential')
+      })
+
+      it('merges verifiableCredential arrays when not array types', () => {
+        const result = transformPresentationInput({ verifiableCredential: { id: 'foo' }, vp: { verifiableCredential: { foo: 'bar' } } } as any)
+        expect(result).toMatchObject({ vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }] } })
+        expect(result).not.toHaveProperty('verifiableCredential')
+      })
+
+      it('condenses JWT credentials', () => {
+        const result = transformPresentationInput({ verifiableCredential: { id: 'foo', proof: { jwt: 'header.payload1.signature' } }, vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] } } as any)
+        expect(result).toMatchObject({ vp: { verifiableCredential: ['header.payload1.signature', { foo: 'bar' }, 'header.payload2.signature'] } })
+        expect(result).not.toHaveProperty('verifiableCredential')
+      })
+
+      it('filters empty credentials', () => {
+        const result = transformPresentationInput({ verifiableCredential: undefined, vp: { verifiableCredential: [null, { foo: 'bar' }, 'header.payload2.signature'] } } as any)
+        expect(result).toMatchObject({ vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] } })
+        expect(result).not.toHaveProperty('verifiableCredential')
+      })
+    })
+
+    describe('context', () => {
+      it('merges @context fields', () => {
+        const result = transformPresentationInput({ context: ['AA'], '@context': ['BB'], vp: { '@context': ['CC'] } })
+        expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC'] } })
+        expect(result).not.toHaveProperty('context')
+        expect(result).not.toHaveProperty('@context')
+      })
+
+      it('merges @context fields when not array types', () => {
+        const result = transformPresentationInput({ context: 'AA', '@context': 'BB', vp: { '@context': ['CC'] } } as any)
+        expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC'] } })
+        expect(result).not.toHaveProperty('context')
+        expect(result).not.toHaveProperty('@context')
+      })
+
+      it('keeps only unique entries in vp.@context', () => {
+        const result = transformPresentationInput({
+          context: ['AA', 'BB'],
+          '@context': ['BB', 'CC'],
+          vp: { '@context': ['CC', 'DD'] }
+        })
+        expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC', 'DD'] } })
+        expect(result).not.toHaveProperty('context')
+        expect(result).not.toHaveProperty('@context')
+      })
+
+      it('removes undefined entries from @context', () => {
+        const result = transformPresentationInput({})
+        expect(result.vp['@context'].length).toBe(0)
+      })
+    })
+
+    describe('type', () => {
+      it('merges type fields', () => {
+        const result = transformPresentationInput({ type: ['AA'], vp: { type: ['BB'] } })
+        expect(result).toMatchObject({ vp: { type: ['AA', 'BB'] } })
+        expect(result).not.toHaveProperty('type')
+      })
+
+      it('merges type fields when not array types', () => {
+        const result = transformPresentationInput({ type: 'AA', vp: { type: ['BB'] } } as any)
+        expect(result).toMatchObject({ vp: { type: ['AA', 'BB'] } })
+        expect(result).not.toHaveProperty('type')
+      })
+
+      it('keeps only unique entries in vc.type', () => {
+        const result = transformPresentationInput({ type: ['AA', 'BB'], vp: { type: ['BB', 'CC'] } })
+        expect(result).toMatchObject({ vp: { type: ['AA', 'BB', 'CC'] } })
+      })
+
+      it('removes undefined entries from vc.type', () => {
+        const result = transformPresentationInput({})
+        expect(result.vp.type.length).toBe(0)
+      })
+    })
+
+    describe('jti', () => {
+      it('uses the id property as jti', () => {
+        const result = transformPresentationInput({ id: 'foo' })
+        expect(result).toMatchObject({ jti: 'foo' })
+        expect(result).not.toHaveProperty('id')
+      })
+
+      it('preserves jti entry if present', () => {
+        const result = transformPresentationInput({ jti: 'bar', id: 'foo' })
+        expect(result).toMatchObject({ jti: 'bar', id: 'foo' })
+      })
+    })
+
+    describe('issuanceDate', () => {
+      it('transforms the issuanceDate property to nbf', () => {
+        const result = transformPresentationInput({ issuanceDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ nbf: 1234567890 })
+        expect(result).not.toHaveProperty('issuanceDate')
+      })
+
+      it('preserves the issuanceDate property if it fails to be parsed as a Date', () => {
+        const result = transformPresentationInput({ issuanceDate: 'tomorrow' })
+        expect(result).toMatchObject({ issuanceDate: 'tomorrow' })
+      })
+
+      it('preserves nbf entry if present', () => {
+        const result = transformPresentationInput({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' })
+      })
+
+      it('preserves nbf entry if explicitly undefined', () => {
+        const result = transformPresentationInput({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' })
+      })
+    })
+
+    describe('expirationDate', () => {
+      it('transforms the expirationDate property to exp', () => {
+        const result = transformPresentationInput({ expirationDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ exp: 1234567890 })
+        expect(result).not.toHaveProperty('expirationDate')
+      })
+
+      it('preserves the expirationDate property if it fails to be parsed as a Date', () => {
+        const result = transformPresentationInput({ expirationDate: 'tomorrow' })
+        expect(result).toMatchObject({ expirationDate: 'tomorrow' })
+      })
+
+      it('preserves exp entry if present', () => {
+        const result = transformPresentationInput({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' })
+      })
+
+      it('preserves exp entry if explicitly undefined', () => {
+        const result = transformPresentationInput({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' })
+      })
+    })
+
+    describe('holder', () => {
+      it('uses holder as iss when of type string', () => {
+        const result = transformPresentationInput({ holder: 'foo' })
+        expect(result).toMatchObject({ iss: 'foo' })
+        expect(result).not.toHaveProperty('holder')
+      })
+
+      it('preserves holder property if not string type', () => {
+        const result = transformPresentationInput({ holder: 12 })
+        expect(result).toMatchObject({ holder: 12 })
+      })
+
+      it('preserves holder property if iss is present', () => {
+        const result = transformPresentationInput({ iss: 'foo', holder: 'bar' })
+        expect(result).toMatchObject({ iss: 'foo', holder: 'bar' })
+      })
+    })
+
+    describe('verifier', () => {
+      it('merges verifier and aud props into aud array', () => {
+        const result = transformPresentationInput({ verifier: ['foo'], aud: ['bar'] })
+        expect(result).toMatchObject({ aud: ['foo', 'bar'] })
+        expect(result).not.toHaveProperty('verifier')
+      })
+
+      it('merges verifier and aud props into aud array when different types', () => {
+        const result = transformPresentationInput({ verifier: 'foo', aud: 'bar' })
+        expect(result).toMatchObject({ aud: ['foo', 'bar'] })
+      })
+
+      it('filters null or undefined values in aud', () => {
+        const result = transformPresentationInput({ verifier: ['foo', null], aud: ['bar', undefined] })
+        expect(result).toMatchObject({ aud: ['foo', 'bar'] })
+      })
+
+      it('unique values in aud', () => {
+        const result = transformPresentationInput({ verifier: ['foo', 'bar'], aud: ['bar', 'baz'] })
+        expect(result).toMatchObject({ aud: ['foo', 'bar', 'baz'] })
       })
     })
   })
