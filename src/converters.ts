@@ -299,7 +299,7 @@ function normalizeJwtPresentation(input: JWT): Verifiable<Presentation> {
  * @param input either a JWT or JWT payload, or a VerifiablePresentation
  */
 export function normalizePresentation(
-  input: Partial<PresentationPayload> | Partial<JwtPresentationPayload>
+  input: Partial<PresentationPayload> | Partial<JwtPresentationPayload> | JWT
 ): Verifiable<Presentation> {
   if (typeof input === 'string') {
     if (JWT_FORMAT.test(input)) {
@@ -325,25 +325,57 @@ export function normalizePresentation(
   }
 }
 
+/**
+ * Transforms a W3C Presentation payload into a JWT compatible encoding.
+ * The method accepts app specific fields and in case of collision, existing JWT properties will take precedence.
+ * Also, `nbf`, `exp` and `jti` properties can be explicitly set to `undefined` and they will be kept intact.
+ * @param input either a JWT payload or a CredentialPayloadInput
+ */
 export function transformPresentationInput(
   input: Partial<PresentationPayload> | Partial<JwtPresentationPayload>
 ): JwtPresentationPayload {
-  //TODO: test that app specific input.vp properties are preserved
   const result: Partial<JwtPresentationPayload> = { vp: { ...input.vp }, ...input }
 
-  //TODO: check that all context combos are preserved
-  result.vp['@context'] = [...asArray(input.context), ...asArray(input['@context']), ...asArray(input.vp['@context'])]
+  const contextEntries = [
+    ...asArray(input.context),
+    ...asArray(input['@context']),
+    ...asArray(input.vp?.['@context'])
+  ].filter(notEmpty)
+  result.vp['@context'] = [...new Set(contextEntries)]
   delete result.context
   delete result['@context']
 
-  //TODO: check that all type combos are preserved
-  result.vc.type = [...asArray(input.type), ...asArray(input.vp?.type)]
+  const types = [...asArray(input.type), ...asArray(input.vp?.type)].filter(notEmpty)
+  result.vp.type = [...new Set(types)]
   delete result.type
+
+  if (input.id && Object.getOwnPropertyNames(input).indexOf('jti') == -1) {
+    result.jti = input.id
+    delete result.id
+  }
+
+  if (input.issuanceDate && Object.getOwnPropertyNames(input).indexOf('nbf') == -1) {
+    const converted = Date.parse(input.issuanceDate)
+    if (!isNaN(converted)) {
+      result.nbf = converted / 1000
+      delete result.issuanceDate
+    }
+  }
+
+  if (input.expirationDate && Object.getOwnPropertyNames(input).indexOf('exp') == -1) {
+    const converted = Date.parse(input.expirationDate)
+    if (!isNaN(converted)) {
+      result.exp = converted / 1000
+      delete result.expirationDate
+    }
+  }
 
   result.vp.verifiableCredential = [
     ...asArray(result.verifiableCredential),
     ...asArray(result.vp?.verifiableCredential)
-  ].map((credential: VerifiableCredential) => {
+  ]
+  .filter(notEmpty)
+  .map((credential: VerifiableCredential) => {
     if (typeof credential === 'object' && credential.proof?.jwt) {
       return credential.proof.jwt
     } else {
@@ -352,34 +384,18 @@ export function transformPresentationInput(
   })
   delete result.verifiableCredential
 
-  //TODO: check that existing jti is preserved and that id is used if not
-  if (input.id) {
-    result.jti = input.jti || input.id
-    delete result.id
+  if (input.holder && Object.getOwnPropertyNames(input).indexOf('iss') == -1) {
+    if (typeof input.holder === 'string') {
+      result.iss = input.holder
+      delete result.holder
+    } else {
+      //nop
+    }
   }
 
-  //TODO: check that issuanceDate is used if present and that nbf is preserved if present
-  if (input.issuanceDate) {
-    result.nbf = input.nbf || Date.parse(input.issuanceDate) / 1000
-    delete result.issuanceDate
-  }
-
-  //TODO: check that expiryDate is used if present and that exp is preserved if present
-  if (input.expirationDate) {
-    result.exp = input.exp || Date.parse(input.expirationDate) / 1000
-    delete result.expirationDate
-  }
-
-  //TODO: check that iss is preserved, if present
-  //TODO: check that issuer is used as string if present
-  if (input.holder) {
-    result.iss = input.iss || input.holder
-    delete result.issuer
-  }
-
-  //TODO: check that aud members are preserved, if present
   if (input.verifier) {
-    result.aud = [...asArray(input.verifier), ...asArray(input.aud)]
+    const audience = [...asArray(input.verifier), ...asArray(input.aud)].filter(notEmpty)
+    result.aud = [...new Set(audience)]
     delete result.verifier
   }
 
