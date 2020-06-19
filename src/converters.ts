@@ -217,52 +217,76 @@ export function transformCredentialInput(
   return result as JwtCredentialPayload
 }
 
-function normalizeJwtPresentationPayload(input: Partial<JwtPresentationPayload>): Presentation {
+function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPayload>): Presentation {
   let result: Partial<PresentationPayload> = { ...input }
 
-  result.verifiableCredential = [...asArray(input.verifiableCredential), ...asArray(input.vp?.verifiableCredential)]
+  result.verifiableCredential = [
+    ...asArray(input.verifiableCredential),
+    ...asArray(input.vp?.verifiableCredential)
+  ].filter(notEmpty)
   result.verifiableCredential = result.verifiableCredential.map(normalizeCredential)
 
-  if (input.iss) {
-    result.holder = input.holder || input.iss
+  if (input.iss && !input.holder) {
+    result.holder = input.iss
     delete result.iss
   }
 
   if (input.aud) {
-    result.verifier = [...asArray(input.verifier), ...asArray(input.aud)]
+    result.verifier = [...asArray(input.verifier), ...asArray(input.aud)].filter(notEmpty)
+    result.verifier = [...new Set(result.verifier)]
     delete result.aud
   }
 
-  if (input.jti) {
+  if (input.jti && Object.getOwnPropertyNames(input).indexOf('id') == -1) {
     result.id = input.id || input.jti
     delete result.jti
   }
 
-  result.type = [...asArray(input.type), ...asArray(input.vp.type)]
-  result['@context'] = [...asArray(input.context), ...asArray(input['@context']), ...asArray(input.vp['@context'])]
-  delete result.context
-  //TODO: figure out if the whole vp property should be deleted
-  delete result.vp.context
-  delete result.vp.type
+  const types = [...asArray(input.type), ...asArray(input.vp?.type)].filter(notEmpty)
+  result.type = [...new Set(types)]
+  delete result.vp?.type
 
-  //TODO: test parsing Date strings into Date objects
-  if (input.iat || input.nbf) {
-    result.issuanceDate = input.issuanceDate || new Date(input.nbf || input.iat).toISOString()
-    delete result.nbf
-    delete result.iat
+  const contexts = [
+    ...asArray(input.context),
+    ...asArray(input['@context']),
+    ...asArray(input.vp?.['@context'])
+  ].filter(notEmpty)
+  result['@context'] = [...new Set(contexts)]
+  delete result.context
+  delete result.vp?.['@context']
+
+  if (!input.issuanceDate && (input.iat || input.nbf)) {
+    result.issuanceDate = new Date((input.nbf || input.iat) * 1000).toISOString()
+    if (input.nbf) {
+      delete result.nbf
+    } else {
+      delete result.iat
+    }
   }
 
-  if (input.exp) {
-    result.expirationDate = input.expirationDate || new Date(input.exp).toISOString()
+  if (!input.expirationDate && input.exp) {
+    result.expirationDate = new Date(input.exp * 1000).toISOString()
     delete result.exp
+  }
+
+  if (result.vp && Object.keys(result.vp).length == 0) {
+    delete result.vp
   }
 
   return result as Presentation
 }
 
 function normalizeJwtPresentation(input: JWT): Verifiable<Presentation> {
+  let decoded
+  try {
+    decoded = decodeJWT(input)
+  } catch (e) {
+    const err = new Error('unknown presentation format')
+    err['cause'] = e
+    throw err
+  }
   return {
-    ...normalizeJwtPresentationPayload(decodeJWT(input).payload),
+    ...normalizeJwtPresentationPayload(decoded.payload),
     proof: {
       type: DEFAULT_JWT_PROOF_TYPE,
       jwt: input
@@ -278,8 +302,19 @@ export function normalizePresentation(
   input: Partial<PresentationPayload> | Partial<JwtPresentationPayload>
 ): Verifiable<Presentation> {
   if (typeof input === 'string') {
-    //FIXME: attempt to deserialize as JSON before assuming it is a JWT
-    return normalizeJwtPresentation(input)
+    if (JWT_FORMAT.test(input)) {
+      return normalizeJwtPresentation(input)
+    } else {
+      let parsed: object
+      try {
+        parsed = JSON.parse(input)
+      } catch (e) {
+        const err = new Error('unknown presentation format')
+        err['cause'] = e
+        throw err
+      }
+      return normalizePresentation(parsed)
+    }
   } else if (input.proof?.jwt) {
     //TODO: test that it correctly propagates app specific proof properties
     return { ...normalizeJwtPresentation(input.proof.jwt), proof: input.proof }
