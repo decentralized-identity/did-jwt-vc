@@ -1,8 +1,9 @@
 import { DID_FORMAT, DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './constants'
 import { JwtCredentialSubject } from './types'
+import { VerifiableCredential } from 'src'
 
-export function validateJwtFormat(value: string): void {
-  if (!value.match(JWT_FORMAT)) {
+export function validateJwtFormat(value: VerifiableCredential): void {
+  if (typeof value === 'string' && !value.match(JWT_FORMAT)) {
     throw new TypeError(`"${value}" is not a valid JWT format`)
   }
 }
