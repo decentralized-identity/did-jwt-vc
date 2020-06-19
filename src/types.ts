@@ -17,7 +17,7 @@ export interface JwtCredentialPayload {
     credentialSubject: JwtCredentialSubject
   }
   nbf?: number
-  aud?: string
+  aud?: string | string[]
   exp?: number
   jti?: string
   [x: string]: any
@@ -36,7 +36,7 @@ export interface JwtPresentationPayload {
   [x: string]: any
 }
 
-export type IssuerType = { id: string;[x: string]: any } | string
+export type IssuerType = { id: string; [x: string]: any } | string
 export type DateType = string | Date
 /**
  * used as input when creating Verifiable Credentials
@@ -74,11 +74,11 @@ type Replace<T, U> = Omit<T, keyof U> & U
 /**
  * This data type represents a parsed VerifiableCredential.
  * It is meant to be an unambiguous representation of the properties of a Credential and is usually the result of a transformation method.
- * 
+ *
  * `issuer` is always an object with an `id` property and potentially other app specific issuer claims
  * `issuanceDate` is an ISO DateTime string
  * `expirationDate`, is a nullable ISO DateTime string
- * 
+ *
  * Any JWT specific properties are transformed to the broader W3C variant and any app specific properties are left intact
  */
 export type Credential = Replace<CredentialPayload, NarrowCredentialDefinitions>
@@ -104,7 +104,7 @@ interface NarrowPresentationDefinitions {
 /**
  * This data type represents a parsed Presentation payload.
  * It is meant to be an unambiguous representation of the properties of a Presentation and is usually the result of a transformation method.
- * 
+ *
  * The `verifiableCredential` array should contain parsed `Verifiable<Credential>` elements.
  * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are left intact.
  */

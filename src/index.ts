@@ -1,25 +1,23 @@
 import { createJWT, verifyJWT } from 'did-jwt'
 import { JWT_ALG, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 import * as validators from './validators'
-import { JwtCredentialPayload, Issuer, JwtPresentationPayload, JWT, VerifiablePresentation, VerifiableCredential } from './types'
+import {
+  JwtCredentialPayload,
+  Issuer,
+  JwtPresentationPayload,
+  JWT,
+  VerifiablePresentation,
+  VerifiableCredential
+} from './types'
 import { DIDDocument } from 'did-resolver'
 
-export {
-  Issuer,
-  JwtCredentialPayload,
-  JwtPresentationPayload,
-  VerifiableCredential,
-  VerifiablePresentation
-}
+export { Issuer, JwtCredentialPayload, JwtPresentationPayload, VerifiableCredential, VerifiablePresentation }
 
 interface Resolvable {
   resolve: (did: string) => Promise<DIDDocument>
 }
 
-export async function createVerifiableCredentialJwt(
-  payload: JwtCredentialPayload,
-  issuer: Issuer
-): Promise<JWT> {
+export async function createVerifiableCredentialJwt(payload: JwtCredentialPayload, issuer: Issuer): Promise<JWT> {
   validateJwtVerifiableCredentialPayload(payload)
   return createJWT(payload, {
     issuer: issuer.did,

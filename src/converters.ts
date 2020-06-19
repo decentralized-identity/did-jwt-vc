@@ -2,7 +2,7 @@ import {
   VerifiableCredential,
   JWT,
   JwtPresentationPayload,
-  JwtCredentialPayload as JwtCredentialPayload,
+  JwtCredentialPayload,
   CredentialPayload,
   Credential,
   Verifiable,
@@ -10,49 +10,97 @@ import {
   Presentation
 } from './types'
 import { decodeJWT } from 'did-jwt'
+import { JWT_FORMAT, DEFAULT_JWT_PROOF_TYPE } from './constants'
 
 function asArray(input: any) {
   return Array.isArray(input) ? input : [input]
 }
 
+function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined
+}
+
+function cleanUndefined<T>(input: T): T {
+  if (typeof input !== 'object') {
+    return input
+  }
+  const obj = { ...input }
+  Object.keys(obj).forEach((key) => obj[key] === undefined && delete obj[key])
+  return obj
+}
+
 function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): Credential {
   let result: Partial<CredentialPayload> = { ...input }
 
-  result.credentialSubject = { ...result.credentialSubject, ...result.vc?.credentialSubject }
-  result.credentialSubject.id = result.credentialSubject?.id || result.sub
-  delete result.sub
+  //FIXME: handle case when credentialSubject(s) are not object types
+  result.credentialSubject = { ...input.credentialSubject, ...input.vc?.credentialSubject }
+  if (input.sub && !input.credentialSubject?.id) {
+    result.credentialSubject.id = input.sub
+    delete result.sub
+  }
+  delete result.vc?.credentialSubject
 
-  result.issuer = typeof result.issuer === 'object' ? { ...result.issuer, id: result.iss } : { id: result.iss }
-  delete result.iss
-
-  result.id = result.id || result.jti
-  delete result.jti
-
-  result.type = [...asArray(result.type), ...asArray(result.vc.type)]
-  result['@context'] = [...asArray(result.context), ...asArray(result['@context']), ...asArray(result.vc['@context'])]
-  delete result.context
-  delete result.vc
-
-  //TODO: test parsing Date strings into Date objects
-  if (result.iat || result.nbf) {
-    result.issuanceDate = result.issuanceDate || new Date(result.nbf || result.iat).toISOString()
-    delete result.nbf
-    delete result.iat
+  if (typeof input.issuer === 'undefined' || typeof input.issuer === 'object') {
+    result.issuer = cleanUndefined({ id: input.iss, ...input.issuer })
+    if (!input.issuer?.id) {
+      delete result.iss
+    }
   }
 
-  if (result.exp) {
-    result.expirationDate = result.expirationDate || new Date(result.exp).toISOString()
+  if (!input.id && input.jti) {
+    result.id = result.id || result.jti
+    delete result.jti
+  }
+
+  result.type = [...asArray(result.type), ...asArray(result.vc?.type)].filter(notEmpty)
+  result.type = [...new Set(result.type)]
+  delete result.vc?.type
+
+  const contextArray: string[] = [
+    ...asArray(input.context),
+    ...asArray(input['@context']),
+    ...asArray(input.vc?.['@context'])
+  ].filter(notEmpty)
+  result['@context'] = [...new Set(contextArray)]
+  delete result.context
+  delete result.vc?.['@context']
+
+  if (!input.issuanceDate && (input.iat || input.nbf)) {
+    result.issuanceDate = new Date((input.nbf || input.iat) * 1000).toISOString()
+    if (input.nbf) {
+      delete result.nbf
+    } else {
+      delete result.iat
+    }
+  }
+
+  if (!input.expirationDate && input.exp) {
+    result.expirationDate = new Date(input.exp * 1000).toISOString()
     delete result.exp
   }
+
+  if (result.vc && Object.keys(result.vc).length == 0) {
+    delete result.vc
+  }
+
+  //FIXME: interpret `aud` property as `verifier`
 
   return result as Credential
 }
 
 function normalizeJwtCredential(input: JWT): Verifiable<Credential> {
+  let decoded
+  try {
+    decoded = decodeJWT(input)
+  } catch (e) {
+    const err = new Error('unknown credential format')
+    err['cause'] = e
+    throw err
+  }
   return {
-    ...normalizeJwtCredentialPayload(decodeJWT(input)),
+    ...normalizeJwtCredentialPayload(decoded.payload),
     proof: {
-      type: 'JwtProof2020',
+      type: DEFAULT_JWT_PROOF_TYPE,
       jwt: input
     }
   }
@@ -60,14 +108,27 @@ function normalizeJwtCredential(input: JWT): Verifiable<Credential> {
 
 /**
  * Normalizes a credential payload into an unambiguous W3C credential data type
+ * In case of conflict, Existing W3C Credential specific properties take precedence,
+ * except for arrays and object types which get merged.
  * @param input either a JWT or JWT payload, or a VerifiableCredential
  */
 export function normalizeCredential(
   input: Partial<VerifiableCredential> | Partial<JwtCredentialPayload>
 ): Verifiable<Credential> {
   if (typeof input === 'string') {
-    //FIXME: attempt to deserialize as JSON before assuming it is a JWT
-    return normalizeJwtCredential(input)
+    if (JWT_FORMAT.test(input)) {
+      return normalizeJwtCredential(input)
+    } else {
+      let parsed: object
+      try {
+        parsed = JSON.parse(input)
+      } catch (e) {
+        const err = new Error('unknown credential format')
+        err['cause'] = e
+        throw err
+      }
+      return normalizeCredential(parsed)
+    }
   } else if (input.proof?.jwt) {
     //TODO: test that it correctly propagates app specific proof properties
     return { ...normalizeJwtCredential(input.proof.jwt), proof: input.proof }
@@ -188,9 +249,9 @@ function normalizeJwtPresentationPayload(input: Partial<JwtPresentationPayload>)
 
 function normalizeJwtPresentation(input: JWT): Verifiable<Presentation> {
   return {
-    ...normalizeJwtPresentationPayload(decodeJWT(input)),
+    ...normalizeJwtPresentationPayload(decodeJWT(input).payload),
     proof: {
-      type: 'JwtProof2020',
+      type: DEFAULT_JWT_PROOF_TYPE,
       jwt: input
     }
   }
@@ -231,14 +292,16 @@ export function transformPresentationInput(
   result.vc.type = [...asArray(input.type), ...asArray(input.vp?.type)]
   delete result.type
 
-  result.vp.verifiableCredential = [...asArray(result.verifiableCredential), ...asArray(result.vp?.verifiableCredential)]
-    .map((credential: VerifiableCredential) => {
-      if (typeof credential === 'object' && credential.proof?.jwt) {
-        return credential.proof.jwt
-      } else {
-        return credential
-      }
-    })
+  result.vp.verifiableCredential = [
+    ...asArray(result.verifiableCredential),
+    ...asArray(result.vp?.verifiableCredential)
+  ].map((credential: VerifiableCredential) => {
+    if (typeof credential === 'object' && credential.proof?.jwt) {
+      return credential.proof.jwt
+    } else {
+      return credential
+    }
+  })
   delete result.verifiableCredential
 
   //TODO: check that existing jti is preserved and that id is used if not
