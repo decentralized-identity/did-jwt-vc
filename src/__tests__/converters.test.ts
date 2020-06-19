@@ -1,4 +1,4 @@
-import { normalizeCredential, transformCredentialInput } from '../converters'
+import { normalizeCredential, transformCredentialInput, normalizePresentation } from '../converters'
 import { DEFAULT_JWT_PROOF_TYPE } from '../constants'
 
 describe('credential', () => {
@@ -481,4 +481,196 @@ describe('credential', () => {
   })
 })
 
-describe('presentation', () => {})
+describe('presentation', () => {
+  describe('transform JWT or W3C VP => to W3C VP', () => {
+    it('passes through empty payload', () => {
+      const result = normalizePresentation({})
+      expect(result).toMatchObject({})
+    })
+
+    it('passes through app specific properties', () => {
+      const result = normalizePresentation({ foo: 'bar' })
+      expect(result).toMatchObject({ foo: 'bar' })
+    })
+
+    it('clear vp prop if empty', () => {
+      const result = normalizePresentation({ foo: 'bar', vp: {} })
+      expect(result).toMatchObject({ foo: 'bar' })
+      expect(result).not.toHaveProperty('vp')
+    })
+
+    it('preserves app specific props in vp', () => {
+      const result = normalizePresentation({ foo: 'bar', vp: { bar: 'baz' } })
+      expect(result).toMatchObject({ foo: 'bar', vp: { bar: 'baz' } })
+    })
+
+    describe('verifiableCredential', () => {
+      it('merges the verifiableCredential fields as an array', () => {
+        const result = normalizePresentation({
+          verifiableCredential: { foo: 'bar' },
+          vp: { verifiableCredential: [{ foo: 'baz' }] }
+        } as any)
+        expect(result).toMatchObject({
+          verifiableCredential: [{ foo: 'bar' }, { foo: 'baz' }]
+        })
+      })
+
+      it('parses the underlying credentials', () => {
+        const result = normalizePresentation({
+          vp: {
+            verifiableCredential: [
+              'e30.eyJjb250ZXh0IjoidG9wIGNvbnRleHQiLCJAY29udGV4dCI6WyJhbHNvIHRvcCJdLCJ0eXBlIjpbIkEiXSwiaXNzdWVyIjp7ImNsYWltIjoiaXNzdWVyIGNsYWltIn0sImlzcyI6ImZvbyIsInN1YiI6ImJhciIsInZjIjp7IkBjb250ZXh0IjpbInZjIGNvbnRleHQiXSwidHlwZSI6WyJCIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7InNvbWV0aGluZyI6Im5vdGhpbmcifSwiYXBwU3BlY2lmaWMiOiJzb21lIGFwcCBzcGVjaWZpYyBmaWVsZCJ9LCJuYmYiOjEyMzQ1Njc4OTAsImlhdCI6MTExMTExMTExMSwiZXhwIjoxMjMxMjMxMjMxLCJhcHBTcGVjaWZpYyI6ImFub3RoZXIgYXBwIHNwZWNpZmljIGZpZWxkIn0.signature'
+            ]
+          }
+        })
+        expect(result).toMatchObject({
+          verifiableCredential: [
+            {
+              '@context': ['top context', 'also top', 'vc context'],
+              type: ['A', 'B'],
+              issuer: { id: 'foo', claim: 'issuer claim' },
+              vc: { appSpecific: 'some app specific field' },
+              iat: 1111111111,
+              appSpecific: 'another app specific field',
+              credentialSubject: { something: 'nothing', id: 'bar' },
+              issuanceDate: '2009-02-13T23:31:30.000Z',
+              expirationDate: '2009-01-06T08:40:31.000Z',
+              proof: {
+                type: 'JwtProof2020',
+                jwt:
+                  'e30.eyJjb250ZXh0IjoidG9wIGNvbnRleHQiLCJAY29udGV4dCI6WyJhbHNvIHRvcCJdLCJ0eXBlIjpbIkEiXSwiaXNzdWVyIjp7ImNsYWltIjoiaXNzdWVyIGNsYWltIn0sImlzcyI6ImZvbyIsInN1YiI6ImJhciIsInZjIjp7IkBjb250ZXh0IjpbInZjIGNvbnRleHQiXSwidHlwZSI6WyJCIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7InNvbWV0aGluZyI6Im5vdGhpbmcifSwiYXBwU3BlY2lmaWMiOiJzb21lIGFwcCBzcGVjaWZpYyBmaWVsZCJ9LCJuYmYiOjEyMzQ1Njc4OTAsImlhdCI6MTExMTExMTExMSwiZXhwIjoxMjMxMjMxMjMxLCJhcHBTcGVjaWZpYyI6ImFub3RoZXIgYXBwIHNwZWNpZmljIGZpZWxkIn0.signature'
+              }
+            }
+          ]
+        })
+      })
+    })
+
+    describe('holder', () => {
+      it('uses the iss property as holder', () => {
+        const result = normalizePresentation({ iss: 'foo' })
+        expect(result).toMatchObject({ holder: 'foo' })
+        expect(result).not.toHaveProperty('iss')
+      })
+
+      it('preserves the holder property if present', () => {
+        const result = normalizePresentation({ iss: 'foo', holder: 'bar' })
+        expect(result).toMatchObject({ holder: 'bar', iss: 'foo' })
+      })
+    })
+
+    describe('verifier', () => {
+      it('merges the verifier and aud properties', () => {
+        const result = normalizePresentation({ verifier: ['foo'], aud: ['bar'] })
+        expect(result).toMatchObject({ verifier: ['foo', 'bar'] })
+        expect(result).not.toHaveProperty('aud')
+      })
+
+      it('merges the verifier and aud as arrays', () => {
+        const result = normalizePresentation({ verifier: 'foo', aud: 'bar' })
+        expect(result).toMatchObject({ verifier: ['foo', 'bar'] })
+        expect(result).not.toHaveProperty('aud')
+      })
+
+      it('unique entries in the verifier array', () => {
+        const result = normalizePresentation({ verifier: ['foo', 'bar'], aud: ['bar', 'baz'] })
+        expect(result).toMatchObject({ verifier: ['foo', 'bar', 'baz'] })
+        expect(result).not.toHaveProperty('aud')
+      })
+
+      it('preserves the holder property if present', () => {
+        const result = normalizePresentation({ iss: 'foo', holder: 'bar' })
+        expect(result).toMatchObject({ holder: 'bar', iss: 'foo' })
+      })
+    })
+
+    describe('id', () => {
+      it('uses jti property as id', () => {
+        const result = normalizePresentation({ jti: 'foo' })
+        expect(result).toMatchObject({ id: 'foo' })
+        expect(result).not.toHaveProperty('jti')
+      })
+
+      it('preserves id property if present', () => {
+        const result = normalizePresentation({ jti: 'foo', id: 'bar' })
+        expect(result).toMatchObject({ jti: 'foo', id: 'bar' })
+      })
+    })
+
+    describe('type', () => {
+      it('merges type arrays', () => {
+        const result = normalizePresentation({ type: ['foo'], vp: { type: ['bar'] } })
+        expect(result).toMatchObject({ type: ['foo', 'bar'] })
+        expect(result).not.toHaveProperty('vp')
+      })
+
+      it('merges type arrays for non-array types', () => {
+        const result = normalizePresentation({ type: 'foo', vp: { type: 'bar' } } as any)
+        expect(result).toMatchObject({ type: ['foo', 'bar'] })
+        expect(result).not.toHaveProperty('vp')
+      })
+
+      it('unique entries in type array', () => {
+        const result = normalizePresentation({ type: ['foo', 'bar'], vp: { type: ['bar', 'baz'] } })
+        expect(result).toMatchObject({ type: ['foo', 'bar', 'baz'] })
+      })
+    })
+
+    describe('@context', () => {
+      it('merges @context arrays', () => {
+        const result = normalizePresentation({ context: ['foo'], '@context': ['bar'], vp: { '@context': ['baz'] } })
+        expect(result).toMatchObject({ '@context': ['foo', 'bar', 'baz'] })
+        expect(result).not.toHaveProperty('vp')
+        expect(result).not.toHaveProperty('context')
+      })
+
+      it('merges @context arrays for non-array contexts', () => {
+        const result = normalizePresentation({ '@context': 'foo', context: 'bar', vp: { '@context': 'baz' } } as any)
+        expect(result).toMatchObject({ '@context': ['bar', 'foo', 'baz'] })
+        expect(result).not.toHaveProperty('vp')
+        expect(result).not.toHaveProperty('context')
+      })
+
+      it('unique entries in @context array', () => {
+        const result = normalizePresentation({
+          '@context': ['foo', 'bar'],
+          context: ['bar', 'baz', undefined, null],
+          vp: { '@context': ['bar', 'baz', 'bak'] }
+        })
+        expect(result).toMatchObject({ '@context': ['bar', 'baz', 'foo', 'bak'] })
+      })
+    })
+
+    describe('issuanceDate', () => {
+      it('keeps issuanceDate property when present', () => {
+        const result = normalizePresentation({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 })
+        expect(result).toMatchObject({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 })
+      })
+
+      it('uses nbf as issuanceDate when present', () => {
+        const result = normalizePresentation({ nbf: 1234567890, iat: 1111111111 })
+        expect(result).toMatchObject({ issuanceDate: '2009-02-13T23:31:30.000Z', iat: 1111111111 })
+        expect(result).not.toHaveProperty('nbf')
+      })
+
+      it('uses iat as issuanceDate when no nbf and no issuanceDate present', () => {
+        const result = normalizePresentation({ iat: 1111111111 })
+        expect(result).toMatchObject({ issuanceDate: '2005-03-18T01:58:31.000Z' })
+        expect(result).not.toHaveProperty('iat')
+      })
+    })
+
+    describe('expirationDate', () => {
+      it('keeps expirationDate property when present', () => {
+        const result = normalizePresentation({ expirationDate: 'tomorrow', exp: 1222222222 })
+        expect(result).toMatchObject({ expirationDate: 'tomorrow', exp: 1222222222 })
+      })
+
+      it('uses exp as issuanceDate when present', () => {
+        const result = normalizePresentation({ exp: 1222222222 })
+        expect(result).toMatchObject({ expirationDate: '2008-09-24T02:10:22.000Z' })
+        expect(result).not.toHaveProperty('exp')
+      })
+    })
+  })
+})
