@@ -65,7 +65,7 @@
     "jest": "26.0.1",
     "microbundle": "0.12.2",
     "prettier": "2.0.5",
-    "semantic-release": "17.0.8",
+    "semantic-release": "17.1.0",
     "ts-jest": "26.1.1",
     "tslint": "6.1.2",
     "tslint-config-prettier": "1.18.0",
