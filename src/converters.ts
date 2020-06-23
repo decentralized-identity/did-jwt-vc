@@ -10,7 +10,7 @@ import {
   Presentation
 } from './types'
 import { decodeJWT } from 'did-jwt'
-import { JWT_FORMAT, DEFAULT_JWT_PROOF_TYPE } from './constants'
+import { JWT_FORMAT, DEFAULT_JWT_PROOF_TYPE, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 
 function asArray(input: any) {
   return Array.isArray(input) ? input : [input]
@@ -29,8 +29,32 @@ function cleanUndefined<T>(input: T): T {
   return obj
 }
 
+export function isLegacyAttestationFormat(payload: any): boolean {
+  // payload is an object and has all the required fields of old attestation format
+  return payload instanceof Object && payload.sub && payload.iss && payload.claim && payload.iat
+}
+
+export function attestationToVcFormat(payload: any): JwtCredentialPayload {
+  const { iat, nbf, claim, vc, ...rest } = payload
+  const result: JwtCredentialPayload = {
+    ...rest,
+    nbf: nbf ? nbf : iat,
+    vc: {
+      '@context': [DEFAULT_CONTEXT],
+      type: [DEFAULT_VC_TYPE],
+      credentialSubject: payload.claim
+    }
+  }
+  if (vc) payload.issVc = vc
+  return result
+}
+
 function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): Credential {
   let result: Partial<CredentialPayload> = { ...input }
+
+  if (isLegacyAttestationFormat(input)) {
+    result = attestationToVcFormat(input)
+  }
 
   //FIXME: handle case when credentialSubject(s) are not object types
   result.credentialSubject = { ...input.credentialSubject, ...input.vc?.credentialSubject }
@@ -225,6 +249,7 @@ function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPaylo
     ...asArray(input.vp?.verifiableCredential)
   ].filter(notEmpty)
   result.verifiableCredential = result.verifiableCredential.map(normalizeCredential)
+  delete result.vp?.verifiableCredential
 
   if (input.iss && !input.holder) {
     result.holder = input.iss

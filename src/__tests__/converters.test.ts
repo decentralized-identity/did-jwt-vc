@@ -48,7 +48,7 @@ describe('credential', () => {
       it('merges credentialSubject objects', () => {
         const result = normalizeCredential({
           credentialSubject: { foo: 'bar' },
-          vc: { credentialSubject: { bar: 'baz' } }
+          vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] }
         })
         expect(result).toMatchObject({ credentialSubject: { foo: 'bar', bar: 'baz' } })
       })
@@ -56,7 +56,7 @@ describe('credential', () => {
       it('merges credentialSubject objects with JWT precedence', () => {
         const result = normalizeCredential({
           credentialSubject: { foo: 'bar' },
-          vc: { credentialSubject: { foo: 'bazzz' } }
+          vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] }
         })
         expect(result).toMatchObject({ credentialSubject: { foo: 'bazzz' } })
       })
@@ -133,12 +133,12 @@ describe('credential', () => {
       })
 
       it('merges type as arrays for single items', () => {
-        const result = normalizeCredential({ type: 'bar', vc: { type: 'foo' } })
+        const result = normalizeCredential({ type: 'bar', vc: { type: 'foo', '@context': [], credentialSubject: {} } })
         expect(result).toMatchObject({ type: ['bar', 'foo'] })
       })
 
       it('merges type as arrays uniquely', () => {
-        const result = normalizeCredential({ type: 'foo', vc: { type: 'foo' } })
+        const result = normalizeCredential({ type: 'foo', vc: { type: 'foo', '@context': [], credentialSubject: {} } })
         expect(result).toMatchObject({ type: ['foo'] })
         expect(result).not.toHaveProperty('vc')
       })
@@ -156,7 +156,7 @@ describe('credential', () => {
       })
 
       it('merges @context as arrays for single items', () => {
-        const result = normalizeCredential({ context: 'baz', '@context': 'bar', vc: { '@context': 'foo' } })
+        const result = normalizeCredential({ context: 'baz', '@context': 'bar', vc: { '@context': 'foo', type: [], credentialSubject: {} } })
         expect(result).toMatchObject({ '@context': ['baz', 'bar', 'foo'] })
       })
 
@@ -646,7 +646,7 @@ describe('presentation', () => {
         const result = normalizePresentation({
           '@context': ['foo', 'bar'],
           context: ['bar', 'baz', undefined, null],
-          vp: { '@context': ['bar', 'baz', 'bak'] }
+          vp: { '@context': ['bar', 'baz', 'bak'], type: [], verifiableCredential: [] }
         })
         expect(result).toMatchObject({ '@context': ['bar', 'baz', 'foo', 'bak'] })
       })

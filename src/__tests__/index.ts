@@ -1,5 +1,5 @@
 import EthrDID from 'ethr-did'
-import { createVerifiableCredentialJwt, createPresentationJwt, verifyCredential, verifyPresentation } from '../index'
+import { createVerifiableCredentialJwt, verifyCredential, verifyPresentation, createVerifiablePresentationJwt } from '../index'
 import { verifyJWT, decodeJWT } from 'did-jwt'
 import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
@@ -111,19 +111,19 @@ describe('createVerifiableCredential', () => {
 
 describe('createPresentation', () => {
   it('creates a valid Presentation JWT with required fields', async () => {
-    const presentationJwt = await createPresentationJwt(presentationPayload, did)
+    const presentationJwt = await createVerifiablePresentationJwt(presentationPayload, did)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
   })
   it('creates a valid Presentation JWT with extra optional fields', async () => {
-    const presentationJwt = await createPresentationJwt({ ...presentationPayload, extra: 42 }, did)
+    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, did)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
   })
   it('calls functions to validate required fields', async () => {
-    await createPresentationJwt(presentationPayload, did)
+    await createVerifiablePresentationJwt(presentationPayload, did)
     expect(mockValidateContext).toHaveBeenCalledWith(presentationPayload.vp['@context'])
     expect(mockValidateVpType).toHaveBeenCalledWith(presentationPayload.vp.type)
     for (const vc of presentationPayload.vp.verifiableCredential) {
@@ -132,7 +132,7 @@ describe('createPresentation', () => {
   })
   it('throws a TypeError if vp.verifiableCredential is empty', async () => {
     await expect(
-      createPresentationJwt(
+      createVerifiablePresentationJwt(
         {
           ...presentationPayload,
           vp: {
@@ -147,7 +147,7 @@ describe('createPresentation', () => {
   })
   it('calls functions to validate optional fields if they are present', async () => {
     const timestamp = Math.floor(new Date().getTime())
-    await createPresentationJwt(
+    await createVerifiablePresentationJwt(
       {
         ...presentationPayload,
         exp: timestamp
@@ -162,22 +162,20 @@ describe('verifyCredential', () => {
   it('verifies a valid Verifiable Credential', async () => {
     const verified = await verifyCredential(VC_JWT, resolver)
     expect(verified.payload.vc).toBeDefined()
+    expect(verified.verifiableCredential).toBeDefined()
   })
-
+  
   it('verifies and converts a legacy format attestation into a Verifiable Credential', async () => {
     // tslint:disable-next-line: max-line-length
     const LEGACY_FORMAT_ATTESTATION =
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
     const verified = await verifyCredential(LEGACY_FORMAT_ATTESTATION, resolver)
-    expect(verified.payload.vc).toBeDefined()
+    // expect(verified.payload.vc).toBeDefined()
+    expect(verified.verifiableCredential).toBeDefined()
   })
 
   it('rejects an invalid JWT', () => {
     expect(verifyCredential('not a jwt', resolver)).rejects.toThrow()
-  })
-
-  it('rejects a valid JWT that is missing VC attributes', () => {
-    expect(verifyCredential(BASIC_JWT, resolver)).rejects.toThrow()
   })
 })
 
@@ -185,6 +183,7 @@ describe('verifyPresentation', () => {
   it('verifies a valid Presentation', async () => {
     const verified = await verifyPresentation(PRESENTATION_JWT, resolver)
     expect(verified.payload.vp).toBeDefined()
+    expect(verified.verifiablePresentation).toBeDefined()
   })
 
   it('rejects an invalid JWT', () => {
