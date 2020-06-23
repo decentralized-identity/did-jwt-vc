@@ -1,4 +1,4 @@
-import { Signer } from 'did-jwt'
+import { Signer, verifyJWT } from 'did-jwt'
 
 export interface JwtCredentialSubject {
   [x: string]: any
@@ -11,11 +11,11 @@ export interface CredentialStatus {
 
 export interface JwtCredentialPayload {
   sub: string
-  vc: {
-    '@context': string[]
-    type: string[]
+  vc: Extensible<{
+    '@context': string[] | string
+    type: string[] | string
     credentialSubject: JwtCredentialSubject
-  }
+  }>
   nbf?: number
   aud?: string | string[]
   exp?: number
@@ -24,11 +24,11 @@ export interface JwtCredentialPayload {
 }
 
 export interface JwtPresentationPayload {
-  vp: {
-    '@context': string[]
-    type: string[]
-    verifiableCredential: VerifiableCredential[]
-  }
+  vp: Extensible<{
+    '@context': string[] | string
+    type: string[] | string
+    verifiableCredential: VerifiableCredential[] | VerifiableCredential
+  }>
   aud?: string | string[]
   nbf?: number
   exp?: number
@@ -36,12 +36,12 @@ export interface JwtPresentationPayload {
   [x: string]: any
 }
 
-export type IssuerType = { id: string; [x: string]: any } | string
+export type IssuerType = { id: string;[x: string]: any } | string
 export type DateType = string | Date
 /**
  * used as input when creating Verifiable Credentials
  */
-export interface CredentialPayload {
+interface ICredentialPayload {
   '@context': string[]
   id?: string
   type: string[]
@@ -53,12 +53,12 @@ export interface CredentialPayload {
     [x: string]: any
   }
   credentialStatus?: CredentialStatus
-  //application specific fields
-  [x: string]: any
 }
 
+export type CredentialPayload = Extensible<ICredentialPayload>
+
 /**
- * This is meant to reflect unambiguous types for the properties in `CredentialPayloadInput`
+ * This is meant to reflect unambiguous types for the properties in `CredentialPayload`
  */
 interface NarrowCredentialDefinitions {
   issuer: Exclude<IssuerType, string>
@@ -70,6 +70,7 @@ interface NarrowCredentialDefinitions {
  * Replaces the matching property types of T with the ones in U
  */
 type Replace<T, U> = Omit<T, keyof U> & U
+type Extensible<T> = T & { [x: string]: any }
 
 /**
  * This data type represents a parsed VerifiableCredential.
@@ -81,21 +82,23 @@ type Replace<T, U> = Omit<T, keyof U> & U
  *
  * Any JWT specific properties are transformed to the broader W3C variant and any app specific properties are left intact
  */
-export type Credential = Replace<CredentialPayload, NarrowCredentialDefinitions>
+export type Credential = Extensible<Replace<ICredentialPayload, NarrowCredentialDefinitions>>
 
 /**
  * used as input when creating Verifiable Presentations
  */
-export interface PresentationPayload {
+export interface IPresentationPayload {
   '@context': string[]
   type: string[]
   id?: string
   verifiableCredential: VerifiableCredential[]
   holder: string
   verifier?: string[]
-  //application specific fields
-  [x: string]: any
+  issuanceDate?: string
+  expirationDate?: string
 }
+
+export type PresentationPayload = Extensible<IPresentationPayload>
 
 interface NarrowPresentationDefinitions {
   verifiableCredential: Verifiable<Credential>[]
@@ -108,7 +111,7 @@ interface NarrowPresentationDefinitions {
  * The `verifiableCredential` array should contain parsed `Verifiable<Credential>` elements.
  * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are left intact.
  */
-export type Presentation = Replace<PresentationPayload, NarrowPresentationDefinitions>
+export type Presentation = Extensible<Replace<IPresentationPayload, NarrowPresentationDefinitions>>
 
 export interface Proof {
   type?: string
@@ -120,6 +123,17 @@ export type JWT = string
 
 export type VerifiablePresentation = Verifiable<Presentation> | JWT
 export type VerifiableCredential = JWT | Verifiable<Credential>
+
+type UnpackedPromise<T> = T extends Promise<infer U> ? U : T;
+export type Verified = UnpackedPromise<ReturnType<typeof verifyJWT>>;
+
+export type VerifiedPresentation = Verified & {
+  verifiablePresentation: Verifiable<Presentation>
+}
+
+export type VerifiedCredential = Verified & {
+  verifiableCredential: Verifiable<Credential>
+}
 
 export interface Issuer {
   did: string

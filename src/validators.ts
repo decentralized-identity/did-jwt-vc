@@ -15,9 +15,15 @@ export function validateJwtFormat(value: VerifiableCredential): void {
 // 10 digits max is 9999999999 -> 11/20/2286 @ 5:46pm (UTC)
 // 11 digits max is 99999999999 -> 11/16/5138 @ 9:46am (UTC)
 // 12 digits max is 999999999999 -> 09/27/33658 @ 1:46am (UTC)
-export function validateTimestamp(value: number): void {
-  if (!(Number.isInteger(value) && value < 100000000000)) {
-    throw new TypeError(`"${value}" is not a unix timestamp in seconds`)
+export function validateTimestamp(value: number | string): void {
+  if (typeof value === 'number') {
+    if (!(Number.isInteger(value) && value < 100000000000)) {
+      throw new TypeError(`"${value}" is not a unix timestamp in seconds`)
+    }
+  } else if (typeof value === 'string') {
+    validateTimestamp(new Date(value).valueOf() / 1000)
+  } else {
+    throw new TypeError(`"${value}" is not a valid time`)
   }
 }
 
