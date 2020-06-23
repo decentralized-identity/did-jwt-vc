@@ -1,5 +1,10 @@
 import EthrDID from 'ethr-did'
-import { createVerifiableCredentialJwt, verifyCredential, verifyPresentation, createVerifiablePresentationJwt } from '../index'
+import {
+  createVerifiableCredentialJwt,
+  verifyCredential,
+  verifyPresentation,
+  createVerifiablePresentationJwt
+} from '../index'
 import { verifyJWT, decodeJWT } from 'did-jwt'
 import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
@@ -164,11 +169,11 @@ describe('verifyCredential', () => {
     expect(verified.payload.vc).toBeDefined()
     expect(verified.verifiableCredential).toBeDefined()
   })
-  
+
   it('verifies and converts a legacy format attestation into a Verifiable Credential', async () => {
     // tslint:disable-next-line: max-line-length
     const LEGACY_FORMAT_ATTESTATION =
-    'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
+      'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
     const verified = await verifyCredential(LEGACY_FORMAT_ATTESTATION, resolver)
     // expect(verified.payload.vc).toBeDefined()
     expect(verified.verifiableCredential).toBeDefined()

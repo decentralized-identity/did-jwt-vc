@@ -18,15 +18,34 @@ import {
   Verified
 } from './types'
 import { DIDDocument } from 'did-resolver'
-import { transformCredentialInput, transformPresentationInput, normalizePresentation, normalizeCredential, isLegacyAttestationFormat, attestationToVcFormat } from './converters'
+import {
+  transformCredentialInput,
+  transformPresentationInput,
+  normalizePresentation,
+  normalizeCredential,
+  isLegacyAttestationFormat,
+  attestationToVcFormat,
+  asArray
+} from './converters'
 
-export { Issuer, JwtCredentialPayload, JwtPresentationPayload, VerifiableCredential, VerifiablePresentation, VerifiedCredential, VerifiedPresentation }
+export {
+  Issuer,
+  JwtCredentialPayload,
+  JwtPresentationPayload,
+  VerifiableCredential,
+  VerifiablePresentation,
+  VerifiedCredential,
+  VerifiedPresentation
+}
 
 interface Resolvable {
   resolve: (did: string) => Promise<DIDDocument>
 }
 
-export async function createVerifiableCredentialJwt(payload: JwtCredentialPayload | CredentialPayload, issuer: Issuer): Promise<JWT> {
+export async function createVerifiableCredentialJwt(
+  payload: JwtCredentialPayload | CredentialPayload,
+  issuer: Issuer
+): Promise<JWT> {
   const parsedPayload = transformCredentialInput(payload)
   validateJwtVerifiableCredentialPayload(parsedPayload)
   return createJWT(parsedPayload, {
@@ -36,7 +55,10 @@ export async function createVerifiableCredentialJwt(payload: JwtCredentialPayloa
   })
 }
 
-export async function createVerifiablePresentationJwt(payload: JwtPresentationPayload | PresentationPayload, issuer: Issuer): Promise<JWT> {
+export async function createVerifiablePresentationJwt(
+  payload: JwtPresentationPayload | PresentationPayload,
+  issuer: Issuer
+): Promise<JWT> {
   const parsedPayload = transformPresentationInput(payload)
   validateJwtPresentationPayload(parsedPayload)
   return createJWT(parsedPayload, {
@@ -68,8 +90,12 @@ export function validateJwtPresentationPayload(payload: JwtPresentationPayload):
   if (payload.vp.verifiableCredential.length < 1) {
     throw new TypeError('vp.verifiableCredential must not be empty')
   }
-  for (const vc of payload.vp.verifiableCredential) {
-    validators.validateJwtFormat(vc)
+  for (const vc of asArray(payload.vp.verifiableCredential)) {
+    if (typeof vc === 'string') {
+      validators.validateJwtFormat(vc)
+    } else {
+      validateVerifiableCredentialPayload(vc)
+    }
   }
   if (payload.exp) validators.validateTimestamp(payload.exp)
 }
@@ -90,17 +116,16 @@ export function validatePresentationPayload(payload: PresentationPayload): void 
   if (payload.expirationDate) validators.validateTimestamp(payload.expirationDate)
 }
 
-export async function verifyCredential(vc: JWT, resolver: Resolvable): Promise<any> {
-  const verified = await verifyJWT(vc, { resolver })
-  if (isLegacyAttestationFormat(verified.payload)) {
-    verified.payload = attestationToVcFormat(verified.payload)
-  }
-  validateJwtVerifiableCredentialPayload(verified.payload)
-  return verified
+export async function verifyCredential(vc: JWT, resolver: Resolvable): Promise<VerifiedCredential> {
+  const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver })
+  verified.verifiableCredential = normalizeCredential(verified.jwt)
+  validateVerifiableCredentialPayload(verified.verifiableCredential)
+  return verified as VerifiedCredential
 }
 
-export async function verifyPresentation(presentation: JWT, resolver: Resolvable): Promise<any> {
-  const verified = await verifyJWT(presentation, { resolver })
-  validateJwtPresentationPayload(verified.payload)
-  return verified
+export async function verifyPresentation(presentation: JWT, resolver: Resolvable): Promise<VerifiedPresentation> {
+  const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver })
+  verified.verifiablePresentation = normalizePresentation(verified.jwt)
+  validatePresentationPayload(verified.verifiablePresentation)
+  return verified as VerifiedPresentation
 }

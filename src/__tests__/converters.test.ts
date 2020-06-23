@@ -1,4 +1,9 @@
-import { normalizeCredential, transformCredentialInput, normalizePresentation, transformPresentationInput } from '../converters'
+import {
+  normalizeCredential,
+  transformCredentialInput,
+  normalizePresentation,
+  transformPresentationInput
+} from '../converters'
 import { DEFAULT_JWT_PROOF_TYPE } from '../constants'
 
 function encodeBase64Url(input: string): string {
@@ -156,7 +161,11 @@ describe('credential', () => {
       })
 
       it('merges @context as arrays for single items', () => {
-        const result = normalizeCredential({ context: 'baz', '@context': 'bar', vc: { '@context': 'foo', type: [], credentialSubject: {} } })
+        const result = normalizeCredential({
+          context: 'baz',
+          '@context': 'bar',
+          vc: { '@context': 'foo', type: [], credentialSubject: {} }
+        })
         expect(result).toMatchObject({ '@context': ['baz', 'bar', 'foo'] })
       })
 
@@ -723,25 +732,41 @@ describe('presentation', () => {
 
     describe('verifiableCredential', () => {
       it('merges verifiableCredentials arrays', () => {
-        const result = transformPresentationInput({ verifiableCredential: [{ id: 'foo' }], vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] } } as any)
-        expect(result).toMatchObject({ vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] } })
+        const result = transformPresentationInput({
+          verifiableCredential: [{ id: 'foo' }],
+          vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] }
+        } as any)
+        expect(result).toMatchObject({
+          vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] }
+        })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
 
       it('merges verifiableCredential arrays when not array types', () => {
-        const result = transformPresentationInput({ verifiableCredential: { id: 'foo' }, vp: { verifiableCredential: { foo: 'bar' } } } as any)
+        const result = transformPresentationInput({
+          verifiableCredential: { id: 'foo' },
+          vp: { verifiableCredential: { foo: 'bar' } }
+        } as any)
         expect(result).toMatchObject({ vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }] } })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
 
       it('condenses JWT credentials', () => {
-        const result = transformPresentationInput({ verifiableCredential: { id: 'foo', proof: { jwt: 'header.payload1.signature' } }, vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] } } as any)
-        expect(result).toMatchObject({ vp: { verifiableCredential: ['header.payload1.signature', { foo: 'bar' }, 'header.payload2.signature'] } })
+        const result = transformPresentationInput({
+          verifiableCredential: { id: 'foo', proof: { jwt: 'header.payload1.signature' } },
+          vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] }
+        } as any)
+        expect(result).toMatchObject({
+          vp: { verifiableCredential: ['header.payload1.signature', { foo: 'bar' }, 'header.payload2.signature'] }
+        })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
 
       it('filters empty credentials', () => {
-        const result = transformPresentationInput({ verifiableCredential: undefined, vp: { verifiableCredential: [null, { foo: 'bar' }, 'header.payload2.signature'] } } as any)
+        const result = transformPresentationInput({
+          verifiableCredential: undefined,
+          vp: { verifiableCredential: [null, { foo: 'bar' }, 'header.payload2.signature'] }
+        } as any)
         expect(result).toMatchObject({ vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] } })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
@@ -756,7 +781,11 @@ describe('presentation', () => {
       })
 
       it('merges @context fields when not array types', () => {
-        const result = transformPresentationInput({ context: 'AA', '@context': 'BB', vp: { '@context': ['CC'] } } as any)
+        const result = transformPresentationInput({
+          context: 'AA',
+          '@context': 'BB',
+          vp: { '@context': ['CC'] }
+        } as any)
         expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC'] } })
         expect(result).not.toHaveProperty('context')
         expect(result).not.toHaveProperty('@context')
