@@ -62,7 +62,7 @@
     "did-resolver": "2.0.1",
     "ethr-did": "1.1.0",
     "faker": "4.1.0",
-    "jest": "26.0.1",
+    "jest": "26.1.0",
     "microbundle": "0.12.2",
     "prettier": "2.0.5",
     "semantic-release": "17.1.0",
