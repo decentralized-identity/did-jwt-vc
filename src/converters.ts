@@ -12,7 +12,7 @@ import {
 import { decodeJWT } from 'did-jwt'
 import { JWT_FORMAT, DEFAULT_JWT_PROOF_TYPE, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 
-function asArray(input: any) {
+export function asArray(input: any) {
   return Array.isArray(input) ? input : [input]
 }
 
@@ -399,14 +399,14 @@ export function transformPresentationInput(
     ...asArray(result.verifiableCredential),
     ...asArray(result.vp?.verifiableCredential)
   ]
-  .filter(notEmpty)
-  .map((credential: VerifiableCredential) => {
-    if (typeof credential === 'object' && credential.proof?.jwt) {
-      return credential.proof.jwt
-    } else {
-      return credential
-    }
-  })
+    .filter(notEmpty)
+    .map((credential: VerifiableCredential) => {
+      if (typeof credential === 'object' && credential.proof?.jwt) {
+        return credential.proof.jwt
+      } else {
+        return credential
+      }
+    })
   delete result.verifiableCredential
 
   if (input.holder && Object.getOwnPropertyNames(input).indexOf('iss') == -1) {

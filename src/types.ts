@@ -11,11 +11,12 @@ export interface CredentialStatus {
 
 export interface JwtCredentialPayload {
   sub: string
-  vc: Extensible<{
+  vc: {
     '@context': string[] | string
     type: string[] | string
     credentialSubject: JwtCredentialSubject
-  }>
+    [x: string]: any
+  }
   nbf?: number
   aud?: string | string[]
   exp?: number
@@ -24,11 +25,12 @@ export interface JwtCredentialPayload {
 }
 
 export interface JwtPresentationPayload {
-  vp: Extensible<{
+  vp: {
     '@context': string[] | string
     type: string[] | string
     verifiableCredential: VerifiableCredential[] | VerifiableCredential
-  }>
+    [x: string]: any
+  }
   aud?: string | string[]
   nbf?: number
   exp?: number
@@ -36,7 +38,7 @@ export interface JwtPresentationPayload {
   [x: string]: any
 }
 
-export type IssuerType = { id: string;[x: string]: any } | string
+export type IssuerType = { id: string; [x: string]: any } | string
 export type DateType = string | Date
 /**
  * used as input when creating Verifiable Credentials
@@ -124,8 +126,8 @@ export type JWT = string
 export type VerifiablePresentation = Verifiable<Presentation> | JWT
 export type VerifiableCredential = JWT | Verifiable<Credential>
 
-type UnpackedPromise<T> = T extends Promise<infer U> ? U : T;
-export type Verified = UnpackedPromise<ReturnType<typeof verifyJWT>>;
+type UnpackedPromise<T> = T extends Promise<infer U> ? U : T
+export type Verified = UnpackedPromise<ReturnType<typeof verifyJWT>>
 
 export type VerifiedPresentation = Verified & {
   verifiablePresentation: Verifiable<Presentation>
