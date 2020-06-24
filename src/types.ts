@@ -43,7 +43,7 @@ export type DateType = string | Date
 /**
  * used as input when creating Verifiable Credentials
  */
-interface ICredentialPayload {
+interface FixedCredentialPayload {
   '@context': string[]
   id?: string
   type: string[]
@@ -57,7 +57,7 @@ interface ICredentialPayload {
   credentialStatus?: CredentialStatus
 }
 
-export type CredentialPayload = Extensible<ICredentialPayload>
+export type CredentialPayload = Extensible<FixedCredentialPayload>
 
 /**
  * This is meant to reflect unambiguous types for the properties in `CredentialPayload`
@@ -84,12 +84,12 @@ type Extensible<T> = T & { [x: string]: any }
  *
  * Any JWT specific properties are transformed to the broader W3C variant and any app specific properties are left intact
  */
-export type Credential = Extensible<Replace<ICredentialPayload, NarrowCredentialDefinitions>>
+export type Credential = Extensible<Replace<FixedCredentialPayload, NarrowCredentialDefinitions>>
 
 /**
  * used as input when creating Verifiable Presentations
  */
-export interface IPresentationPayload {
+export interface FixedPresentationPayload {
   '@context': string[]
   type: string[]
   id?: string
@@ -100,7 +100,7 @@ export interface IPresentationPayload {
   expirationDate?: string
 }
 
-export type PresentationPayload = Extensible<IPresentationPayload>
+export type PresentationPayload = Extensible<FixedPresentationPayload>
 
 interface NarrowPresentationDefinitions {
   verifiableCredential: Verifiable<Credential>[]
@@ -113,7 +113,7 @@ interface NarrowPresentationDefinitions {
  * The `verifiableCredential` array should contain parsed `Verifiable<Credential>` elements.
  * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are left intact.
  */
-export type Presentation = Extensible<Replace<IPresentationPayload, NarrowPresentationDefinitions>>
+export type Presentation = Extensible<Replace<FixedPresentationPayload, NarrowPresentationDefinitions>>
 
 export interface Proof {
   type?: string

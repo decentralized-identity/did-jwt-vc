@@ -30,21 +30,21 @@ export function validateTimestamp(value: number | string): void {
 
 export function validateContext(value: string | string[]): void {
   const input = asArray(value)
-  if (input.length < 1 || input.indexOf(DEFAULT_CONTEXT) == -1) {
+  if (input.length < 1 || input.indexOf(DEFAULT_CONTEXT) === -1) {
     throw new TypeError(`@context is missing default context "${DEFAULT_CONTEXT}"`)
   }
 }
 
 export function validateVcType(value: string | string[]): void {
   const input = asArray(value)
-  if (input.length < 1 || input.indexOf(DEFAULT_VC_TYPE) == -1) {
+  if (input.length < 1 || input.indexOf(DEFAULT_VC_TYPE) === -1) {
     throw new TypeError(`type is missing default "${DEFAULT_VC_TYPE}"`)
   }
 }
 
 export function validateVpType(value: string | string[]): void {
   const input = asArray(value)
-  if (input.length < 1 || input.indexOf(DEFAULT_VP_TYPE) == -1) {
+  if (input.length < 1 || input.indexOf(DEFAULT_VP_TYPE) === -1) {
     throw new TypeError(`type is missing default "${DEFAULT_VP_TYPE}"`)
   }
 }
