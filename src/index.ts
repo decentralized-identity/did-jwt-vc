@@ -14,7 +14,7 @@ import {
   Credential,
   Presentation,
   VerifiedCredential,
-  VerifiedPresentation,
+  VerifiedPresentation
 } from './types'
 import { DIDDocument } from 'did-resolver'
 import {
@@ -32,7 +32,14 @@ export {
   VerifiableCredential,
   VerifiablePresentation,
   VerifiedCredential,
-  VerifiedPresentation
+  VerifiedPresentation,
+  Verifiable,
+  Credential,
+  Presentation,
+  transformCredentialInput,
+  transformPresentationInput,
+  normalizeCredential,
+  normalizePresentation
 }
 
 interface Resolvable {
@@ -40,24 +47,25 @@ interface Resolvable {
 }
 
 /**
-* Creates a VerifiableCredential given a `CredentialPayload` or `JwtCredentialPayload` and an `Issuer`.
-*
-* This method transforms the payload into the [JWT encoding](https://www.w3.org/TR/vc-data-model/#jwt-encoding)
-* described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum spec
-* required spec.
-*
-* The `issuer` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
-*
-* @param payload `CredentialPayload` or `JwtCredentialPayload`
-* @param issuer `Issuer` the DID, signer and algorithm that will sign the token
-* @return a `Promise` that resolves to the JWT encoded verifiable credential or rejects with `TypeError` if the `payload` is not W3C compliant
-*/
+ * Creates a VerifiableCredential given a `CredentialPayload` or `JwtCredentialPayload` and an `Issuer`.
+ *
+ * This method transforms the payload into the [JWT encoding](https://www.w3.org/TR/vc-data-model/#jwt-encoding)
+ * described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum spec
+ * required spec.
+ *
+ * The `issuer` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
+ *
+ * @param payload `CredentialPayload` or `JwtCredentialPayload`
+ * @param issuer `Issuer` the DID, signer and algorithm that will sign the token
+ * @return a `Promise` that resolves to the JWT encoded verifiable credential or rejects with `TypeError` if the
+ * `payload` is not W3C compliant
+ */
 export async function createVerifiableCredentialJwt(
   payload: JwtCredentialPayload | CredentialPayload,
   issuer: Issuer
 ): Promise<JWT> {
   const parsedPayload = transformCredentialInput(payload)
-  validateJwtVerifiableCredentialPayload(parsedPayload)
+  validateJwtCredentialPayload(parsedPayload)
   return createJWT(parsedPayload, {
     issuer: issuer.did,
     signer: issuer.signer,
@@ -66,18 +74,19 @@ export async function createVerifiableCredentialJwt(
 }
 
 /**
-* Creates a VerifiablePresentation JWT given a `PresentationPayload` or `JwtPresentationPayload` and an `Issuer`.
-*
-* This method transforms the payload into the [JWT encoding](https://www.w3.org/TR/vc-data-model/#jwt-encoding)
-* described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum spec
-* required spec.
-*
-* The `issuer` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
-*
-* @param payload `PresentationPayload` or `JwtPresentationPayload`
-* @param issuer `Issuer` the DID, signer and algorithm that will sign the token
-* @return a `Promise` that resolves to the JWT encoded verifiable presentation or rejects with `TypeError` if the `payload` is not W3C compliant
-*/
+ * Creates a VerifiablePresentation JWT given a `PresentationPayload` or `JwtPresentationPayload` and an `Issuer`.
+ *
+ * This method transforms the payload into the [JWT encoding](https://www.w3.org/TR/vc-data-model/#jwt-encoding)
+ * described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum spec
+ * required spec.
+ *
+ * The `issuer` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
+ *
+ * @param payload `PresentationPayload` or `JwtPresentationPayload`
+ * @param issuer `Issuer` the DID, signer and algorithm that will sign the token
+ * @return a `Promise` that resolves to the JWT encoded verifiable presentation or rejects with `TypeError` if the
+ * `payload` is not W3C compliant
+ */
 export async function createVerifiablePresentationJwt(
   payload: JwtPresentationPayload | PresentationPayload,
   issuer: Issuer
@@ -91,7 +100,7 @@ export async function createVerifiablePresentationJwt(
   })
 }
 
-export function validateJwtVerifiableCredentialPayload(payload: JwtCredentialPayload): void {
+export function validateJwtCredentialPayload(payload: JwtCredentialPayload): void {
   validators.validateContext(payload.vc['@context'])
   validators.validateVcType(payload.vc.type)
   validators.validateCredentialSubject(payload.vc.credentialSubject)
@@ -99,7 +108,7 @@ export function validateJwtVerifiableCredentialPayload(payload: JwtCredentialPay
   if (payload.exp) validators.validateTimestamp(payload.exp)
 }
 
-export function validateVerifiableCredentialPayload(payload: CredentialPayload): void {
+export function validateCredentialPayload(payload: CredentialPayload): void {
   validators.validateContext(payload['@context'])
   validators.validateVcType(payload.type)
   validators.validateCredentialSubject(payload.credentialSubject)
@@ -117,7 +126,7 @@ export function validateJwtPresentationPayload(payload: JwtPresentationPayload):
     if (typeof vc === 'string') {
       validators.validateJwtFormat(vc)
     } else {
-      validateVerifiableCredentialPayload(vc)
+      validateCredentialPayload(vc)
     }
   }
   if (payload.exp) validators.validateTimestamp(payload.exp)
@@ -133,7 +142,7 @@ export function validatePresentationPayload(payload: PresentationPayload): void 
     if (typeof vc === 'string') {
       validators.validateJwtFormat(vc)
     } else {
-      validateVerifiableCredentialPayload(vc)
+      validateCredentialPayload(vc)
     }
   }
   if (payload.expirationDate) validators.validateTimestamp(payload.expirationDate)
@@ -141,22 +150,24 @@ export function validatePresentationPayload(payload: PresentationPayload): void 
 
 /**
  * Verifies and validates a VerifiableCredential that is encoded as a JWT according to the W3C spec.
- * 
- * @return a `Promise` that resolves to a `VerifiedCredential` or rejects with `TypeError` if the input is not W3C compliant
+ *
+ * @return a `Promise` that resolves to a `VerifiedCredential` or rejects with `TypeError` if the input is not
+ * W3C compliant
  * @param vc the credential to be verified. Currently only the JWT encoding is supported by this library
  * @param resolver a configured `Resolver` that can provide the DID document of the JWT issuer
  */
 export async function verifyCredential(vc: JWT, resolver: Resolvable): Promise<VerifiedCredential> {
   const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver })
   verified.verifiableCredential = normalizeCredential(verified.jwt)
-  validateVerifiableCredentialPayload(verified.verifiableCredential)
+  validateCredentialPayload(verified.verifiableCredential)
   return verified as VerifiedCredential
 }
 
 /**
  * Verifies and validates a VerifiablePresentation that is encoded as a JWT according to the W3C spec.
- * 
- * @return a `Promise` that resolves to a `VerifiedPresentation` or rejects with `TypeError` if the input is not W3C compliant
+ *
+ * @return a `Promise` that resolves to a `VerifiedPresentation` or rejects with `TypeError` if the input is
+ * not W3C compliant
  * @param presentation the presentation to be verified. Currently only the JWT encoding is supported by this library
  * @param resolver a configured `Resolver` that can provide the DID document of the JWT issuer (presentation holder)
  */
