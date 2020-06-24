@@ -1,9 +1,7 @@
 # did-jwt-vc
-
 Create and verify W3C Verifiable Credentials and Presentations in JWT format
 
 ## Installation
-
 ```
 npm install did-jwt-vc
 ```
@@ -28,16 +26,18 @@ const issuer: Issuer = new EthrDID({
 
 The `Issuer` object must contain a `did` attribute, as well as a `signer` function to generate the signature.
 
-Currently, there is only support for `ethr-did` issuers to sign JWTs using the `ES256K-R` algorithm. Future versions of this library will enable support for alternative DID methods and signing algorithms.
+Currently, there is only support for `ethr-did` issuers to sign JWTs using the `ES256K` algorithm. Future versions of
+this library will enable support for alternative DID methods and signing algorithms.
 
 #### Creating a Verifiable Credential
 
-Specify a `payload` matching the `VerifiableCredentialPayload` interface. Create a JWT by signing it with the previously configured `issuer` using the `createVerifiableCredential` function:
+Specify a `payload` matching the `CredentialPayload` or `JwtCredentialPayload` interfaces. Create a JWT by signing it
+with the previously configured `issuer` using the `createVerifiableCredentialJwt` function:
 
 ```typescript
 import { VerifiableCredentialPayload, createVerifiableCredential } from 'did-jwt-vc'
 
-const vcPayload: VerifiableCredentialPayload = {
+const vcPayload: JwtCredentialPayload = {
   sub: 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4',
   nbf: 1562950282,
   vc: {
@@ -52,14 +52,16 @@ const vcPayload: VerifiableCredentialPayload = {
   }
 }
 
-const vcJwt = await createVerifiableCredential(vcPayload, issuer)
+const vcJwt = await createVerifiableCredentialJwt(vcPayload, issuer)
 console.log(vcJwt)
-// eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc1OTMsInN1YiI6ImRpZDpldGhyOjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJjcmVkZW50aWFsU3ViamVjdCI6eyJkZWdyZWUiOnsidHlwZSI6IkJhY2hlbG9yRGVncmVlIiwibmFtZSI6IkJhY2NhbGF1csOpYXQgZW4gbXVzaXF1ZXMgbnVtw6lyaXF1ZXMifX19LCJpc3MiOiJkaWQ6ZXRocjoweGYxMjMyZjg0MGYzYWQ3ZDIzZmNkYWE4NGQ2YzY2ZGFjMjRlZmIxOTgifQ.ljTuUW6bcsoBQksMo5l8eFImVdOA-ew993B4ret_p9A8j2DLQ60CQmqB14NnN5XxD0d_glLRs1Myc_LBJjnuNwE
+// eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQi...0CQmqB14NnN5XxD0d_glLRs1Myc_LBJjnuNwE
 ```
 
 #### Creating a Verifiable Presentation
 
-Specify a `payload` matching the `PresentationPayload` interface, including the VC JWTs to be presented in the `vp.verifiableCredential` array. Create a JWT by signing it with the previously configured `issuer` using the `createPresentation` function:
+Specify a `payload` matching the `PresentationPayload` or `JwtPresentationPayload` interfaces, including the VC JWTs to
+be presented in the `vp.verifiableCredential` array. Create a JWT by signing it with the previously configured `issuer`
+using the `createVerifiablePresentationJwt` function:
 
 ```typescript
 import { PresentationPayload, createPresentation } from 'did-jwt-vc'
@@ -74,14 +76,16 @@ const vpPayload: PresentationPayload = {
 
 const vpJwt = await createPresentation(vpPayload, issuer)
 console.log(vpJwt)
-// eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc1OTMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU9ESTFORGMxT1RNc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaVhTd2lkSGx3WlNJNld5SldaWEpwWm1saFlteGxRM0psWkdWdWRHbGhiQ0pkTENKamNtVmtaVzUwYVdGc1UzVmlhbVZqZENJNmV5SmtaV2R5WldVaU9uc2lkSGx3WlNJNklrSmhZMmhsYkc5eVJHVm5jbVZsSWl3aWJtRnRaU0k2SWtKaFkyTmhiR0YxY3NPcFlYUWdaVzRnYlhWemFYRjFaWE1nYm5WdHc2bHlhWEYxWlhNaWZYMTlMQ0pwYzNNaU9pSmthV1E2WlhSb2Nqb3dlR1l4TWpNeVpqZzBNR1l6WVdRM1pESXpabU5rWVdFNE5HUTJZelkyWkdGak1qUmxabUl4T1RnaWZRLmxqVHVVVzZiY3NvQlFrc01vNWw4ZUZJbVZkT0EtZXc5OTNCNHJldF9wOUE4ajJETFE2MENRbXFCMTRObk41WHhEMGRfZ2xMUnMxTXljX0xCSmpudU53RSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.cFyO-xPMdj0Hg1DaCkm30hzcVcYdnDdgyxXLZr9NAJNMUzZ6naacuWNGdZGuU0ZDwmgpUMUqIzMqFFRmge0R8QA
+// eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc...JNMUzZ6naacuWNGdZGuU0ZDwmgpUMUqIzMqFFRmge0R8QA
 ```
 
 ### Verifying JWTs
 
 #### Prerequisites
 
-Create a `Resolver` using [did-resolver](https://github.com/decentralized-identity/did-resolver) and register the [ethr-did-resolver](https://github.com/decentralized-identity/ethr-did-resolver). When verifying a JWT signed by a DID, it is necessary to resolve its DID Document to check for keys that can validate the signature.
+Create a `Resolver` using [did-resolver](https://github.com/decentralized-identity/did-resolver) and register the
+[ethr-did-resolver](https://github.com/decentralized-identity/ethr-did-resolver). When verifying a JWT signed by a DID,
+it is necessary to resolve its DID Document to check for keys that can validate the signature.
 
 ```typescript
 import { Resolver } from 'did-resolver'
@@ -106,29 +110,38 @@ const verifiedVC = await verifyCredential(vcJwt, resolver)
 console.log(verifiedVC)
 /*
 {
-  payload: {
-    iat: 1582547593,
-    sub: 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4',
-    nbf: 1562950282,
-    vc: { '@context': [Array], type: [Array], credentialSubject: [Object] },
-    iss: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+  "payload": {
+    // the original payload of the signed credential
   },
-  doc: {
-    '@context': 'https://w3id.org/did/v1',
-    id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-    publicKey: [ [Object] ],
-    authentication: [ [Object] ]
+  "doc": {
+    // the DID document of the credential issuer (as returned by the `resolver`)
   },
-  issuer: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-  signer: {
-    id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198#owner',
-    type: 'Secp256k1VerificationKey2018',
-    owner: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-    ethereumAddress: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+  "issuer": "did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198", //the credential issuer
+  "signer": {
+    //the publicKey entry of the `doc` that has signed the credential
   },
-  jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc1OTMsInN1YiI6ImRpZDpldGhyOjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJjcmVkZW50aWFsU3ViamVjdCI6eyJkZWdyZWUiOnsidHlwZSI6IkJhY2hlbG9yRGVncmVlIiwibmFtZSI6IkJhY2NhbGF1csOpYXQgZW4gbXVzaXF1ZXMgbnVtw6lyaXF1ZXMifX19LCJpc3MiOiJkaWQ6ZXRocjoweGYxMjMyZjg0MGYzYWQ3ZDIzZmNkYWE4NGQ2YzY2ZGFjMjRlZmIxOTgifQ.ljTuUW6bcsoBQksMo5l8eFImVdOA-ew993B4ret_p9A8j2DLQ60CQmqB14NnN5XxD0d_glLRs1Myc_LBJjnuNwE'
+  "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY...Sx3Y2IdWaUpatJQA", // the original credential
+  "verifiableCredential": {
+    "@context": [Array],
+    "type": [ "VerifiableCredential", "UniversityDegreeCredential" ],
+    "issuer": {
+      "id": "did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198"
+    },
+    "issuanceDate": "2019-07-12T16:51:22.000Z",
+    "credentialSubject": {
+      "id": "did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4"
+      "degree": {
+        "type": "BachelorDegree",
+        "name": "Baccalauréat en musiques numériques"
+      },
+    },
+    "proof": {
+      "type": "JwtProof2020",
+      "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY...Sx3Y2IdWaUpatJQA"
+    }
+  }
 }
- */
+*/
 ```
 
 #### Verifying a Verifiable Presentation
@@ -143,28 +156,68 @@ console.log(verifiedVP)
 /*
 {
   payload: {
-    iat: 1582547593,
+    iat: 1568045263,
     vp: {
       '@context': [Array],
-      type: [Array],
-      verifiableCredential: [Array]
+      type: ['VerifiablePresentation'],
+      verifiableCredential: [
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY5...lpNm51cqSx3Y2IdWaUpatJQA'
+      ]
     },
     iss: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
   },
+  
   doc: {
     '@context': 'https://w3id.org/did/v1',
     id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-    publicKey: [ [Object] ],
-    authentication: [ [Object] ]
+    publicKey: [
+      {
+        id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198#owner',
+        type: 'Secp256k1VerificationKey2018',
+        ethereumAddress: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+        owner: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+      }
+    ]
   },
+  
   issuer: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+  
   signer: {
     id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198#owner',
     type: 'Secp256k1VerificationKey2018',
-    owner: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-    ethereumAddress: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+    ethereumAddress: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+    owner: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
   },
-  jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc1OTMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU9ESTFORGMxT1RNc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaVhTd2lkSGx3WlNJNld5SldaWEpwWm1saFlteGxRM0psWkdWdWRHbGhiQ0pkTENKamNtVmtaVzUwYVdGc1UzVmlhbVZqZENJNmV5SmtaV2R5WldVaU9uc2lkSGx3WlNJNklrSmhZMmhsYkc5eVJHVm5jbVZsSWl3aWJtRnRaU0k2SWtKaFkyTmhiR0YxY3NPcFlYUWdaVzRnYlhWemFYRjFaWE1nYm5WdHc2bHlhWEYxWlhNaWZYMTlMQ0pwYzNNaU9pSmthV1E2WlhSb2Nqb3dlR1l4TWpNeVpqZzBNR1l6WVdRM1pESXpabU5rWVdFNE5HUTJZelkyWkdGak1qUmxabUl4T1RnaWZRLmxqVHVVVzZiY3NvQlFrc01vNWw4ZUZJbVZkT0EtZXc5OTNCNHJldF9wOUE4ajJETFE2MENRbXFCMTRObk41WHhEMGRfZ2xMUnMxTXljX0xCSmpudU53RSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.cFyO-xPMdj0Hg1DaCkm30hzcVcYdnDdgyxXLZr9NAJNMUzZ6naacuWNGdZGuU0ZDwmgpUMUqIzMqFFRmge0R8QA'
+
+  jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwIjp7...ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE',
+
+  verifiablePresentation: {
+    verifiableCredential: [
+      {
+        iat: 1566923269,
+        credentialSubject: {
+          degree: { type: 'BachelorDegree', name: 'Baccalauréat en musiques numériques' },
+          id: 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
+        },
+        issuer: { id: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198' },
+        type: ['VerifiableCredential', 'UniversityDegreeCredential'],
+        '@context': [Array],
+        issuanceDate: '2019-07-12T16:51:22.000Z',
+        proof: {
+          type: 'JwtProof2020',
+          jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY5...lpNm51cqSx3Y2IdWaUpatJQA'
+        }
+      }
+    ],
+    holder: 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+    type: ['VerifiablePresentation'],
+    '@context': [Array],
+    issuanceDate: '2019-09-09T16:07:43.000Z',
+    proof: {
+      type: 'JwtProof2020',
+      jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwI...ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE'
+    }
+  }
 }
- */
+*/
 ```
