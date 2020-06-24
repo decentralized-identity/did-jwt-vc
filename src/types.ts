@@ -127,13 +127,13 @@ export type VerifiablePresentation = Verifiable<Presentation> | JWT
 export type VerifiableCredential = JWT | Verifiable<Credential>
 
 type UnpackedPromise<T> = T extends Promise<infer U> ? U : T
-export type Verified = UnpackedPromise<ReturnType<typeof verifyJWT>>
+export type VerifiedJWT = UnpackedPromise<ReturnType<typeof verifyJWT>>
 
-export type VerifiedPresentation = Verified & {
+export type VerifiedPresentation = VerifiedJWT & {
   verifiablePresentation: Verifiable<Presentation>
 }
 
-export type VerifiedCredential = Verified & {
+export type VerifiedCredential = VerifiedJWT & {
   verifiableCredential: Verifiable<Credential>
 }
 
