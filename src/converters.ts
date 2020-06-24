@@ -56,7 +56,7 @@ function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): Cr
     result = attestationToVcFormat(input)
   }
 
-  //FIXME: handle case when credentialSubject(s) are not object types
+  // FIXME: handle case when credentialSubject(s) are not object types
   result.credentialSubject = { ...input.credentialSubject, ...input.vc?.credentialSubject }
   if (input.sub && !input.credentialSubject?.id) {
     result.credentialSubject.id = input.sub
@@ -103,11 +103,11 @@ function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): Cr
     delete result.exp
   }
 
-  if (result.vc && Object.keys(result.vc).length == 0) {
+  if (result.vc && Object.keys(result.vc).length === 0) {
     delete result.vc
   }
 
-  //FIXME: interpret `aud` property as `verifier`
+  // FIXME: interpret `aud` property as `verifier`
 
   return result as Credential
 }
@@ -117,9 +117,7 @@ function normalizeJwtCredential(input: JWT): Verifiable<Credential> {
   try {
     decoded = decodeJWT(input)
   } catch (e) {
-    const err = new Error('unknown credential format')
-    err['cause'] = e
-    throw err
+    throw new TypeError('unknown credential format')
   }
   return {
     ...normalizeJwtCredentialPayload(decoded.payload),
@@ -147,18 +145,16 @@ export function normalizeCredential(
       try {
         parsed = JSON.parse(input)
       } catch (e) {
-        const err = new Error('unknown credential format')
-        err['cause'] = e
-        throw err
+        throw new TypeError('unknown credential format')
       }
       return normalizeCredential(parsed)
     }
   } else if (input.proof?.jwt) {
-    //TODO: test that it correctly propagates app specific proof properties
+    // TODO: test that it correctly propagates app specific proof properties
     return { ...normalizeJwtCredential(input.proof.jwt), proof: input.proof }
   } else {
-    //TODO: test that it accepts JWT payload, CredentialPayload, VerifiableCredential
-    //TODO: test that it correctly propagates proof, if any
+    // TODO: test that it accepts JWT payload, CredentialPayload, VerifiableCredential
+    // TODO: test that it correctly propagates proof, if any
     return { proof: {}, ...normalizeJwtCredentialPayload(input) }
   }
 }
@@ -202,12 +198,12 @@ export function transformCredentialInput(
   result.vc.type = [...new Set(types)]
   delete result.type
 
-  if (input.id && Object.getOwnPropertyNames(input).indexOf('jti') == -1) {
+  if (input.id && Object.getOwnPropertyNames(input).indexOf('jti') === -1) {
     result.jti = input.id
     delete result.id
   }
 
-  if (input.issuanceDate && Object.getOwnPropertyNames(input).indexOf('nbf') == -1) {
+  if (input.issuanceDate && Object.getOwnPropertyNames(input).indexOf('nbf') === -1) {
     const converted = Date.parse(input.issuanceDate)
     if (!isNaN(converted)) {
       result.nbf = converted / 1000
@@ -215,7 +211,7 @@ export function transformCredentialInput(
     }
   }
 
-  if (input.expirationDate && Object.getOwnPropertyNames(input).indexOf('exp') == -1) {
+  if (input.expirationDate && Object.getOwnPropertyNames(input).indexOf('exp') === -1) {
     const converted = Date.parse(input.expirationDate)
     if (!isNaN(converted)) {
       result.exp = converted / 1000
@@ -223,18 +219,18 @@ export function transformCredentialInput(
     }
   }
 
-  if (input.issuer && Object.getOwnPropertyNames(input).indexOf('iss') == -1) {
+  if (input.issuer && Object.getOwnPropertyNames(input).indexOf('iss') === -1) {
     if (typeof input.issuer === 'object') {
       result.iss = input.issuer?.id
       delete result.issuer.id
-      if (Object.keys(result.issuer).length == 0) {
+      if (Object.keys(result.issuer).length === 0) {
         delete result.issuer
       }
     } else if (typeof input.issuer === 'string') {
       result.iss = input.iss || '' + input.issuer
       delete result.issuer
     } else {
-      //nop
+      // nop
     }
   }
 
@@ -242,7 +238,7 @@ export function transformCredentialInput(
 }
 
 function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPayload>): Presentation {
-  let result: Partial<PresentationPayload> = { ...input }
+  const result: Partial<PresentationPayload> = { ...input }
 
   result.verifiableCredential = [
     ...asArray(input.verifiableCredential),
@@ -262,7 +258,7 @@ function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPaylo
     delete result.aud
   }
 
-  if (input.jti && Object.getOwnPropertyNames(input).indexOf('id') == -1) {
+  if (input.jti && Object.getOwnPropertyNames(input).indexOf('id') === -1) {
     result.id = input.id || input.jti
     delete result.jti
   }
@@ -294,7 +290,7 @@ function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPaylo
     delete result.exp
   }
 
-  if (result.vp && Object.keys(result.vp).length == 0) {
+  if (result.vp && Object.keys(result.vp).length === 0) {
     delete result.vp
   }
 
@@ -306,9 +302,7 @@ function normalizeJwtPresentation(input: JWT): Verifiable<Presentation> {
   try {
     decoded = decodeJWT(input)
   } catch (e) {
-    const err = new Error('unknown presentation format')
-    err['cause'] = e
-    throw err
+    throw new TypeError('unknown presentation format')
   }
   return {
     ...normalizeJwtPresentationPayload(decoded.payload),
@@ -334,18 +328,16 @@ export function normalizePresentation(
       try {
         parsed = JSON.parse(input)
       } catch (e) {
-        const err = new Error('unknown presentation format')
-        err['cause'] = e
-        throw err
+        throw new TypeError('unknown presentation format')
       }
       return normalizePresentation(parsed)
     }
   } else if (input.proof?.jwt) {
-    //TODO: test that it correctly propagates app specific proof properties
+    // TODO: test that it correctly propagates app specific proof properties
     return { ...normalizeJwtPresentation(input.proof.jwt), proof: input.proof }
   } else {
-    //TODO: test that it accepts JWT payload, PresentationPayload, VerifiablePresentation
-    //TODO: test that it correctly propagates proof, if any
+    // TODO: test that it accepts JWT payload, PresentationPayload, VerifiablePresentation
+    // TODO: test that it correctly propagates proof, if any
     return { proof: {}, ...normalizeJwtPresentationPayload(input) }
   }
 }
@@ -374,12 +366,12 @@ export function transformPresentationInput(
   result.vp.type = [...new Set(types)]
   delete result.type
 
-  if (input.id && Object.getOwnPropertyNames(input).indexOf('jti') == -1) {
+  if (input.id && Object.getOwnPropertyNames(input).indexOf('jti') === -1) {
     result.jti = input.id
     delete result.id
   }
 
-  if (input.issuanceDate && Object.getOwnPropertyNames(input).indexOf('nbf') == -1) {
+  if (input.issuanceDate && Object.getOwnPropertyNames(input).indexOf('nbf') === -1) {
     const converted = Date.parse(input.issuanceDate)
     if (!isNaN(converted)) {
       result.nbf = converted / 1000
@@ -387,7 +379,7 @@ export function transformPresentationInput(
     }
   }
 
-  if (input.expirationDate && Object.getOwnPropertyNames(input).indexOf('exp') == -1) {
+  if (input.expirationDate && Object.getOwnPropertyNames(input).indexOf('exp') === -1) {
     const converted = Date.parse(input.expirationDate)
     if (!isNaN(converted)) {
       result.exp = converted / 1000
@@ -409,12 +401,12 @@ export function transformPresentationInput(
     })
   delete result.verifiableCredential
 
-  if (input.holder && Object.getOwnPropertyNames(input).indexOf('iss') == -1) {
+  if (input.holder && Object.getOwnPropertyNames(input).indexOf('iss') === -1) {
     if (typeof input.holder === 'string') {
       result.iss = input.holder
       delete result.holder
     } else {
-      //nop
+      // nop
     }
   }
 
