@@ -35,7 +35,7 @@ Specify a `payload` matching the `CredentialPayload` or `JwtCredentialPayload` i
 with the previously configured `issuer` using the `createVerifiableCredentialJwt` function:
 
 ```typescript
-import { VerifiableCredentialPayload, createVerifiableCredential } from 'did-jwt-vc'
+import { JwtCredentialPayload, createVerifiableCredentialJwt } from 'did-jwt-vc'
 
 const vcPayload: JwtCredentialPayload = {
   sub: 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4',
@@ -64,9 +64,9 @@ be presented in the `vp.verifiableCredential` array. Create a JWT by signing it 
 using the `createVerifiablePresentationJwt` function:
 
 ```typescript
-import { PresentationPayload, createPresentation } from 'did-jwt-vc'
+import { JwtPresentationPayload, createVerifiablePresentationJwt } from 'did-jwt-vc'
 
-const vpPayload: PresentationPayload = {
+const vpPayload: JwtPresentationPayload = {
   vp: {
     '@context': ['https://www.w3.org/2018/credentials/v1'],
     type: ['VerifiablePresentation'],
@@ -74,7 +74,7 @@ const vpPayload: PresentationPayload = {
   }
 }
 
-const vpJwt = await createPresentation(vpPayload, issuer)
+const vpJwt = await createVerifiablePresentationJwt(vpPayload, issuer)
 console.log(vpJwt)
 // eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1ODI1NDc...JNMUzZ6naacuWNGdZGuU0ZDwmgpUMUqIzMqFFRmge0R8QA
 ```
