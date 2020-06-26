@@ -5,6 +5,8 @@ import {
   transformPresentationInput
 } from '../converters'
 import { DEFAULT_JWT_PROOF_TYPE } from '../constants'
+import { CredentialPayload, PresentationPayload } from '../types'
+import { validateJwtCredentialPayload, validateJwtPresentationPayload } from '..'
 
 function encodeBase64Url(input: string): string {
   return Buffer.from(input, 'utf-8').toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
@@ -326,6 +328,25 @@ describe('credential', () => {
     it('passes through app specific vc properties', () => {
       const result = transformCredentialInput({ vc: { foo: 'bar' } })
       expect(result).toMatchObject({ vc: { foo: 'bar' } })
+    })
+
+    it('transforms to a valid payload', () => {
+      const credential: CredentialPayload = {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiableCredential', 'PublicProfile'],
+        issuer: { id: 'did:example:123' },
+        issuanceDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString(),
+        id: 'vc1',
+        credentialSubject: {
+          id: 'did:example:123',
+          name: 'Alice'
+        }
+      }
+      const transformed = transformCredentialInput(credential)
+      expect(() => {
+        validateJwtCredentialPayload(transformed)
+      }).not.toThrow()
     })
 
     describe('credentialSubject', () => {
@@ -728,6 +749,23 @@ describe('presentation', () => {
     it('passes through app specific vp properties', () => {
       const result = transformPresentationInput({ vp: { foo: 'bar' } })
       expect(result).toMatchObject({ vp: { foo: 'bar' } })
+    })
+
+    it('transforms to a valid payload', () => {
+      const presentation: PresentationPayload = {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation', 'PublicProfile'],
+        holder: 'did:example:123',
+        verifier: ['did:example:234'],
+        issuanceDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString(),
+        id: 'vp1',
+        verifiableCredential: ['header.payload.signature']
+      }
+      const transformed = transformPresentationInput(presentation)
+      expect(() => {
+        validateJwtPresentationPayload(transformed)
+      }).not.toThrow()
     })
 
     describe('verifiableCredential', () => {

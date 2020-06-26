@@ -10,6 +10,7 @@ export interface CredentialStatus {
 }
 
 export interface JwtCredentialPayload {
+  iss?: string
   sub: string
   vc: {
     '@context': string[] | string
@@ -31,6 +32,7 @@ export interface JwtPresentationPayload {
     verifiableCredential: VerifiableCredential[] | VerifiableCredential
     [x: string]: any
   }
+  iss?: string
   aud?: string | string[]
   nbf?: number
   exp?: number
@@ -84,7 +86,7 @@ type Extensible<T> = T & { [x: string]: any }
  *
  * Any JWT specific properties are transformed to the broader W3C variant and any app specific properties are left intact
  */
-export type Credential = Extensible<Replace<FixedCredentialPayload, NarrowCredentialDefinitions>>
+export type W3CCredential = Extensible<Replace<FixedCredentialPayload, NarrowCredentialDefinitions>>
 
 /**
  * used as input when creating Verifiable Presentations
@@ -103,7 +105,7 @@ export interface FixedPresentationPayload {
 export type PresentationPayload = Extensible<FixedPresentationPayload>
 
 interface NarrowPresentationDefinitions {
-  verifiableCredential: Verifiable<Credential>[]
+  verifiableCredential: Verifiable<W3CCredential>[]
 }
 
 /**
@@ -113,7 +115,7 @@ interface NarrowPresentationDefinitions {
  * The `verifiableCredential` array should contain parsed `Verifiable<Credential>` elements.
  * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are left intact.
  */
-export type Presentation = Extensible<Replace<FixedPresentationPayload, NarrowPresentationDefinitions>>
+export type W3CPresentation = Extensible<Replace<FixedPresentationPayload, NarrowPresentationDefinitions>>
 
 export interface Proof {
   type?: string
@@ -123,18 +125,18 @@ export interface Proof {
 export type Verifiable<T> = Readonly<T> & { proof: Proof }
 export type JWT = string
 
-export type VerifiablePresentation = Verifiable<Presentation> | JWT
-export type VerifiableCredential = JWT | Verifiable<Credential>
+export type VerifiablePresentation = Verifiable<W3CPresentation> | JWT
+export type VerifiableCredential = JWT | Verifiable<W3CCredential>
 
 type UnpackedPromise<T> = T extends Promise<infer U> ? U : T
 export type VerifiedJWT = UnpackedPromise<ReturnType<typeof verifyJWT>>
 
 export type VerifiedPresentation = VerifiedJWT & {
-  verifiablePresentation: Verifiable<Presentation>
+  verifiablePresentation: Verifiable<W3CPresentation>
 }
 
 export type VerifiedCredential = VerifiedJWT & {
-  verifiableCredential: Verifiable<Credential>
+  verifiableCredential: Verifiable<W3CCredential>
 }
 
 export interface Issuer {

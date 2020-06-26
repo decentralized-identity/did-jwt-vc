@@ -5,7 +5,7 @@ import {
   verifyPresentation,
   createVerifiablePresentationJwt
 } from '../index'
-import { verifyJWT, decodeJWT } from 'did-jwt'
+import { decodeJWT } from 'did-jwt'
 import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
   validateContext,

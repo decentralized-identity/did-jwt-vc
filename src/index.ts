@@ -11,8 +11,8 @@ import {
   CredentialPayload,
   PresentationPayload,
   Verifiable,
-  Credential,
-  Presentation,
+  W3CCredential,
+  W3CPresentation,
   VerifiedCredential,
   VerifiedPresentation
 } from './types'
@@ -34,8 +34,8 @@ export {
   VerifiedCredential,
   VerifiedPresentation,
   Verifiable,
-  Credential,
-  Presentation,
+  W3CCredential,
+  W3CPresentation,
   transformCredentialInput,
   transformPresentationInput,
   normalizeCredential,
@@ -64,10 +64,10 @@ export async function createVerifiableCredentialJwt(
   payload: JwtCredentialPayload | CredentialPayload,
   issuer: Issuer
 ): Promise<JWT> {
-  const parsedPayload = transformCredentialInput(payload)
+  const parsedPayload: JwtCredentialPayload = { iat: undefined, ...transformCredentialInput(payload) }
   validateJwtCredentialPayload(parsedPayload)
   return createJWT(parsedPayload, {
-    issuer: issuer.did,
+    issuer: issuer.did || parsedPayload.iss,
     signer: issuer.signer,
     alg: issuer.alg || JWT_ALG
   })
@@ -91,10 +91,10 @@ export async function createVerifiablePresentationJwt(
   payload: JwtPresentationPayload | PresentationPayload,
   issuer: Issuer
 ): Promise<JWT> {
-  const parsedPayload = transformPresentationInput(payload)
+  const parsedPayload: JwtPresentationPayload = { iat: undefined, ...transformPresentationInput(payload) }
   validateJwtPresentationPayload(parsedPayload)
   return createJWT(parsedPayload, {
-    issuer: issuer.did,
+    issuer: issuer.did || parsedPayload.iss,
     signer: issuer.signer,
     alg: issuer.alg || JWT_ALG
   })
@@ -112,8 +112,9 @@ export function validateCredentialPayload(payload: CredentialPayload): void {
   validators.validateContext(payload['@context'])
   validators.validateVcType(payload.type)
   validators.validateCredentialSubject(payload.credentialSubject)
-  if (payload.issuanceDate) validators.validateTimestamp(new Date(payload.issuanceDate).valueOf() / 1000)
-  if (payload.expirationDate) validators.validateTimestamp(new Date(payload.expirationDate).valueOf() / 1000)
+  if (payload.issuanceDate) validators.validateTimestamp(Math.floor(new Date(payload.issuanceDate).valueOf() / 1000))
+  if (payload.expirationDate)
+    validators.validateTimestamp(Math.floor(new Date(payload.expirationDate).valueOf() / 1000))
 }
 
 export function validateJwtPresentationPayload(payload: JwtPresentationPayload): void {
