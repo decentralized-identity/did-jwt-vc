@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.0...1.0.1) (2020-06-26)
+
+
+### Bug Fixes
+
+* **build:** Use tsc instead of microbundle ([#38](https://github.com/decentralized-identity/did-jwt-vc/issues/38)) ([f75a967](https://github.com/decentralized-identity/did-jwt-vc/commit/f75a96767f413cecbcd3c09954b04c11be3db24d))
+
 # [1.0.0](https://github.com/decentralized-identity/did-jwt-vc/compare/0.2.0...1.0.0) (2020-06-25)
 
 
