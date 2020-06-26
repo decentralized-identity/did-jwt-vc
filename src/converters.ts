@@ -4,10 +4,10 @@ import {
   JwtPresentationPayload,
   JwtCredentialPayload,
   CredentialPayload,
-  Credential,
+  W3CCredential,
   Verifiable,
   PresentationPayload,
-  Presentation
+  W3CPresentation
 } from './types'
 import { decodeJWT } from 'did-jwt'
 import { JWT_FORMAT, DEFAULT_JWT_PROOF_TYPE, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
@@ -49,7 +49,7 @@ export function attestationToVcFormat(payload: any): JwtCredentialPayload {
   return result
 }
 
-function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): Credential {
+function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): W3CCredential {
   let result: Partial<CredentialPayload> = { ...input }
 
   if (isLegacyAttestationFormat(input)) {
@@ -109,10 +109,10 @@ function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): Cr
 
   // FIXME: interpret `aud` property as `verifier`
 
-  return result as Credential
+  return result as W3CCredential
 }
 
-function normalizeJwtCredential(input: JWT): Verifiable<Credential> {
+function normalizeJwtCredential(input: JWT): Verifiable<W3CCredential> {
   let decoded
   try {
     decoded = decodeJWT(input)
@@ -136,7 +136,7 @@ function normalizeJwtCredential(input: JWT): Verifiable<Credential> {
  */
 export function normalizeCredential(
   input: Partial<VerifiableCredential> | Partial<JwtCredentialPayload>
-): Verifiable<Credential> {
+): Verifiable<W3CCredential> {
   if (typeof input === 'string') {
     if (JWT_FORMAT.test(input)) {
       return normalizeJwtCredential(input)
@@ -206,7 +206,7 @@ export function transformCredentialInput(
   if (input.issuanceDate && Object.getOwnPropertyNames(input).indexOf('nbf') === -1) {
     const converted = Date.parse(input.issuanceDate)
     if (!isNaN(converted)) {
-      result.nbf = converted / 1000
+      result.nbf = Math.floor(converted / 1000)
       delete result.issuanceDate
     }
   }
@@ -214,7 +214,7 @@ export function transformCredentialInput(
   if (input.expirationDate && Object.getOwnPropertyNames(input).indexOf('exp') === -1) {
     const converted = Date.parse(input.expirationDate)
     if (!isNaN(converted)) {
-      result.exp = converted / 1000
+      result.exp = Math.floor(converted / 1000)
       delete result.expirationDate
     }
   }
@@ -237,7 +237,7 @@ export function transformCredentialInput(
   return result as JwtCredentialPayload
 }
 
-function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPayload>): Presentation {
+function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPayload>): W3CPresentation {
   const result: Partial<PresentationPayload> = { ...input }
 
   result.verifiableCredential = [
@@ -294,10 +294,10 @@ function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPaylo
     delete result.vp
   }
 
-  return result as Presentation
+  return result as W3CPresentation
 }
 
-function normalizeJwtPresentation(input: JWT): Verifiable<Presentation> {
+function normalizeJwtPresentation(input: JWT): Verifiable<W3CPresentation> {
   let decoded
   try {
     decoded = decodeJWT(input)
@@ -319,7 +319,7 @@ function normalizeJwtPresentation(input: JWT): Verifiable<Presentation> {
  */
 export function normalizePresentation(
   input: Partial<PresentationPayload> | Partial<JwtPresentationPayload> | JWT
-): Verifiable<Presentation> {
+): Verifiable<W3CPresentation> {
   if (typeof input === 'string') {
     if (JWT_FORMAT.test(input)) {
       return normalizeJwtPresentation(input)
@@ -374,7 +374,7 @@ export function transformPresentationInput(
   if (input.issuanceDate && Object.getOwnPropertyNames(input).indexOf('nbf') === -1) {
     const converted = Date.parse(input.issuanceDate)
     if (!isNaN(converted)) {
-      result.nbf = converted / 1000
+      result.nbf = Math.floor(converted / 1000)
       delete result.issuanceDate
     }
   }
@@ -382,7 +382,7 @@ export function transformPresentationInput(
   if (input.expirationDate && Object.getOwnPropertyNames(input).indexOf('exp') === -1) {
     const converted = Date.parse(input.expirationDate)
     if (!isNaN(converted)) {
-      result.exp = converted / 1000
+      result.exp = Math.floor(converted / 1000)
       delete result.expirationDate
     }
   }
