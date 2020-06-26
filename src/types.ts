@@ -46,9 +46,9 @@ export type DateType = string | Date
  * used as input when creating Verifiable Credentials
  */
 interface FixedCredentialPayload {
-  '@context': string[]
+  '@context': string | string[]
   id?: string
-  type: string[]
+  type: string | string[]
   issuer: IssuerType
   issuanceDate: DateType
   expirationDate?: DateType
@@ -65,6 +65,8 @@ export type CredentialPayload = Extensible<FixedCredentialPayload>
  * This is meant to reflect unambiguous types for the properties in `CredentialPayload`
  */
 interface NarrowCredentialDefinitions {
+  '@context': string[]
+  type: string[]
   issuer: Exclude<IssuerType, string>
   issuanceDate: string
   expirationDate?: string
@@ -92,12 +94,12 @@ export type W3CCredential = Extensible<Replace<FixedCredentialPayload, NarrowCre
  * used as input when creating Verifiable Presentations
  */
 export interface FixedPresentationPayload {
-  '@context': string[]
-  type: string[]
+  '@context': string | string[]
+  type: string | string[]
   id?: string
   verifiableCredential: VerifiableCredential[]
   holder: string
-  verifier?: string[]
+  verifier?: string | string[]
   issuanceDate?: string
   expirationDate?: string
 }
@@ -105,6 +107,9 @@ export interface FixedPresentationPayload {
 export type PresentationPayload = Extensible<FixedPresentationPayload>
 
 interface NarrowPresentationDefinitions {
+  '@context': string[]
+  type: string[]
+  verifier: string[]
   verifiableCredential: Verifiable<W3CCredential>[]
 }
 
