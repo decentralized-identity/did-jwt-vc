@@ -1,7 +1,11 @@
-import { DID_FORMAT, DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './constants'
-import { JwtCredentialSubject } from './types'
+import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './constants'
+import { JwtCredentialSubject, DateType } from './types'
 import { VerifiableCredential } from 'src'
 import { asArray } from './converters'
+
+function isDateObject(input: any) {
+  return input && Object.prototype.toString.call(input) === '[object Date]' && !isNaN(input)
+}
 
 export function validateJwtFormat(value: VerifiableCredential): void {
   if (typeof value === 'string' && !value.match(JWT_FORMAT)) {
@@ -16,14 +20,14 @@ export function validateJwtFormat(value: VerifiableCredential): void {
 // 10 digits max is 9999999999 -> 11/20/2286 @ 5:46pm (UTC)
 // 11 digits max is 99999999999 -> 11/16/5138 @ 9:46am (UTC)
 // 12 digits max is 999999999999 -> 09/27/33658 @ 1:46am (UTC)
-export function validateTimestamp(value: number | string): void {
+export function validateTimestamp(value: number | DateType): void {
   if (typeof value === 'number') {
     if (!(Number.isInteger(value) && value < 100000000000)) {
       throw new TypeError(`"${value}" is not a unix timestamp in seconds`)
     }
   } else if (typeof value === 'string') {
-    validateTimestamp(new Date(value).valueOf() / 1000)
-  } else {
+    validateTimestamp(Math.floor(new Date(value).valueOf() / 1000))
+  } else if (!isDateObject(value)) {
     throw new TypeError(`"${value}" is not a valid time`)
   }
 }

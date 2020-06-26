@@ -318,7 +318,7 @@ function normalizeJwtPresentation(input: JWT): Verifiable<W3CPresentation> {
  * @param input either a JWT or JWT payload, or a VerifiablePresentation
  */
 export function normalizePresentation(
-  input: Partial<PresentationPayload> | Partial<JwtPresentationPayload> | JWT
+  input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload> | JWT
 ): Verifiable<W3CPresentation> {
   if (typeof input === 'string') {
     if (JWT_FORMAT.test(input)) {
@@ -349,7 +349,7 @@ export function normalizePresentation(
  * @param input either a JWT payload or a CredentialPayloadInput
  */
 export function transformPresentationInput(
-  input: Partial<PresentationPayload> | Partial<JwtPresentationPayload>
+  input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload>
 ): JwtPresentationPayload {
   const result: Partial<JwtPresentationPayload> = { vp: { ...input.vp }, ...input }
 

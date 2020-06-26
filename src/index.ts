@@ -27,6 +27,8 @@ import {
 
 export {
   Issuer,
+  CredentialPayload,
+  PresentationPayload,
   JwtCredentialPayload,
   JwtPresentationPayload,
   VerifiableCredential,
@@ -112,9 +114,8 @@ export function validateCredentialPayload(payload: CredentialPayload): void {
   validators.validateContext(payload['@context'])
   validators.validateVcType(payload.type)
   validators.validateCredentialSubject(payload.credentialSubject)
-  if (payload.issuanceDate) validators.validateTimestamp(Math.floor(new Date(payload.issuanceDate).valueOf() / 1000))
-  if (payload.expirationDate)
-    validators.validateTimestamp(Math.floor(new Date(payload.expirationDate).valueOf() / 1000))
+  if (payload.issuanceDate) validators.validateTimestamp(payload.issuanceDate)
+  if (payload.expirationDate) validators.validateTimestamp(payload.expirationDate)
 }
 
 export function validateJwtPresentationPayload(payload: JwtPresentationPayload): void {

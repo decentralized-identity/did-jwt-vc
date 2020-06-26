@@ -550,7 +550,7 @@ describe('presentation', () => {
         const result = normalizePresentation({
           verifiableCredential: { foo: 'bar' },
           vp: { verifiableCredential: [{ foo: 'baz' }] }
-        } as any)
+        })
         expect(result).toMatchObject({
           verifiableCredential: [{ foo: 'bar' }, { foo: 'baz' }]
         })
@@ -646,7 +646,7 @@ describe('presentation', () => {
       })
 
       it('merges type arrays for non-array types', () => {
-        const result = normalizePresentation({ type: 'foo', vp: { type: 'bar' } } as any)
+        const result = normalizePresentation({ type: 'foo', vp: { type: 'bar' } })
         expect(result).toMatchObject({ type: ['foo', 'bar'] })
         expect(result).not.toHaveProperty('vp')
       })
@@ -666,7 +666,7 @@ describe('presentation', () => {
       })
 
       it('merges @context arrays for non-array contexts', () => {
-        const result = normalizePresentation({ '@context': 'foo', context: 'bar', vp: { '@context': 'baz' } } as any)
+        const result = normalizePresentation({ '@context': 'foo', context: 'bar', vp: { '@context': 'baz' } })
         expect(result).toMatchObject({ '@context': ['bar', 'foo', 'baz'] })
         expect(result).not.toHaveProperty('vp')
         expect(result).not.toHaveProperty('context')
@@ -773,7 +773,7 @@ describe('presentation', () => {
         const result = transformPresentationInput({
           verifiableCredential: [{ id: 'foo' }],
           vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] }
-        } as any)
+        })
         expect(result).toMatchObject({
           vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] }
         })
@@ -784,7 +784,7 @@ describe('presentation', () => {
         const result = transformPresentationInput({
           verifiableCredential: { id: 'foo' },
           vp: { verifiableCredential: { foo: 'bar' } }
-        } as any)
+        })
         expect(result).toMatchObject({ vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }] } })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
@@ -793,7 +793,7 @@ describe('presentation', () => {
         const result = transformPresentationInput({
           verifiableCredential: { id: 'foo', proof: { jwt: 'header.payload1.signature' } },
           vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] }
-        } as any)
+        })
         expect(result).toMatchObject({
           vp: { verifiableCredential: ['header.payload1.signature', { foo: 'bar' }, 'header.payload2.signature'] }
         })
@@ -804,7 +804,7 @@ describe('presentation', () => {
         const result = transformPresentationInput({
           verifiableCredential: undefined,
           vp: { verifiableCredential: [null, { foo: 'bar' }, 'header.payload2.signature'] }
-        } as any)
+        })
         expect(result).toMatchObject({ vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] } })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
@@ -823,7 +823,7 @@ describe('presentation', () => {
           context: 'AA',
           '@context': 'BB',
           vp: { '@context': ['CC'] }
-        } as any)
+        })
         expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC'] } })
         expect(result).not.toHaveProperty('context')
         expect(result).not.toHaveProperty('@context')
@@ -854,7 +854,7 @@ describe('presentation', () => {
       })
 
       it('merges type fields when not array types', () => {
-        const result = transformPresentationInput({ type: 'AA', vp: { type: ['BB'] } } as any)
+        const result = transformPresentationInput({ type: 'AA', vp: { type: ['BB'] } })
         expect(result).toMatchObject({ vp: { type: ['AA', 'BB'] } })
         expect(result).not.toHaveProperty('type')
       })
