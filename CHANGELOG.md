@@ -1,3 +1,11 @@
+## [1.0.2](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.1...1.0.2) (2020-06-29)
+
+
+### Bug Fixes
+
+* converting to jwt ([d7f9578](https://github.com/decentralized-identity/did-jwt-vc/commit/d7f95783c73eaaa521eab1fb352881884b59f42c)), closes [#37](https://github.com/decentralized-identity/did-jwt-vc/issues/37)
+* **types:** widen types used as input ([c3e7a2e](https://github.com/decentralized-identity/did-jwt-vc/commit/c3e7a2e745145e985f60da7c343d9889d50e76dc))
+
 ## [1.0.1](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.0...1.0.1) (2020-06-26)
 
 
