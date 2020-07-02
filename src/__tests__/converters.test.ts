@@ -518,6 +518,21 @@ describe('credential', () => {
         expect(result).toMatchObject({ iss: 'foo', issuer: { bar: 'baz' } })
         expect(result.issuer).not.toHaveProperty('id')
       })
+      it('does not mutate the input object', () => {
+        const input = {
+          '@context': ['https://www.w3.org/2018/credentials/v1'],
+          type: ['VerifiableCredential'],
+          issuer: { id: 'did:example:567'},
+          issuanceDate: '2020-07-02T09:58:10.284Z',
+          credentialSubject: { id: 'did:example:123', foo: 'bar' }
+        }
+        const result = transformCredentialInput(input)
+        expect(input['@context']).toEqual(['https://www.w3.org/2018/credentials/v1'])
+        expect(input.type).toEqual(['VerifiableCredential'])
+        expect(input.issuanceDate).toEqual('2020-07-02T09:58:10.284Z')
+        expect(input.credentialSubject).toEqual({ id: 'did:example:123', foo: 'bar' })
+        expect(input.issuer.id).toEqual('did:example:567')
+      })
     })
   })
 })
