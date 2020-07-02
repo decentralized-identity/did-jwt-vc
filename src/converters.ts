@@ -16,6 +16,37 @@ export function asArray(input: any) {
   return Array.isArray(input) ? input : [input]
 }
 
+function deepCopy<T>(obj: T): T {
+  let copy
+
+  // Handle the 3 simple types, and null or undefined
+  if (null === obj || 'object' !== typeof obj) return obj
+
+  // Handle Date
+  if (obj instanceof Date) {
+    copy = new Date()
+    copy.setTime(obj.getTime())
+    return copy
+  }
+
+  // Handle Array
+  if (obj instanceof Array) {
+    copy = obj.map(deepCopy)
+    return copy
+  }
+
+  // Handle Object
+  if (obj instanceof Object) {
+    copy = {}
+    for (const key of Object.keys(obj)) {
+      copy[key] = deepCopy(obj[key])
+    }
+    return copy
+  }
+
+  throw new Error("Unable to copy obj! Its type isn't supported.")
+}
+
 function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined
 }
@@ -50,7 +81,7 @@ export function attestationToVcFormat(payload: any): JwtCredentialPayload {
 }
 
 function normalizeJwtCredentialPayload(input: Partial<JwtCredentialPayload>): W3CCredential {
-  let result: Partial<CredentialPayload> = { ...input }
+  let result: Partial<CredentialPayload> = deepCopy(input)
 
   if (isLegacyAttestationFormat(input)) {
     result = attestationToVcFormat(input)
@@ -151,7 +182,7 @@ export function normalizeCredential(
     }
   } else if (input.proof?.jwt) {
     // TODO: test that it correctly propagates app specific proof properties
-    return { ...normalizeJwtCredential(input.proof.jwt), proof: input.proof }
+    return deepCopy({ ...normalizeJwtCredential(input.proof.jwt), proof: input.proof })
   } else {
     // TODO: test that it accepts JWT payload, CredentialPayload, VerifiableCredential
     // TODO: test that it correctly propagates proof, if any
@@ -175,7 +206,7 @@ export function transformCredentialInput(
 ): JwtCredentialPayload {
   if (Array.isArray(input.credentialSubject)) throw Error('credentialSubject of type array not supported')
 
-  const result: Partial<JwtCredentialPayload> = { vc: { ...input.vc }, ...input }
+  const result: Partial<JwtCredentialPayload> = deepCopy({ vc: { ...input.vc }, ...input })
 
   const credentialSubject = { ...input.credentialSubject, ...input.vc?.credentialSubject }
   if (!input.sub) {
@@ -238,7 +269,7 @@ export function transformCredentialInput(
 }
 
 function normalizeJwtPresentationPayload(input: DeepPartial<JwtPresentationPayload>): W3CPresentation {
-  const result: Partial<PresentationPayload> = { ...input }
+  const result: Partial<PresentationPayload> = deepCopy(input)
 
   result.verifiableCredential = [
     ...asArray(input.verifiableCredential),
@@ -351,7 +382,7 @@ export function normalizePresentation(
 export function transformPresentationInput(
   input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload>
 ): JwtPresentationPayload {
-  const result: Partial<JwtPresentationPayload> = { vp: { ...input.vp }, ...input }
+  const result: Partial<JwtPresentationPayload> = deepCopy({ vp: { ...input.vp }, ...input })
 
   const contextEntries = [
     ...asArray(input.context),
