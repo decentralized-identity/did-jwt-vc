@@ -35,6 +35,106 @@ describe('credential', () => {
       expect(result).toMatchObject({ foo: 'bar', vc: { bar: 'baz' } })
     })
 
+    describe('normalizeCredential deep copy of input', () => {
+      it('keeps proof property if proof is jwt', () => {
+        let input = {
+          foo: 'bar',
+          proof: {
+            jwt:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjcwMjQ5NzQsIm5hbWUiOiJib2IiLCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.2lP3YDOBj9pirxmPAJojQ-q6Rp7w4wA59ZLm19HdqC2leuxlZEQ5w8y0tzpH8n2I25aQ0vVB6j6TimCNLFasqQE',
+            bar: 'baz'
+          }
+        }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.sub', () => {
+        let input = { sub: 'foo', bar: 'baz' }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.vc.credentialSubject', () => {
+        let input = { vc: { credentialSubject: { bar: 'foo' }, bar: 'baz' }, baz: 'bak' }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.iss', () => {
+        let input = { iss: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.jti', () => {
+        let input = { jti: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.vc.type array', () => {
+        let input = { vc: { type: ['foo'] } }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.vc.type string', () => {
+        let input = { vc: { type: 'foo' } }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.context array', () => {
+        let input = { context: ['foo'] }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.context string', () => {
+        let input = { context: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.vc.@context array', () => {
+        let input = { vc: { '@context': ['foo'] } }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.vc.@context string', () => {
+        let input = { vc: { '@context': 'foo' } }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.nbf', () => {
+        let input = { nbf: 123 }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.iat', () => {
+        let input = { iat: 123 }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.exp', () => {
+        let input = { exp: 123 }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.vc when it is filtered from output', () => {
+        let input = { vc: {} }
+        const frozen = JSON.stringify(input)
+        const unused = normalizeCredential(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+    })
+
     describe('credentialSubject', () => {
       it('keeps credentialSubject object', () => {
         const result = normalizeCredential({ credentialSubject: { foo: 'bar' } })
@@ -349,6 +449,75 @@ describe('credential', () => {
       }).not.toThrow()
     })
 
+    describe('transformCredentialInput deep copy', () => {
+      it('keeps input.credentialSubject.id', () => {
+        const input = { credentialSubject: { id: 'foo' } }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.vc.credentialSubject.id', () => {
+        const input = { vc: { credentialSubject: { id: 'foo' } } }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.context', () => {
+        const input = { context: ['foo'] }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.@context', () => {
+        const input = { '@context': ['foo'] }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.type', () => {
+        const input = { type: ['foo'] }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.id', () => {
+        const input = { id: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.issuanceDate', () => {
+        const input = { issuanceDate: new Date().toISOString() }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.expirationDate', () => {
+        const input = { expirationDate: new Date().toISOString() }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.issuer object when filtered from output', () => {
+        const input = { issuer: {} }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.issuer.id', () => {
+        const input = { issuer: { id: 'foo' } }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+      it('keeps input.issuer string', () => {
+        const input = { issuer: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = transformCredentialInput(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+    })
+
     describe('credentialSubject', () => {
       it('uses credentialSubject.id as sub', () => {
         const result = transformCredentialInput({ credentialSubject: { id: 'foo' } })
@@ -518,6 +687,21 @@ describe('credential', () => {
         expect(result).toMatchObject({ iss: 'foo', issuer: { bar: 'baz' } })
         expect(result.issuer).not.toHaveProperty('id')
       })
+      it('does not mutate the input object', () => {
+        const input = {
+          '@context': ['https://www.w3.org/2018/credentials/v1'],
+          type: ['VerifiableCredential'],
+          issuer: { id: 'did:example:567'},
+          issuanceDate: '2020-07-02T09:58:10.284Z',
+          credentialSubject: { id: 'did:example:123', foo: 'bar' }
+        }
+        const result = transformCredentialInput(input)
+        expect(input['@context']).toEqual(['https://www.w3.org/2018/credentials/v1'])
+        expect(input.type).toEqual(['VerifiableCredential'])
+        expect(input.issuanceDate).toEqual('2020-07-02T09:58:10.284Z')
+        expect(input.credentialSubject).toEqual({ id: 'did:example:123', foo: 'bar' })
+        expect(input.issuer.id).toEqual('did:example:567')
+      })
     })
   })
 })
@@ -543,6 +727,97 @@ describe('presentation', () => {
     it('preserves app specific props in vp', () => {
       const result = normalizePresentation({ foo: 'bar', vp: { bar: 'baz' } })
       expect(result).toMatchObject({ foo: 'bar', vp: { bar: 'baz' } })
+    })
+
+    describe('normalizePresentation deep copy', () => {
+      it('keeps input.proof if jwt', () => {
+        const input = {
+          proof: {
+            jwt:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU5qWTVNak15Tmprc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaUxDSm9kSFJ3Y3pvdkwzZDNkeTUzTXk1dmNtY3ZNakF4T0M5amNtVmtaVzUwYVdGc2N5OWxlR0Z0Y0d4bGN5OTJNU0pkTENKMGVYQmxJanBiSWxabGNtbG1hV0ZpYkdWRGNtVmtaVzUwYVdGc0lpd2lWVzVwZG1WeWMybDBlVVJsWjNKbFpVTnlaV1JsYm5ScFlXd2lYU3dpWTNKbFpHVnVkR2xoYkZOMVltcGxZM1FpT25zaVpHVm5jbVZsSWpwN0luUjVjR1VpT2lKQ1lXTm9aV3h2Y2tSbFozSmxaU0lzSW01aGJXVWlPaUpDWVdOallXeGhkWExEcVdGMElHVnVJRzExYzJseGRXVnpJRzUxYmNPcGNtbHhkV1Z6SW4xOWZTd2lhWE56SWpvaVpHbGtPbVYwYUhJNk1IaG1NVEl6TW1ZNE5EQm1NMkZrTjJReU0yWmpaR0ZoT0RSa05tTTJObVJoWXpJMFpXWmlNVGs0SW4wLnJGUlpVQ3czR3UwRV9JNVpKYnJicHVIVjFKTkF3cFhhaUZadUo1OWlKLVROcXVmcjRjdUdDQkVFQ0ZiZ1FGLWxwTm01MWNxU3gzWTJJZFdhVXBhdEpRQSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.bWZyEpLsx0u6v-UIcQf9TVMde1gTFsn091BY-TViUuRoUNsNQFzN-ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE'
+          }
+        }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.vp.verifiableCredential', () => {
+        const input = { vp: { verifiableCredential: [] } }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.iss', () => {
+        const input = { iss: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.aud', () => {
+        const input = { aud: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.jti', () => {
+        const input = { jti: '1234' }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.vp.type', () => {
+        const input = { vp: { type: ['foo'] } }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.vp.@context', () => {
+        const input = { vp: { '@context': ['foo'] } }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.context', () => {
+        const input = { context: ['foo'] }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.iat', () => {
+        const input = { iat: 123 }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.nbf', () => {
+        const input = { nbf: 123 }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.exp', () => {
+        const input = { exp: 123 }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
+
+      it('keeps input.vp when filtered from output', () => {
+        const input = { vp: {} }
+        const frozen = JSON.stringify(input)
+        const unused = normalizePresentation(input)
+        expect(frozen).toBe(JSON.stringify(input))
+      })
     })
 
     describe('verifiableCredential', () => {
@@ -766,6 +1041,82 @@ describe('presentation', () => {
       expect(() => {
         validateJwtPresentationPayload(transformed)
       }).not.toThrow()
+    })
+
+    describe('transformPresentationInput deep copy', () => {
+      it('keeps input.context', () => {
+        const input = { context: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.@context', () => {
+        const input = { '@context': ['foo'] }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.vp.@context', () => {
+        const input = { context: 'bar', vp: { '@context': ['foo'] } }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.type', () => {
+        const input = { type: ['foo'] }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.vp.type', () => {
+        const input = { type: 'bar', vp: { type: ['foo'] } }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.id', () => {
+        const input = { id: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.holder', () => {
+        const input = { holder: 'foo' }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.verifier', () => {
+        const input = { verifier: 'foo', aud: 'bar' }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.issuanceDate', () => {
+        const input = { issuanceDate: new Date().toISOString() }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.expirationDate', () => {
+        const input = { expirationDate: new Date().toISOString() }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
+      it('keeps input.vp.verifiableCredential', () => {
+        const input = {
+          verifiableCredential:
+            'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY5MjMyNjksInN1YiI6ImRpZDpldGhyOjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVW5pdmVyc2l0eURlZ3JlZUNyZWRlbnRpYWwiXSwiY3JlZGVudGlhbFN1YmplY3QiOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19fSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.rFRZUCw3Gu0E_I5ZJbrbpuHV1JNAwpXaiFZuJ59iJ-TNqufr4cuGCBEECFbgQF-lpNm51cqSx3Y2IdWaUpatJQA',
+          vp: {
+            verifiableCredential:
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjcwMjQ5NzQsIm5hbWUiOiJib2IiLCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.2lP3YDOBj9pirxmPAJojQ-q6Rp7w4wA59ZLm19HdqC2leuxlZEQ5w8y0tzpH8n2I25aQ0vVB6j6TimCNLFasqQE'
+          }
+        }
+        const frozen = JSON.stringify(input)
+        const unused = transformPresentationInput(input)
+        expect(JSON.stringify(input)).toBe(frozen)
+      })
     })
 
     describe('verifiableCredential', () => {
