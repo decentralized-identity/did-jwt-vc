@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.3...1.0.4) (2020-07-20)
+
+
+### Bug Fixes
+
+* **build:** use commonjs module format ([#46](https://github.com/decentralized-identity/did-jwt-vc/issues/46)) ([76e503b](https://github.com/decentralized-identity/did-jwt-vc/commit/76e503bc4307d313681a245665250932c98bcd64)), closes [#47](https://github.com/decentralized-identity/did-jwt-vc/issues/47)
+
 ## [1.0.3](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.2...1.0.3) (2020-07-02)
 
 
