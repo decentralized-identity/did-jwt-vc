@@ -691,7 +691,7 @@ describe('credential', () => {
         const input = {
           '@context': ['https://www.w3.org/2018/credentials/v1'],
           type: ['VerifiableCredential'],
-          issuer: { id: 'did:example:567'},
+          issuer: { id: 'did:example:567' },
           issuanceDate: '2020-07-02T09:58:10.284Z',
           credentialSubject: { id: 'did:example:123', foo: 'bar' }
         }
