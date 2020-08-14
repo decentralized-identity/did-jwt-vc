@@ -53,7 +53,7 @@ interface FixedCredentialPayload {
   issuanceDate: DateType
   expirationDate?: DateType
   credentialSubject: {
-    id: string
+    id?: string
     [x: string]: any
   }
   credentialStatus?: CredentialStatus
