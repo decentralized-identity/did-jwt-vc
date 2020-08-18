@@ -5,7 +5,7 @@ import {
   verifyPresentation,
   createVerifiablePresentationJwt
 } from '../index'
-import { decodeJWT } from 'did-jwt'
+import { decodeJWT, Resolvable } from 'did-jwt'
 import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
   validateContext,
@@ -67,7 +67,7 @@ const presentationPayload = {
     verifiableCredential: [VC_JWT]
   }
 }
-const resolver = {
+const resolver: Resolvable = {
   resolve: (did: string) =>
     Promise.resolve({
       '@context': 'https://w3id.org/did/v1',
