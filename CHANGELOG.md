@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.4...1.0.5) (2020-08-18)
+
+
+### Bug Fixes
+
+* set credentialSubject.id as optional ([#45](https://github.com/decentralized-identity/did-jwt-vc/issues/45)) ([c31ee17](https://github.com/decentralized-identity/did-jwt-vc/commit/c31ee1715a7aa749b9419aeed79ee584a645bea3))
+
 ## [1.0.4](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.3...1.0.4) (2020-07-20)
 
 
