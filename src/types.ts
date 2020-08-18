@@ -1,4 +1,4 @@
-import { Signer, verifyJWT } from 'did-jwt'
+import { Signer, JWTVerified, JWTPayload } from 'did-jwt'
 
 export interface JwtCredentialSubject {
   [x: string]: any
@@ -9,9 +9,13 @@ export interface CredentialStatus {
   type: string
 }
 
+/**
+ * A JWT payload representation of a Credential
+ * @see https://www.w3.org/TR/vc-data-model/#jwt-encoding
+ */
 export interface JwtCredentialPayload {
   iss?: string
-  sub: string
+  sub?: string
   vc: {
     '@context': string[] | string
     type: string[] | string
@@ -25,6 +29,10 @@ export interface JwtCredentialPayload {
   [x: string]: any
 }
 
+/**
+ * A JWT payload representation of a Presentation
+ * @see https://www.w3.org/TR/vc-data-model/#jwt-encoding
+ */
 export interface JwtPresentationPayload {
   vp: {
     '@context': string[] | string
@@ -59,6 +67,10 @@ interface FixedCredentialPayload {
   credentialStatus?: CredentialStatus
 }
 
+/**
+ * A more flexible representation of a {@link W3CCredential} that can be used as input to methods
+ * that expect it.
+ */
 export type CredentialPayload = Extensible<FixedCredentialPayload>
 
 /**
@@ -104,6 +116,10 @@ export interface FixedPresentationPayload {
   expirationDate?: string
 }
 
+/**
+ * A more flexible representation of a {@link W3CPresentation} that can be used as input to methods
+ * that expect it.
+ */
 export type PresentationPayload = Extensible<FixedPresentationPayload>
 
 interface NarrowPresentationDefinitions {
@@ -127,23 +143,54 @@ export interface Proof {
   [x: string]: any
 }
 
-export type Verifiable<T> = Readonly<T> & { proof: Proof }
+/**
+ * Represents a readonly representation of a verifiable object, including the {@link Proof}
+ * property that can be used to verify it.
+ */
+export type Verifiable<T> = Readonly<T> & { readonly proof: Proof }
 export type JWT = string
 
-export type VerifiablePresentation = Verifiable<W3CPresentation> | JWT
+/**
+ * A union type for both possible representations of a Credential (JWT and W3C standard)
+ *
+ * @see https://www.w3.org/TR/vc-data-model/#proof-formats
+ */
 export type VerifiableCredential = JWT | Verifiable<W3CCredential>
 
-type UnpackedPromise<T> = T extends Promise<infer U> ? U : T
-export type VerifiedJWT = UnpackedPromise<ReturnType<typeof verifyJWT>>
+/**
+ * A union type for both possible representations of a Presentation (JWT and W3C standard)
+ *
+ * @see https://www.w3.org/TR/vc-data-model/#proof-formats
+ */
+export type VerifiablePresentation = JWT | Verifiable<W3CPresentation>
 
+export type VerifiedJWT = JWTVerified
+
+/**
+ * Represents the result of a Presentation verification.
+ * It includes the properties produced by `did-jwt` and a W3C compliant representation of
+ * the Presentation that was just verified.
+ *
+ * This is usually the result of a verification method and not meant to be created by generic code.
+ */
 export type VerifiedPresentation = VerifiedJWT & {
   verifiablePresentation: Verifiable<W3CPresentation>
 }
 
+/**
+ * Represents the result of a Credential verification.
+ * It includes the properties produced by `did-jwt` and a W3C compliant representation of
+ * the Credential that was just verified.
+ *
+ * This is usually the result of a verification method and not meant to be created by generic code.
+ */
 export type VerifiedCredential = VerifiedJWT & {
   verifiableCredential: Verifiable<W3CCredential>
 }
 
+/**
+ * Represents a tuple of a DID-URL with a `Signer` and associated algorithm.
+ */
 export interface Issuer {
   did: string
   signer: Signer

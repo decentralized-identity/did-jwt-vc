@@ -1,4 +1,4 @@
-import { createJWT, verifyJWT } from 'did-jwt'
+import { createJWT, verifyJWT, Resolvable } from 'did-jwt'
 import { JWT_ALG } from './constants'
 import * as validators from './validators'
 import {
@@ -24,7 +24,6 @@ import {
   normalizePresentation,
   asArray
 } from './converters'
-
 export {
   Issuer,
   CredentialPayload,
@@ -42,10 +41,6 @@ export {
   transformPresentationInput,
   normalizeCredential,
   normalizePresentation
-}
-
-interface Resolvable {
-  resolve: (did: string) => Promise<DIDDocument>
 }
 
 /**
