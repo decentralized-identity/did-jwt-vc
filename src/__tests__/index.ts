@@ -77,7 +77,7 @@ const resolver = {
           id: `${did}#owner`,
           type: 'Secp256k1VerificationKey2018',
           ethereumAddress: `${did.substring(9)}`,
-          owner: did
+          controller: did
         }
       ]
     } as DIDDocument)
