@@ -2158,7 +2158,12 @@ did-resolver@0.0.6, did-resolver@^0.0.6:
   resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-0.0.6.tgz#2d4638b8914871c19945fb3243f6f298c1cca9db"
   integrity sha512-PqxzaoomTbJG3IzEouUGgppu3xrsbGKHS75zS3vS/Hfm56XxLpwIe7yFLokgXUbMWmLa0dczFHOibmebO4wRLA==
 
-did-resolver@2.1.0, did-resolver@^2.1.0:
+did-resolver@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-2.1.1.tgz#43796f8a3e921644e5fb15a8147684ca87019cfd"
+  integrity sha512-FYLTkNWofjYNDGV1HTQlyVu1OqZiFxR4I8KM+oxGVOkbXva15NfWzbzciqdXUDqOhe6so5aroAdrVip6gSAYSA==
+
+did-resolver@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-2.1.0.tgz#653d00499aefdd0a42bd59d265e0d470d801fc42"
   integrity sha512-9skNafNhYB4UHAcQnv5ozCZSITW+m4kNybSuDVNpGeMqppD5DGXrpOrluFjE6TWtinT217wvy/G46IbRDZ1u2A==
