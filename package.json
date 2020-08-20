@@ -60,7 +60,7 @@
     "did-resolver": "2.1.1",
     "ethr-did": "1.1.0",
     "faker": "4.1.0",
-    "jest": "26.4.0",
+    "jest": "26.4.1",
     "prettier": "2.0.5",
     "semantic-release": "17.1.1",
     "ts-jest": "26.2.0",
