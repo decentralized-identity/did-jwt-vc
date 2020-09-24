@@ -778,10 +778,10 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
-"@types/faker@5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-5.1.1.tgz#db1c14ddb4a325d710ba00e79913b9ff5740bd6b"
-  integrity sha512-CK4YJa4JOO+mul/DTb3HbuUOtS1T4shEbIkuSFVvqfslxAiKxPj2OJb6oUS0n4x+FWia8EOGdIzdClV2F/97SQ==
+"@types/faker@5.1.2":
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-5.1.2.tgz#3d5a97d5648502d7fb1eeb2809ca105edcd0d59b"
+  integrity sha512-a3FADSHjjinczCwr7tTejoMZzbSS5vi70VCyns4C1idxJrDSRGZCQG0s27YppXLcoWrBOkwBbBsZ9vDRDpQK7A==
 
 "@types/graceful-fs@^4.1.2":
   version "4.1.3"
