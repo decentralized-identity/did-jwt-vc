@@ -57,7 +57,7 @@
     "@types/faker": "5.1.5",
     "@types/jest": "26.0.20",
     "codecov": "3.8.1",
-    "did-resolver": "2.1.1",
+    "did-resolver": "2.1.2",
     "ethr-did": "1.1.0",
     "faker": "5.1.0",
     "jest": "26.6.3",
