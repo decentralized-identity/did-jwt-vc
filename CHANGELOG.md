@@ -1,3 +1,10 @@
+## [1.0.7](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.6...1.0.7) (2021-01-18)
+
+
+### Bug Fixes
+
+* **deps:** bump dependencies and fix type issues ([#55](https://github.com/decentralized-identity/did-jwt-vc/issues/55)) ([a169cd3](https://github.com/decentralized-identity/did-jwt-vc/commit/a169cd38c975c62e402d5c96b7c010c30b86ff35)), closes [#52](https://github.com/decentralized-identity/did-jwt-vc/issues/52) [#53](https://github.com/decentralized-identity/did-jwt-vc/issues/53)
+
 ## [1.0.6](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.5...1.0.6) (2020-08-18)
 
 
