@@ -205,7 +205,7 @@ console.log(verifiedVP)
     '@context': [Array],
     issuanceDate: '2019-09-09T16:07:43.000Z',
     proof: {
-      // synthetic proof type, NOT an LD-Proof
+      // proof type for internal use, NOT a registered W3C vc-data-model proof type
       type: 'JwtProof2020',
       jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwI...ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE'
     }
