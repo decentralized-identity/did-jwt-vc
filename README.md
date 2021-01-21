@@ -136,7 +136,7 @@ console.log(verifiedVC)
       },
     },
     "proof": {
-      // synthetic proof type, NOT a registered LD-Proof type
+      //  proof type for internal use, NOT a registered vc-data-model type
       "type": "JwtProof2020",
       "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY...Sx3Y2IdWaUpatJQA"
     }
