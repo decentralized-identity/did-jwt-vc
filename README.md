@@ -217,7 +217,7 @@ console.log(verifiedVP)
 #### Notes on verification and proof properties
 
 The result of the verification methods, when successful, also conveniently contain the decoded and parsed payloads, in
-a format that closely matches the [W3C data model]() for verifiable credentials and presentations. 
+a format that closely matches the [W3C data model](https://www.w3.org/TR/vc-data-model/) for verifiable credentials and presentations. 
 This makes it easier to work with both credential encodings in the same system.
 This parsed payload also shows a `proof` property that lists the full JWT credential or presentation.
 
