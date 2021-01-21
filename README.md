@@ -222,7 +222,7 @@ This makes it easier to work with both credential encodings in the same system.
 This parsed payload also shows a `proof` property that lists the full JWT credential or presentation.
 
 The `JwtProof2020` is a synthetic proof type, usable for differentiating credentials by type.
-It is not a registered LD-Proof algorithm and should not be treated as such.
+It is not a registered W3C VC Data Model algorithm and should not be treated as such.
 
 Also note that the `@context` fields that appear in this parsed payload are the same as the ones in the incoming JWT.
 This means that the parsed payload will probably not be suitable for an LD-processor.
