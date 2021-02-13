@@ -1013,10 +1013,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.14.tgz#24a0b5959f16ac141aeb0c5b3cd7a15b7c64cbce"
   integrity sha512-syUgf67ZQpaJj01/tRTknkMNoBBLWJOBODF0Zm4NrXmiSuxjymFrxnTu1QVYRubhVkRcZLYZG8STTwJRdVm/WQ==
 
-"@types/node@14.14.26":
-  version "14.14.26"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.26.tgz#e40df24c957568f350cca04e63bfb1e1556d1cbf"
-  integrity sha512-skWxepWOs+VArEBWd2S/VR3wUavioIIx9/HzW+UJiIjtwa6+kNXdsOeq7FfxDXf56hIcL0ieo2brwMgBJ1+lhw==
+"@types/node@14.14.27":
+  version "14.14.27"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.27.tgz#c7127f8da0498993e13b1a42faf1303d3110d2f2"
+  integrity sha512-Ecfmo4YDQPwuqTCl1yBxLV5ihKfRlkBmzUEDcfIRvDxOTGQEeikr317Ln7Gcv0tjA8dVgKI3rniqW2G1OyKDng==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -6555,10 +6555,10 @@ saxes@^5.0.0:
   dependencies:
     xmlchars "^2.2.0"
 
-semantic-release@17.3.8:
-  version "17.3.8"
-  resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-17.3.8.tgz#ae713d239f60a6ea9ca1c431318507d54b278c67"
-  integrity sha512-VOYRY/qm4ysTUbOTrMaVRd+boG0HQlHgSCvVgNqvG0l99RCIwuUkamD0D+T5l7XhMHc4XGxNRGrElcVyPPS86A==
+semantic-release@17.3.9:
+  version "17.3.9"
+  resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-17.3.9.tgz#99ebe7ef7c6b79b3bfb44baeaf242c6fc6a31f09"
+  integrity sha512-iPDySFcAXG+7KiM0JH4bvF++imkf85VmfXpIBPAyDxK/P4+pe19KNFCfkzTKwUJkTIAyLUIr7WOg3W5h5aMwNg==
   dependencies:
     "@semantic-release/commit-analyzer" "^8.0.0"
     "@semantic-release/error" "^2.2.0"
