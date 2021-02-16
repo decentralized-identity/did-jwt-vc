@@ -77,23 +77,23 @@ export async function createVerifiableCredentialJwt(
  * described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum spec
  * required spec.
  *
- * The `issuer` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
+ * The `holder` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
  *
  * @param payload `PresentationPayload` or `JwtPresentationPayload`
- * @param issuer `Issuer` the DID, signer and algorithm that will sign the token
+ * @param holder `Issuer` of the Presentation JWT (holder of the VC), signer and algorithm that will sign the token
  * @return a `Promise` that resolves to the JWT encoded verifiable presentation or rejects with `TypeError` if the
  * `payload` is not W3C compliant
  */
 export async function createVerifiablePresentationJwt(
   payload: JwtPresentationPayload | PresentationPayload,
-  issuer: Issuer
+  holder: Issuer
 ): Promise<JWT> {
   const parsedPayload: JwtPresentationPayload = { iat: undefined, ...transformPresentationInput(payload) }
   validateJwtPresentationPayload(parsedPayload)
   return createJWT(parsedPayload, {
-    issuer: issuer.did || parsedPayload.iss,
-    signer: issuer.signer,
-    alg: issuer.alg || JWT_ALG
+    issuer: holder.did || parsedPayload.iss,
+    signer: holder.signer,
+    alg: holder.alg || JWT_ALG
   })
 }
 
