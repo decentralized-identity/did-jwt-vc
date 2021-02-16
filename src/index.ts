@@ -77,7 +77,7 @@ export async function createVerifiableCredentialJwt(
  * described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum spec
  * required spec.
  *
- * The `issuer` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
+ * The `holder` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
  *
  * @param payload `PresentationPayload` or `JwtPresentationPayload`
  * @param holder `Issuer` of the Presentation JWT (holder of the VC), signer and algorithm that will sign the token
