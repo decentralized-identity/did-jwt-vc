@@ -206,3 +206,11 @@ export interface VerifyPresentationOptions {
   domain?: string
   challenge?: string
 }
+
+/**
+ * Represents the Creation Options that can be passed to the createVerifiablePresentationJwt Method.
+ */
+export interface CreatePresentationOptions {
+  domain?: string
+  challenge?: string
+}

@@ -14,7 +14,7 @@ import {
   W3CCredential,
   W3CPresentation,
   VerifiedCredential,
-  VerifiedPresentation, VerifyPresentationOptions
+  VerifiedPresentation, VerifyPresentationOptions, CreatePresentationOptions
 } from './types'
 import { DIDDocument } from 'did-resolver'
 import {
@@ -22,7 +22,7 @@ import {
   transformPresentationInput,
   normalizeCredential,
   normalizePresentation,
-  asArray
+  asArray, notEmpty
 } from './converters'
 export {
   Issuer,
@@ -81,14 +81,28 @@ export async function createVerifiableCredentialJwt(
  *
  * @param payload `PresentationPayload` or `JwtPresentationPayload`
  * @param holder `Issuer` of the Presentation JWT (holder of the VC), signer and algorithm that will sign the token
+ * @param options `CreatePresentationOptions` allows to pass additional values to the resulting JWT payload
  * @return a `Promise` that resolves to the JWT encoded verifiable presentation or rejects with `TypeError` if the
  * `payload` is not W3C compliant
  */
 export async function createVerifiablePresentationJwt(
   payload: JwtPresentationPayload | PresentationPayload,
-  holder: Issuer
+  holder: Issuer,
+  options: CreatePresentationOptions = {}
 ): Promise<JWT> {
   const parsedPayload: JwtPresentationPayload = { iat: undefined, ...transformPresentationInput(payload) }
+
+  // add challenge to nonce
+  if (options.challenge) {
+    parsedPayload.nonce = options.challenge
+  }
+
+  // add domain to audience.
+  if (options.domain) {
+    const audience = [...asArray(options.domain), ...asArray(parsedPayload.aud)].filter(notEmpty)
+    parsedPayload.aud = [...new Set(audience)]
+  }
+
   validateJwtPresentationPayload(parsedPayload)
   return createJWT(parsedPayload, {
     issuer: holder.did || parsedPayload.iss,

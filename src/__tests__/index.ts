@@ -17,7 +17,7 @@ import {
   validateCredentialSubject
 } from '../validators'
 import { DIDDocument } from 'did-resolver'
-import { VerifyPresentationOptions } from '../types'
+import { CreatePresentationOptions, VerifyPresentationOptions } from '../types'
 
 jest.mock('../validators')
 
@@ -123,12 +123,57 @@ describe('createPresentation', () => {
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
   })
+
   it('creates a valid Presentation JWT with extra optional fields', async () => {
     const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, did)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
+    expect(payload.extra).toBe(42)
   })
+
+  it('creates a valid Presentation JWT with domain option', async () => {
+    const options: CreatePresentationOptions = {
+      domain: 'TEST_DOMAIN'
+    }
+
+    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, did, options)
+    const decodedPresentation = await decodeJWT(presentationJwt)
+    const { iat, ...payload } = decodedPresentation.payload
+    expect(payload).toMatchSnapshot()
+    expect(payload).toHaveProperty('aud', ['TEST_DOMAIN'])
+    expect(payload).toHaveProperty('extra', 42)
+    expect(payload).not.toHaveProperty('nonce')
+  })
+
+  it('creates a valid Presentation JWT with domain option and existing aud', async () => {
+    const options: CreatePresentationOptions = {
+      domain: 'TEST_DOMAIN'
+    }
+
+    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, aud: ['EXISTING_AUD'] }, did, options)
+    const decodedPresentation = await decodeJWT(presentationJwt)
+    const { iat, ...payload } = decodedPresentation.payload
+    expect(payload).toMatchSnapshot()
+    expect(payload).toHaveProperty('aud', ['TEST_DOMAIN', 'EXISTING_AUD'])
+    expect(payload).not.toHaveProperty('nonce')
+  })
+
+
+  it('creates a valid Presentation JWT with challenge option', async () => {
+    const options: CreatePresentationOptions = {
+      challenge: 'TEST_CHALLENGE'
+    }
+
+    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, did, options)
+    const decodedPresentation = await decodeJWT(presentationJwt)
+    const { iat, ...payload } = decodedPresentation.payload
+    expect(payload).toMatchSnapshot()
+    expect(payload).not.toHaveProperty('aud')
+    expect(payload).toHaveProperty('nonce', 'TEST_CHALLENGE')
+    expect(payload).toHaveProperty('extra', 42)
+  })
+
   it('calls functions to validate required fields', async () => {
     await createVerifiablePresentationJwt(presentationPayload, did)
     expect(mockValidateContext).toHaveBeenCalledWith(presentationPayload.vp['@context'])
