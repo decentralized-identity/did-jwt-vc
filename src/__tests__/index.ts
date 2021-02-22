@@ -4,7 +4,7 @@ import {
   verifyCredential,
   verifyPresentation,
   createVerifiablePresentationJwt,
-  Issuer
+  Issuer, verifyPresentationPayloadOptions
 } from '../index'
 import { decodeJWT, Resolvable } from 'did-jwt'
 import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
@@ -17,6 +17,7 @@ import {
   validateCredentialSubject
 } from '../validators'
 import { DIDDocument } from 'did-resolver'
+import { VerifyPresentationOptions } from '../types'
 
 jest.mock('../validators')
 
@@ -192,11 +193,75 @@ describe('verifyPresentation', () => {
     expect(verified.verifiablePresentation).toBeDefined()
   })
 
+  it('rejects a Presentation without matching challenge', () => {
+    const options: VerifyPresentationOptions = {
+      challenge: 'TEST_CHALLENGE'
+    }
+    expect(verifyPresentation(PRESENTATION_JWT, resolver, options)).rejects.toThrow('Presentation does not contain the mandatory challenge (JWT: nonce) for : TEST_CHALLENGE')
+  })
+
+  it('rejects a Presentation without matching domain', () => {
+    const options: VerifyPresentationOptions = {
+      domain: 'TEST_DOMAIN'
+    }
+    expect(verifyPresentation(PRESENTATION_JWT, resolver, options)).rejects.toThrow('Presentation does not contain the mandatory domain (JWT: aud) for : TEST_DOMAIN')
+  })
+
   it('rejects an invalid JWT', () => {
     expect(verifyPresentation('not a jwt', resolver)).rejects.toThrow()
   })
 
   it('rejects a valid JWT that is missing VP attributes', () => {
     expect(verifyPresentation(BASIC_JWT, resolver)).rejects.toThrow()
+  })
+})
+
+describe('verifyPresentationPayloadOptions', () => {
+  it('verifies a payload with no options present', () => {
+    expect(() => verifyPresentationPayloadOptions(presentationPayload, {})).not.toThrow()
+  })
+
+  it('verifies a payload with challenge options present', () => {
+    const options: VerifyPresentationOptions = {
+      challenge: 'TEST_CHALLENGE'
+    }
+
+    const payload = { nonce: 'TEST_CHALLENGE', ...presentationPayload }
+
+    expect(() => verifyPresentationPayloadOptions(payload, options)).not.toThrow()
+  })
+
+  it('verifies a payload with domain options present (single aud)', () => {
+    const options: VerifyPresentationOptions = {
+      domain: 'TEST_DOMAIN'
+    }
+
+    const payload = { aud: 'TEST_DOMAIN', ...presentationPayload }
+
+    expect(() => verifyPresentationPayloadOptions(payload, options)).not.toThrow()
+  })
+
+  it('verifies a payload with domain options present (array aud)', () => {
+    const options: VerifyPresentationOptions = {
+      domain: 'TEST_DOMAIN'
+    }
+
+    const payload = { aud: ['OTHER_AUD', 'TEST_DOMAIN'], ...presentationPayload }
+
+    expect(() => verifyPresentationPayloadOptions(payload, options)).not.toThrow()
+  })
+
+  it('throws if payload is missing challenge', () => {
+    const options: VerifyPresentationOptions = {
+      challenge: 'TEST_CHALLENGE'
+    }
+    expect(() => verifyPresentationPayloadOptions(presentationPayload, options)).toThrow('Presentation does not contain the mandatory challenge (JWT: nonce) for : TEST_CHALLENGE')
+  })
+
+  it('throws if payload is missing domain', () => {
+    const options: VerifyPresentationOptions = {
+      domain: 'TEST_DOMAIN'
+    }
+    expect(() => verifyPresentationPayloadOptions(presentationPayload, options)).toThrow('Presentation does not contain the mandatory domain (JWT: aud) for : TEST_DOMAIN')
   })
 })
