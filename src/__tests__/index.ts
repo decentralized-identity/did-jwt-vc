@@ -239,6 +239,7 @@ describe('verifyPresentation', () => {
   })
 
   it('rejects a Presentation without matching challenge', () => {
+    expect.assertions(1)
     const options: VerifyPresentationOptions = {
       challenge: 'TEST_CHALLENGE'
     }
@@ -246,6 +247,7 @@ describe('verifyPresentation', () => {
   })
 
   it('rejects a Presentation without matching domain', () => {
+    expect.assertions(1)
     const options: VerifyPresentationOptions = {
       domain: 'TEST_DOMAIN'
     }
@@ -253,6 +255,7 @@ describe('verifyPresentation', () => {
   })
 
   it('rejects an invalid JWT', () => {
+    expect.assertions(1)
     expect(verifyPresentation('not a jwt', resolver)).rejects.toThrow()
   })
 
