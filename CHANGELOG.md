@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.7...1.1.0) (2021-02-24)
+
+
+### Features
+
+* support challenge & domain in Presentation creation and verification ([#61](https://github.com/decentralized-identity/did-jwt-vc/issues/61)) ([3a75c47](https://github.com/decentralized-identity/did-jwt-vc/commit/3a75c4708f545165cd5d483de9ec3d390a95e14e)), closes [#60](https://github.com/decentralized-identity/did-jwt-vc/issues/60) [#22](https://github.com/decentralized-identity/did-jwt-vc/issues/22)
+
 ## [1.0.7](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.6...1.0.7) (2021-01-18)
 
 
