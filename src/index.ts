@@ -14,15 +14,14 @@ import {
   W3CCredential,
   W3CPresentation,
   VerifiedCredential,
-  VerifiedPresentation
+  VerifiedPresentation, VerifyPresentationOptions, CreatePresentationOptions
 } from './types'
-import { DIDDocument } from 'did-resolver'
 import {
   transformCredentialInput,
   transformPresentationInput,
   normalizeCredential,
   normalizePresentation,
-  asArray
+  asArray, notEmpty
 } from './converters'
 export {
   Issuer,
@@ -81,14 +80,28 @@ export async function createVerifiableCredentialJwt(
  *
  * @param payload `PresentationPayload` or `JwtPresentationPayload`
  * @param holder `Issuer` of the Presentation JWT (holder of the VC), signer and algorithm that will sign the token
+ * @param options `CreatePresentationOptions` allows to pass additional values to the resulting JWT payload
  * @return a `Promise` that resolves to the JWT encoded verifiable presentation or rejects with `TypeError` if the
  * `payload` is not W3C compliant
  */
 export async function createVerifiablePresentationJwt(
   payload: JwtPresentationPayload | PresentationPayload,
-  holder: Issuer
+  holder: Issuer,
+  options: CreatePresentationOptions = {}
 ): Promise<JWT> {
   const parsedPayload: JwtPresentationPayload = { iat: undefined, ...transformPresentationInput(payload) }
+
+  // add challenge to nonce
+  if (options.challenge && Object.getOwnPropertyNames(parsedPayload).indexOf('nonce') === -1) {
+    parsedPayload.nonce = options.challenge
+  }
+
+  // add domain to audience.
+  if (options.domain) {
+    const audience = [...asArray(options.domain), ...asArray(parsedPayload.aud)].filter(notEmpty)
+    parsedPayload.aud = [...new Set(audience)]
+  }
+
   validateJwtPresentationPayload(parsedPayload)
   return createJWT(parsedPayload, {
     issuer: holder.did || parsedPayload.iss,
@@ -161,15 +174,47 @@ export async function verifyCredential(vc: JWT, resolver: Resolvable): Promise<V
 }
 
 /**
+ * Verifies that the given JwtPresentationPayload contains the appropriate options from VerifyPresentationOptions
+ *
+ * @param payload the JwtPresentationPayload to verify against
+ * @param options the VerifyPresentationOptions that contain the optional values to verify.
+ * @throws {Error} If VerifyPresentationOptions are not satisfied
+ */
+export function verifyPresentationPayloadOptions(payload: JwtPresentationPayload, options: VerifyPresentationOptions) {
+
+  if (options.challenge && options.challenge !== payload.nonce) {
+    throw new Error(`Presentation does not contain the mandatory challenge (JWT: nonce) for : ${options.challenge}`)
+  }
+
+  if (options.domain) {
+    // aud might be array
+    let matchedAudience;
+    if (payload.aud) {
+      const audArray = Array.isArray(payload.aud) ? payload.aud : [payload.aud]
+      matchedAudience = audArray.find((item) => options.domain === item)
+    }
+
+
+    if (typeof matchedAudience === 'undefined') {
+      throw new Error(`Presentation does not contain the mandatory domain (JWT: aud) for : ${options.domain}`)
+    }
+  }
+}
+
+/**
  * Verifies and validates a VerifiablePresentation that is encoded as a JWT according to the W3C spec.
  *
  * @return a `Promise` that resolves to a `VerifiedPresentation` or rejects with `TypeError` if the input is
- * not W3C compliant
+ * not W3C compliant or the VerifyPresentationOptions are not satisfied.
  * @param presentation the presentation to be verified. Currently only the JWT encoding is supported by this library
  * @param resolver a configured `Resolver` that can provide the DID document of the JWT issuer (presentation holder)
+ * @param options optional verification options that need to be satisfied
  */
-export async function verifyPresentation(presentation: JWT, resolver: Resolvable): Promise<VerifiedPresentation> {
+export async function verifyPresentation(presentation: JWT,
+                                         resolver: Resolvable,
+                                         options: VerifyPresentationOptions = {}): Promise<VerifiedPresentation> {
   const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver })
+  verifyPresentationPayloadOptions(verified.payload, options)
   verified.verifiablePresentation = normalizePresentation(verified.jwt)
   validatePresentationPayload(verified.verifiablePresentation)
   return verified as VerifiedPresentation

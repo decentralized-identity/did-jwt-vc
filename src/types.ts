@@ -45,6 +45,7 @@ export interface JwtPresentationPayload {
   nbf?: number
   exp?: number
   jti?: string
+  nonce?: string
   [x: string]: any
 }
 
@@ -195,4 +196,21 @@ export interface Issuer {
   did: string
   signer: Signer
   alg?: string
+}
+
+/**
+ * Represents the Verification Options that can be passed to the verifyPresentation Method.
+ * The verification will fail if given options are NOT satisfied.
+ */
+export interface VerifyPresentationOptions {
+  domain?: string
+  challenge?: string
+}
+
+/**
+ * Represents the Creation Options that can be passed to the createVerifiablePresentationJwt Method.
+ */
+export interface CreatePresentationOptions {
+  domain?: string
+  challenge?: string
 }
