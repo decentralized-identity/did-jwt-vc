@@ -16,7 +16,6 @@ import {
   VerifiedCredential,
   VerifiedPresentation, VerifyPresentationOptions, CreatePresentationOptions
 } from './types'
-import { DIDDocument } from 'did-resolver'
 import {
   transformCredentialInput,
   transformPresentationInput,
@@ -93,7 +92,7 @@ export async function createVerifiablePresentationJwt(
   const parsedPayload: JwtPresentationPayload = { iat: undefined, ...transformPresentationInput(payload) }
 
   // add challenge to nonce
-  if (options.challenge) {
+  if (options.challenge && Object.getOwnPropertyNames(parsedPayload).indexOf('nonce') === -1) {
     parsedPayload.nonce = options.challenge
   }
 

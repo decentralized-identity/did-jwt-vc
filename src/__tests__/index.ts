@@ -167,7 +167,6 @@ describe('createPresentation', () => {
     expect(payload).not.toHaveProperty('nonce')
   })
 
-
   it('creates a valid Presentation JWT with challenge option', async () => {
     expect.assertions(4)
     const options: CreatePresentationOptions = {
@@ -181,6 +180,20 @@ describe('createPresentation', () => {
     expect(payload).not.toHaveProperty('aud')
     expect(payload).toHaveProperty('nonce', 'TEST_CHALLENGE')
     expect(payload).toHaveProperty('extra', 42)
+  })
+
+  it('creates a valid Presentation JWT and does not overwrite an existing nonce property', async () => {
+    expect.assertions(3)
+    const options: CreatePresentationOptions = {
+      challenge: 'TEST_CHALLENGE'
+    }
+
+    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, nonce: 'EXISTING_NONCE' }, did, options)
+    const decodedPresentation = await decodeJWT(presentationJwt)
+    const { iat, ...payload } = decodedPresentation.payload
+    expect(payload).toMatchSnapshot()
+    expect(payload).not.toHaveProperty('aud')
+    expect(payload).toHaveProperty('nonce', 'EXISTING_NONCE')
   })
 
   it('calls functions to validate required fields', async () => {
