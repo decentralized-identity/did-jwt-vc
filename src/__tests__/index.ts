@@ -91,18 +91,21 @@ beforeEach(() => {
 
 describe('createVerifiableCredential', () => {
   it('creates a valid Verifiable Credential JWT with required fields', async () => {
+    expect.assertions(1)
     const vcJwt = await createVerifiableCredentialJwt(verifiableCredentialPayload, did)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
   it('creates a valid Verifiable Credential JWT with extra optional fields', async () => {
+    expect.assertions(1)
     const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, did)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
   it('calls functions to validate required fields', async () => {
+    expect.assertions(4)
     await createVerifiableCredentialJwt(verifiableCredentialPayload, did)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(verifiableCredentialPayload.nbf)
     expect(mockValidateContext).toHaveBeenCalledWith(verifiableCredentialPayload.vc['@context'])
@@ -110,6 +113,7 @@ describe('createVerifiableCredential', () => {
     expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialPayload.vc.credentialSubject)
   })
   it('calls functions to validate optional fields if they are present', async () => {
+    expect.assertions(1)
     const timestamp = Math.floor(new Date().getTime())
     await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, exp: timestamp }, did)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
@@ -118,6 +122,7 @@ describe('createVerifiableCredential', () => {
 
 describe('createPresentation', () => {
   it('creates a valid Presentation JWT with required fields', async () => {
+    expect.assertions(1)
     const presentationJwt = await createVerifiablePresentationJwt(presentationPayload, did)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
@@ -125,6 +130,7 @@ describe('createPresentation', () => {
   })
 
   it('creates a valid Presentation JWT with extra optional fields', async () => {
+    expect.assertions(2)
     const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, did)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
@@ -133,6 +139,7 @@ describe('createPresentation', () => {
   })
 
   it('creates a valid Presentation JWT with domain option', async () => {
+    expect.assertions(4)
     const options: CreatePresentationOptions = {
       domain: 'TEST_DOMAIN'
     }
@@ -147,6 +154,7 @@ describe('createPresentation', () => {
   })
 
   it('creates a valid Presentation JWT with domain option and existing aud', async () => {
+    expect.assertions(3)
     const options: CreatePresentationOptions = {
       domain: 'TEST_DOMAIN'
     }
@@ -161,6 +169,7 @@ describe('createPresentation', () => {
 
 
   it('creates a valid Presentation JWT with challenge option', async () => {
+    expect.assertions(4)
     const options: CreatePresentationOptions = {
       challenge: 'TEST_CHALLENGE'
     }
@@ -175,6 +184,7 @@ describe('createPresentation', () => {
   })
 
   it('calls functions to validate required fields', async () => {
+    expect.assertions(2 + presentationPayload.vp.verifiableCredential.length)
     await createVerifiablePresentationJwt(presentationPayload, did)
     expect(mockValidateContext).toHaveBeenCalledWith(presentationPayload.vp['@context'])
     expect(mockValidateVpType).toHaveBeenCalledWith(presentationPayload.vp.type)
@@ -183,6 +193,7 @@ describe('createPresentation', () => {
     }
   })
   it('throws a TypeError if vp.verifiableCredential is empty', async () => {
+    expect.assertions(1)
     await expect(
       createVerifiablePresentationJwt(
         {
@@ -198,6 +209,7 @@ describe('createPresentation', () => {
     ).rejects.toThrow(TypeError)
   })
   it('calls functions to validate optional fields if they are present', async () => {
+    expect.assertions(1)
     const timestamp = Math.floor(new Date().getTime())
     await createVerifiablePresentationJwt(
       {
@@ -212,12 +224,14 @@ describe('createPresentation', () => {
 
 describe('verifyCredential', () => {
   it('verifies a valid Verifiable Credential', async () => {
+    expect.assertions(2)
     const verified = await verifyCredential(VC_JWT, resolver)
     expect(verified.payload.vc).toBeDefined()
     expect(verified.verifiableCredential).toBeDefined()
   })
 
   it('verifies and converts a legacy format attestation into a Verifiable Credential', async () => {
+    expect.assertions(1)
     // tslint:disable-next-line: max-line-length
     const LEGACY_FORMAT_ATTESTATION =
       'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjM4MjQ4MDksImV4cCI6OTk2Mjk1MDI4Miwic3ViIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4IiwiY2xhaW0iOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19LCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.OsKmaxoA2pt3_ixWK61BaMDc072g2PymBX_CCUSo-irvtIRUP5qBCcerhpASe5hOcTg5nNpNg0XYXnqyF9I4XwE'
@@ -233,13 +247,13 @@ describe('verifyCredential', () => {
 
 describe('verifyPresentation', () => {
   it('verifies a valid Presentation', async () => {
+    expect.assertions(2)
     const verified = await verifyPresentation(PRESENTATION_JWT, resolver)
     expect(verified.payload.vp).toBeDefined()
     expect(verified.verifiablePresentation).toBeDefined()
   })
 
   it('rejects a Presentation without matching challenge', () => {
-    expect.assertions(1)
     const options: VerifyPresentationOptions = {
       challenge: 'TEST_CHALLENGE'
     }
@@ -247,7 +261,6 @@ describe('verifyPresentation', () => {
   })
 
   it('rejects a Presentation without matching domain', () => {
-    expect.assertions(1)
     const options: VerifyPresentationOptions = {
       domain: 'TEST_DOMAIN'
     }
@@ -255,7 +268,6 @@ describe('verifyPresentation', () => {
   })
 
   it('rejects an invalid JWT', () => {
-    expect.assertions(1)
     expect(verifyPresentation('not a jwt', resolver)).rejects.toThrow()
   })
 
