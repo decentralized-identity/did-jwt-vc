@@ -14,14 +14,17 @@ import {
   W3CCredential,
   W3CPresentation,
   VerifiedCredential,
-  VerifiedPresentation, VerifyPresentationOptions, CreatePresentationOptions
+  VerifiedPresentation,
+  VerifyPresentationOptions,
+  CreatePresentationOptions
 } from './types'
 import {
   transformCredentialInput,
   transformPresentationInput,
   normalizeCredential,
   normalizePresentation,
-  asArray, notEmpty
+  asArray,
+  notEmpty
 } from './converters'
 export {
   Issuer,
@@ -181,19 +184,17 @@ export async function verifyCredential(vc: JWT, resolver: Resolvable): Promise<V
  * @throws {Error} If VerifyPresentationOptions are not satisfied
  */
 export function verifyPresentationPayloadOptions(payload: JwtPresentationPayload, options: VerifyPresentationOptions) {
-
   if (options.challenge && options.challenge !== payload.nonce) {
     throw new Error(`Presentation does not contain the mandatory challenge (JWT: nonce) for : ${options.challenge}`)
   }
 
   if (options.domain) {
     // aud might be array
-    let matchedAudience;
+    let matchedAudience
     if (payload.aud) {
       const audArray = Array.isArray(payload.aud) ? payload.aud : [payload.aud]
       matchedAudience = audArray.find((item) => options.domain === item)
     }
-
 
     if (typeof matchedAudience === 'undefined') {
       throw new Error(`Presentation does not contain the mandatory domain (JWT: aud) for : ${options.domain}`)
@@ -210,9 +211,11 @@ export function verifyPresentationPayloadOptions(payload: JwtPresentationPayload
  * @param resolver a configured `Resolver` that can provide the DID document of the JWT issuer (presentation holder)
  * @param options optional verification options that need to be satisfied
  */
-export async function verifyPresentation(presentation: JWT,
-                                         resolver: Resolvable,
-                                         options: VerifyPresentationOptions = {}): Promise<VerifiedPresentation> {
+export async function verifyPresentation(
+  presentation: JWT,
+  resolver: Resolvable,
+  options: VerifyPresentationOptions = {}
+): Promise<VerifiedPresentation> {
   const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver })
   verifyPresentationPayloadOptions(verified.payload, options)
   verified.verifiablePresentation = normalizePresentation(verified.jwt)

@@ -25,13 +25,19 @@ describe('credential', () => {
     })
 
     it('clears empty vc property', () => {
-      const result = normalizeCredential({ foo: 'bar', vc: {} })
+      const result = normalizeCredential({ foo: 'bar', vc: {} }, true)
       expect(result).toMatchObject({ foo: 'bar' })
       expect(result).not.toHaveProperty('vc')
     })
 
+    it('keeps vc property after normalize', () => {
+      const result = normalizeCredential({ foo: 'bar', vc: {} }, false)
+      expect(result).toMatchObject({ foo: 'bar' })
+      expect(result).toHaveProperty('vc')
+    })
+
     it('passes through app specific properties in vc', () => {
-      const result = normalizeCredential({ foo: 'bar', vc: { bar: 'baz' } })
+      const result = normalizeCredential({ foo: 'bar', vc: { bar: 'baz' } }, true)
       expect(result).toMatchObject({ foo: 'bar', vc: { bar: 'baz' } })
     })
 
@@ -46,197 +52,287 @@ describe('credential', () => {
           }
         }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.sub', () => {
         let input = { sub: 'foo', bar: 'baz' }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.credentialSubject', () => {
         let input = { vc: { credentialSubject: { bar: 'foo' }, bar: 'baz' }, baz: 'bak' }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.iss', () => {
         let input = { iss: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.jti', () => {
         let input = { jti: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.type array', () => {
         let input = { vc: { type: ['foo'] } }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.type string', () => {
         let input = { vc: { type: 'foo' } }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.context array', () => {
         let input = { context: ['foo'] }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.context string', () => {
         let input = { context: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.@context array', () => {
         let input = { vc: { '@context': ['foo'] } }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.@context string', () => {
         let input = { vc: { '@context': 'foo' } }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.nbf', () => {
         let input = { nbf: 123 }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.iat', () => {
         let input = { iat: 123 }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.exp', () => {
         let input = { exp: 123 }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc when it is filtered from output', () => {
         let input = { vc: {} }
         const frozen = JSON.stringify(input)
-        const unused = normalizeCredential(input)
+        const unused = normalizeCredential(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
     })
 
     describe('credentialSubject', () => {
       it('keeps credentialSubject object', () => {
-        const result = normalizeCredential({ credentialSubject: { foo: 'bar' } })
+        const result = normalizeCredential({ credentialSubject: { foo: 'bar' } }, true)
         expect(result).toMatchObject({ credentialSubject: { foo: 'bar' } })
       })
 
       it('interprets JWT sub as credential subject id', () => {
-        const result = normalizeCredential({ sub: 'example.com' })
+        const result = normalizeCredential({ sub: 'example.com' }, true)
         expect(result).toMatchObject({ credentialSubject: { id: 'example.com' } })
         expect(result).not.toHaveProperty('sub')
       })
 
+      it('interprets JWT sub as credential subject id and keeps original', () => {
+        const result = normalizeCredential({ sub: 'example.com' }, false)
+        expect(result).toMatchObject({ sub: 'example.com', credentialSubject: { id: 'example.com' } })
+      })
+
       it('interprets JWT sub as credential subject id without overwriting existing', () => {
-        const result = normalizeCredential({ sub: 'foo', credentialSubject: { id: 'bar' } })
+        const result = normalizeCredential({ sub: 'foo', credentialSubject: { id: 'bar' } }, true)
         expect(result).toMatchObject({ sub: 'foo', credentialSubject: { id: 'bar' } })
       })
 
       it('merges credentialSubject objects', () => {
-        const result = normalizeCredential({
-          credentialSubject: { foo: 'bar' },
-          vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] }
-        })
+        const result = normalizeCredential(
+          {
+            credentialSubject: { foo: 'bar' },
+            vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] }
+          },
+          true
+        )
         expect(result).toMatchObject({ credentialSubject: { foo: 'bar', bar: 'baz' } })
       })
 
+      it('merges credentialSubject objects while keeping originals', () => {
+        const result = normalizeCredential(
+          {
+            credentialSubject: { foo: 'bar' },
+            vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] }
+          },
+          false
+        )
+        expect(result).toMatchObject({
+          credentialSubject: { foo: 'bar', bar: 'baz' },
+          vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] }
+        })
+      })
+
       it('merges credentialSubject objects with JWT precedence', () => {
+        const result = normalizeCredential(
+          {
+            credentialSubject: { foo: 'bar' },
+            vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] }
+          },
+          true
+        )
+        expect(result).toMatchObject({
+          credentialSubject: { foo: 'bazzz' }
+        })
+      })
+
+      it('merges credentialSubject objects with JWT precedence while keeping originals', () => {
         const result = normalizeCredential({
           credentialSubject: { foo: 'bar' },
           vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] }
         })
-        expect(result).toMatchObject({ credentialSubject: { foo: 'bazzz' } })
+        expect(result).toMatchObject({
+          credentialSubject: { foo: 'bazzz' },
+          vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] }
+        })
       })
     })
 
     describe('issuer', () => {
       it('accepts null issuer', () => {
-        const result = normalizeCredential({
-          issuer: null
-        })
+        const result = normalizeCredential(
+          {
+            issuer: null
+          },
+          true
+        )
         expect(result).toMatchObject({})
       })
 
       it('parses iss as issuer id', () => {
-        const result = normalizeCredential({
-          iss: 'foo'
-        })
+        const result = normalizeCredential(
+          {
+            iss: 'foo'
+          },
+          true
+        )
         expect(result).toMatchObject({ issuer: { id: 'foo' } })
         expect(result).not.toHaveProperty('iss')
       })
 
+      it('parses iss as issuer id but keeps originals', () => {
+        const result = normalizeCredential(
+          {
+            iss: 'foo'
+          },
+          false
+        )
+        expect(result).toMatchObject({ issuer: { id: 'foo' }, iss: 'foo' })
+      })
+
       it('keeps iss if issuer already has id', () => {
-        const result = normalizeCredential({
-          iss: 'foo',
-          issuer: {
-            id: 'bar'
-          }
-        })
+        const result = normalizeCredential(
+          {
+            iss: 'foo',
+            issuer: {
+              id: 'bar'
+            }
+          },
+          true
+        )
         expect(result).toMatchObject({ iss: 'foo', issuer: { id: 'bar' } })
       })
 
       it('keeps issuer claims', () => {
-        const result = normalizeCredential({
-          iss: 'foo',
-          issuer: {
-            bar: 'baz'
-          }
-        })
+        const result = normalizeCredential(
+          {
+            iss: 'foo',
+            issuer: {
+              bar: 'baz'
+            }
+          },
+          true
+        )
         expect(result).toMatchObject({ issuer: { id: 'foo', bar: 'baz' } })
         expect(result).not.toHaveProperty('iss')
       })
 
+      it('keeps issuer claims and originals', () => {
+        const result = normalizeCredential(
+          {
+            iss: 'foo',
+            issuer: {
+              bar: 'baz'
+            }
+          },
+          false
+        )
+        expect(result).toMatchObject({ issuer: { id: 'foo', bar: 'baz' }, iss: 'foo' })
+      })
+
       it('keeps issuer if it is not an object', () => {
-        const result = normalizeCredential({
-          iss: 'foo',
-          issuer: 'baz'
-        })
+        const result = normalizeCredential(
+          {
+            iss: 'foo',
+            issuer: 'baz'
+          },
+          true
+        )
         expect(result).toMatchObject({ issuer: 'baz', iss: 'foo' })
       })
     })
 
     describe('jti', () => {
       it('transforms jti to id', () => {
-        const result = normalizeCredential({ jti: 'foo' })
+        const result = normalizeCredential({ jti: 'foo' }, true)
         expect(result).toMatchObject({ id: 'foo' })
-        expect(result).not.toHaveProperty('jti')
+      })
+
+      it('transforms jti to id, keeping originals', () => {
+        const result = normalizeCredential({ jti: 'foo' })
+        expect(result).toMatchObject({ id: 'foo', jti: 'foo' })
       })
 
       it('transforms jti to id if it is not present', () => {
-        const result = normalizeCredential({ jti: 'foo', id: 'bar' })
+        const result = normalizeCredential({ jti: 'foo', id: 'bar' }, true)
         expect(result).toMatchObject({ id: 'bar', jti: 'foo' })
       })
     })
 
     describe('type', () => {
       it('uses type from vc', () => {
-        const result = normalizeCredential({ vc: { type: ['foo'] } })
+        const result = normalizeCredential({ vc: { type: ['foo'] } }, true)
         expect(result).toMatchObject({ type: ['foo'] })
       })
 
+      it('uses type from vc, keeping originals', () => {
+        const result = normalizeCredential({ vc: { type: ['foo'] } }, false)
+        expect(result).toMatchObject({ type: ['foo'], vc: { type: ['foo'] } })
+      })
+
       it('merges type arrays', () => {
-        const result = normalizeCredential({ type: ['bar'], vc: { type: ['foo'] } })
+        const result = normalizeCredential({ type: ['bar'], vc: { type: ['foo'] } }, true)
         expect(result).toMatchObject({ type: ['bar', 'foo'] })
+      })
+
+      it('merges type arrays, keeping originals', () => {
+        const result = normalizeCredential({ type: ['bar'], vc: { type: ['foo'] } }, false)
+        expect(result).toMatchObject({ type: ['bar', 'foo'], vc: { type: ['foo'] } })
       })
 
       it('merges type as arrays for single items', () => {
@@ -245,38 +341,57 @@ describe('credential', () => {
       })
 
       it('merges type as arrays uniquely', () => {
-        const result = normalizeCredential({ type: 'foo', vc: { type: 'foo', '@context': [], credentialSubject: {} } })
+        const result = normalizeCredential(
+          { type: 'foo', vc: { type: 'foo', '@context': [], credentialSubject: {} } },
+          true
+        )
         expect(result).toMatchObject({ type: ['foo'] })
         expect(result).not.toHaveProperty('vc')
+      })
+
+      it('merges type as arrays uniquely, keeping originals', () => {
+        const result = normalizeCredential({ type: 'foo', vc: { type: 'foo', '@context': [], credentialSubject: {} } })
+        expect(result).toMatchObject({ type: ['foo'], vc: { type: 'foo', '@context': [], credentialSubject: {} } })
       })
     })
 
     describe('context', () => {
       it('uses @context from vc', () => {
+        const result = normalizeCredential({ vc: { '@context': ['foo'] } }, true)
+        expect(result).toMatchObject({ '@context': ['foo'] })
+      })
+
+      it('uses @context from vc, keeping originals', () => {
         const result = normalizeCredential({ vc: { '@context': ['foo'] } })
         expect(result).toMatchObject({ '@context': ['foo'] })
       })
 
       it('merges @context arrays', () => {
-        const result = normalizeCredential({ context: ['baz'], '@context': ['bar'], vc: { '@context': ['foo'] } })
+        const result = normalizeCredential({ context: ['baz'], '@context': ['bar'], vc: { '@context': ['foo'] } }, true)
         expect(result).toMatchObject({ '@context': ['baz', 'bar', 'foo'] })
       })
 
       it('merges @context as arrays for single items', () => {
-        const result = normalizeCredential({
-          context: 'baz',
-          '@context': 'bar',
-          vc: { '@context': 'foo', type: [], credentialSubject: {} }
-        })
+        const result = normalizeCredential(
+          {
+            context: 'baz',
+            '@context': 'bar',
+            vc: { '@context': 'foo', type: [], credentialSubject: {} }
+          },
+          true
+        )
         expect(result).toMatchObject({ '@context': ['baz', 'bar', 'foo'] })
       })
 
       it('merges @context as arrays uniquely', () => {
-        const result = normalizeCredential({
-          context: 'baz',
-          '@context': ['bar'],
-          vc: { '@context': ['foo', 'baz', 'bar'] }
-        })
+        const result = normalizeCredential(
+          {
+            context: 'baz',
+            '@context': ['bar'],
+            vc: { '@context': ['foo', 'baz', 'bar'] }
+          },
+          true
+        )
         expect(result).toMatchObject({ '@context': ['baz', 'bar', 'foo'] })
         expect(result).not.toHaveProperty('vc')
       })
@@ -284,33 +399,55 @@ describe('credential', () => {
 
     describe('issuanceDate', () => {
       it('keeps issuanceDate property when present', () => {
+        const result = normalizeCredential({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 }, true)
+        expect(result).toMatchObject({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 })
+      })
+
+      it('uses nbf as issuanceDate when present', () => {
+        const result = normalizeCredential({ nbf: 1234567890, iat: 1111111111 }, true)
+        expect(result).toMatchObject({ issuanceDate: '2009-02-13T23:31:30.000Z', iat: 1111111111 })
+        expect(result).not.toHaveProperty('nbf')
+      })
+
+      it('uses iat as issuanceDate when no nbf and no issuanceDate present', () => {
+        const result = normalizeCredential({ iat: 1111111111 }, true)
+        expect(result).toMatchObject({ issuanceDate: '2005-03-18T01:58:31.000Z' })
+        expect(result).not.toHaveProperty('iat')
+      })
+    })
+
+    describe('issuanceDate keeping originals', () => {
+      it('keeps issuanceDate property when present', () => {
         const result = normalizeCredential({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 })
         expect(result).toMatchObject({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 })
       })
 
       it('uses nbf as issuanceDate when present', () => {
         const result = normalizeCredential({ nbf: 1234567890, iat: 1111111111 })
-        expect(result).toMatchObject({ issuanceDate: '2009-02-13T23:31:30.000Z', iat: 1111111111 })
-        expect(result).not.toHaveProperty('nbf')
+        expect(result).toMatchObject({ issuanceDate: '2009-02-13T23:31:30.000Z', iat: 1111111111, nbf: 1234567890 })
       })
 
       it('uses iat as issuanceDate when no nbf and no issuanceDate present', () => {
         const result = normalizeCredential({ iat: 1111111111 })
-        expect(result).toMatchObject({ issuanceDate: '2005-03-18T01:58:31.000Z' })
-        expect(result).not.toHaveProperty('iat')
+        expect(result).toMatchObject({ issuanceDate: '2005-03-18T01:58:31.000Z', iat: 1111111111 })
       })
     })
 
     describe('expirationDate', () => {
       it('keeps expirationDate property when present', () => {
-        const result = normalizeCredential({ expirationDate: 'tomorrow', exp: 1222222222 })
+        const result = normalizeCredential({ expirationDate: 'tomorrow', exp: 1222222222 }, true)
         expect(result).toMatchObject({ expirationDate: 'tomorrow', exp: 1222222222 })
       })
 
       it('uses exp as issuanceDate when present', () => {
-        const result = normalizeCredential({ exp: 1222222222 })
+        const result = normalizeCredential({ exp: 1222222222 }, true)
         expect(result).toMatchObject({ expirationDate: '2008-09-24T02:10:22.000Z' })
         expect(result).not.toHaveProperty('exp')
+      })
+
+      it('uses exp as issuanceDate when present, keeping original', () => {
+        const result = normalizeCredential({ exp: 1222222222 })
+        expect(result).toMatchObject({ expirationDate: '2008-09-24T02:10:22.000Z', exp: 1222222222 })
       })
     })
 
@@ -376,10 +513,40 @@ describe('credential', () => {
         appSpecific: 'another app specific field'
       }
 
+      const expectedComplexOutputKeepingOriginals = {
+        context: 'top context',
+        '@context': ['top context', 'also top', 'vc context'],
+        type: ['A', 'B'],
+        iss: 'foo',
+        sub: 'bar',
+        issuer: {
+          id: 'foo',
+          claim: 'issuer claim'
+        },
+        credentialSubject: {
+          id: 'bar',
+          something: 'nothing'
+        },
+        issuanceDate: '2009-02-13T23:31:30.000Z',
+        expirationDate: '2009-01-06T08:40:31.000Z',
+        nbf: 1234567890,
+        iat: 1111111111,
+        exp: 1231231231,
+        vc: {
+          '@context': ['vc context'],
+          type: ['B'],
+          credentialSubject: {
+            something: 'nothing'
+          },
+          appSpecific: 'some app specific field'
+        },
+        appSpecific: 'another app specific field'
+      }
+
       it('accepts VerifiableCredential as string', () => {
         const credential = JSON.stringify(complexInput)
 
-        const result = normalizeCredential(credential)
+        const result = normalizeCredential(credential, true)
 
         expect(result).toMatchObject(expectedComplexOutput)
 
@@ -392,13 +559,21 @@ describe('credential', () => {
         expect(result.vc).not.toHaveProperty('credentialSubject')
       })
 
+      it('accepts VerifiableCredential as string, keeping originals', () => {
+        const credential = JSON.stringify(complexInput)
+
+        const result = normalizeCredential(credential)
+
+        expect(result).toMatchObject(expectedComplexOutputKeepingOriginals)
+      })
+
       it('accepts VerifiableCredential as JWT', () => {
         const payload = JSON.stringify(complexInput)
         const header = '{}'
 
         const credential = `${encodeBase64Url(header)}.${encodeBase64Url(payload)}.signature`
 
-        const result = normalizeCredential(credential)
+        const result = normalizeCredential(credential, true)
 
         expect(result).toMatchObject(expectedComplexOutput)
         expect(result).toHaveProperty('proof', { type: DEFAULT_JWT_PROOF_TYPE, jwt: credential })
@@ -410,6 +585,18 @@ describe('credential', () => {
         expect(result.vc).not.toHaveProperty('@context')
         expect(result.vc).not.toHaveProperty('type')
         expect(result.vc).not.toHaveProperty('credentialSubject')
+      })
+
+      it('accepts VerifiableCredential as JWT, keeping originals', () => {
+        const payload = JSON.stringify(complexInput)
+        const header = '{}'
+
+        const credential = `${encodeBase64Url(header)}.${encodeBase64Url(payload)}.signature`
+
+        const result = normalizeCredential(credential)
+
+        expect(result).toMatchObject(expectedComplexOutputKeepingOriginals)
+        expect(result).toHaveProperty('proof', { type: DEFAULT_JWT_PROOF_TYPE, jwt: credential })
       })
     })
   })
@@ -453,116 +640,149 @@ describe('credential', () => {
       it('keeps input.credentialSubject.id', () => {
         const input = { credentialSubject: { id: 'foo' } }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.credentialSubject.id', () => {
         const input = { vc: { credentialSubject: { id: 'foo' } } }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.context', () => {
         const input = { context: ['foo'] }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.@context', () => {
         const input = { '@context': ['foo'] }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.type', () => {
         const input = { type: ['foo'] }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.id', () => {
         const input = { id: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.issuanceDate', () => {
         const input = { issuanceDate: new Date().toISOString() }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.expirationDate', () => {
         const input = { expirationDate: new Date().toISOString() }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.issuer object when filtered from output', () => {
         const input = { issuer: {} }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.issuer.id', () => {
         const input = { issuer: { id: 'foo' } }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.issuer string', () => {
         const input = { issuer: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = transformCredentialInput(input)
+        const unused = transformCredentialInput(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
     })
 
     describe('credentialSubject', () => {
       it('uses credentialSubject.id as sub', () => {
-        const result = transformCredentialInput({ credentialSubject: { id: 'foo' } })
+        const result = transformCredentialInput({ credentialSubject: { id: 'foo' } }, true)
         expect(result).toMatchObject({ sub: 'foo', vc: { credentialSubject: {} } })
         expect(result.vc.credentialSubject).not.toHaveProperty('id')
       })
 
       it('preserves existing sub property if present', () => {
-        const result = transformCredentialInput({ sub: 'bar', credentialSubject: { id: 'foo' } })
+        const result = transformCredentialInput({ sub: 'bar', credentialSubject: { id: 'foo' } }, true)
         expect(result).toMatchObject({ sub: 'bar', vc: { credentialSubject: { id: 'foo' } } })
       })
 
       it('merges credentialSubject properties', () => {
+        const result = transformCredentialInput(
+          {
+            vc: { credentialSubject: { foo: 'bar' } },
+            credentialSubject: { bar: 'baz' }
+          },
+          true
+        )
+        expect(result).toMatchObject({ vc: { credentialSubject: { foo: 'bar', bar: 'baz' } } })
+      })
+
+      it('merges credentialSubject properties, keeping originals', () => {
         const result = transformCredentialInput({
           vc: { credentialSubject: { foo: 'bar' } },
           credentialSubject: { bar: 'baz' }
         })
-        expect(result).toMatchObject({ vc: { credentialSubject: { foo: 'bar', bar: 'baz' } } })
+        expect(result).toMatchObject({
+          vc: { credentialSubject: { foo: 'bar', bar: 'baz' } },
+          credentialSubject: { bar: 'baz' }
+        })
       })
     })
 
     describe('context', () => {
       it('merges @context fields', () => {
-        const result = transformCredentialInput({ context: ['AA'], '@context': ['BB'], vc: { '@context': ['CC'] } })
+        const result = transformCredentialInput(
+          { context: ['AA'], '@context': ['BB'], vc: { '@context': ['CC'] } },
+          true
+        )
         expect(result).toMatchObject({ vc: { '@context': ['AA', 'BB', 'CC'] } })
         expect(result).not.toHaveProperty('context')
         expect(result).not.toHaveProperty('@context')
       })
 
       it('merges @context fields when not array types', () => {
-        const result = transformCredentialInput({ context: 'AA', '@context': 'BB', vc: { '@context': ['CC'] } })
+        const result = transformCredentialInput({ context: 'AA', '@context': 'BB', vc: { '@context': ['CC'] } }, true)
         expect(result).toMatchObject({ vc: { '@context': ['AA', 'BB', 'CC'] } })
         expect(result).not.toHaveProperty('context')
         expect(result).not.toHaveProperty('@context')
       })
 
       it('keeps only unique entries in vc.@context', () => {
+        const result = transformCredentialInput(
+          {
+            context: ['AA', 'BB'],
+            '@context': ['BB', 'CC'],
+            vc: { '@context': ['CC', 'DD'] }
+          },
+          true
+        )
+        expect(result).toMatchObject({ vc: { '@context': ['AA', 'BB', 'CC', 'DD'] } })
+        expect(result).not.toHaveProperty('context')
+        expect(result).not.toHaveProperty('@context')
+      })
+
+      it('keeps only unique entries in vc.@context, and originals', () => {
         const result = transformCredentialInput({
           context: ['AA', 'BB'],
           '@context': ['BB', 'CC'],
           vc: { '@context': ['CC', 'DD'] }
         })
-        expect(result).toMatchObject({ vc: { '@context': ['AA', 'BB', 'CC', 'DD'] } })
-        expect(result).not.toHaveProperty('context')
-        expect(result).not.toHaveProperty('@context')
+        expect(result).toMatchObject({
+          vc: { '@context': ['AA', 'BB', 'CC', 'DD'] },
+          context: ['AA', 'BB'],
+          '@context': ['BB', 'CC']
+        })
       })
 
       it('removes undefined entries from @context', () => {
@@ -572,20 +792,25 @@ describe('credential', () => {
     })
 
     describe('type', () => {
-      it('merges type fields', () => {
+      it('merges type fields keeping originals', () => {
         const result = transformCredentialInput({ type: ['AA'], vc: { type: ['BB'] } })
+        expect(result).toMatchObject({ vc: { type: ['AA', 'BB'] }, type: ['AA'] })
+      })
+
+      it('merges type fields', () => {
+        const result = transformCredentialInput({ type: ['AA'], vc: { type: ['BB'] } }, true)
         expect(result).toMatchObject({ vc: { type: ['AA', 'BB'] } })
         expect(result).not.toHaveProperty('type')
       })
 
       it('merges type fields when not array types', () => {
-        const result = transformCredentialInput({ type: 'AA', vc: { type: ['BB'] } })
+        const result = transformCredentialInput({ type: 'AA', vc: { type: ['BB'] } }, true)
         expect(result).toMatchObject({ vc: { type: ['AA', 'BB'] } })
         expect(result).not.toHaveProperty('type')
       })
 
       it('keeps only unique entries in vc.type', () => {
-        const result = transformCredentialInput({ type: ['AA', 'BB'], vc: { type: ['BB', 'CC'] } })
+        const result = transformCredentialInput({ type: ['AA', 'BB'], vc: { type: ['BB', 'CC'] } }, true)
         expect(result).toMatchObject({ vc: { type: ['AA', 'BB', 'CC'] } })
       })
 
@@ -597,93 +822,118 @@ describe('credential', () => {
 
     describe('jti', () => {
       it('uses the id property as jti', () => {
-        const result = transformCredentialInput({ id: 'foo' })
+        const result = transformCredentialInput({ id: 'foo' }, true)
         expect(result).toMatchObject({ jti: 'foo' })
         expect(result).not.toHaveProperty('id')
       })
 
+      it('uses the id property as jti, keeping original', () => {
+        const result = transformCredentialInput({ id: 'foo' })
+        expect(result).toMatchObject({ jti: 'foo', id: 'foo' })
+      })
+
       it('preserves jti entry if present', () => {
-        const result = transformCredentialInput({ jti: 'bar', id: 'foo' })
+        const result = transformCredentialInput({ jti: 'bar', id: 'foo' }, true)
         expect(result).toMatchObject({ jti: 'bar', id: 'foo' })
       })
     })
 
     describe('issuanceDate', () => {
-      it('transforms the issuanceDate property to nbf', () => {
+      it('transforms the issuanceDate property to nbf, keeping original', () => {
         const result = transformCredentialInput({ issuanceDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ nbf: 1234567890, issuanceDate: '2009-02-13T23:31:30.000Z' })
+      })
+
+      it('transforms the issuanceDate property to nbf', () => {
+        const result = transformCredentialInput({ issuanceDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ nbf: 1234567890 })
         expect(result).not.toHaveProperty('issuanceDate')
       })
 
       it('preserves the issuanceDate property if it fails to be parsed as a Date', () => {
-        const result = transformCredentialInput({ issuanceDate: 'tomorrow' })
+        const result = transformCredentialInput({ issuanceDate: 'tomorrow' }, true)
         expect(result).toMatchObject({ issuanceDate: 'tomorrow' })
       })
 
       it('preserves nbf entry if present', () => {
-        const result = transformCredentialInput({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' })
+        const result = transformCredentialInput({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' })
       })
 
       it('preserves nbf entry if explicitly undefined', () => {
-        const result = transformCredentialInput({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' })
+        const result = transformCredentialInput({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' })
       })
     })
 
     describe('expirationDate', () => {
-      it('transforms the expirationDate property to exp', () => {
+      it('transforms the expirationDate property to exp, keeping original', () => {
         const result = transformCredentialInput({ expirationDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ exp: 1234567890, expirationDate: '2009-02-13T23:31:30.000Z' })
+      })
+
+      it('transforms the expirationDate property to exp', () => {
+        const result = transformCredentialInput({ expirationDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ exp: 1234567890 })
         expect(result).not.toHaveProperty('expirationDate')
       })
 
       it('preserves the expirationDate property if it fails to be parsed as a Date', () => {
-        const result = transformCredentialInput({ expirationDate: 'tomorrow' })
+        const result = transformCredentialInput({ expirationDate: 'tomorrow' }, true)
         expect(result).toMatchObject({ expirationDate: 'tomorrow' })
       })
 
       it('preserves exp entry if present', () => {
-        const result = transformCredentialInput({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' })
+        const result = transformCredentialInput({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' })
       })
 
       it('preserves exp entry if explicitly undefined', () => {
-        const result = transformCredentialInput({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' })
+        const result = transformCredentialInput({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' })
       })
     })
 
     describe('issuer', () => {
-      it('uses issuer.id as iss', () => {
+      it('uses issuer.id as iss, keeping original', () => {
         const result = transformCredentialInput({ issuer: { id: 'foo' } })
+        expect(result).toMatchObject({ iss: 'foo', issuer: { id: 'foo' } })
+      })
+
+      it('uses issuer.id as iss', () => {
+        const result = transformCredentialInput({ issuer: { id: 'foo' } }, true)
         expect(result).toMatchObject({ iss: 'foo' })
         expect(result).not.toHaveProperty('issuer')
       })
 
       it('uses issuer as iss when of type string', () => {
-        const result = transformCredentialInput({ issuer: 'foo' })
+        const result = transformCredentialInput({ issuer: 'foo' }, true)
         expect(result).toMatchObject({ iss: 'foo' })
         expect(result).not.toHaveProperty('issuer')
       })
 
+      it('uses issuer as iss when of type string, keeping original', () => {
+        const result = transformCredentialInput({ issuer: 'foo' })
+        expect(result).toMatchObject({ iss: 'foo', issuer: 'foo' })
+      })
+
       it('ignores issuer property if neither string or object', () => {
-        const result = transformCredentialInput({ issuer: 12 })
+        const result = transformCredentialInput({ issuer: 12 }, true)
         expect(result).toMatchObject({ issuer: 12 })
       })
 
       it('ignores issuer property if iss is present', () => {
-        const result = transformCredentialInput({ iss: 'foo', issuer: 'bar' })
+        const result = transformCredentialInput({ iss: 'foo', issuer: 'bar' }, true)
         expect(result).toMatchObject({ iss: 'foo', issuer: 'bar' })
       })
 
       it('ignores issuer.id property if iss is present', () => {
-        const result = transformCredentialInput({ iss: 'foo', issuer: { id: 'bar' } })
+        const result = transformCredentialInput({ iss: 'foo', issuer: { id: 'bar' } }, true)
         expect(result).toMatchObject({ iss: 'foo', issuer: { id: 'bar' } })
       })
 
       it('preserves issuer claims if present', () => {
-        const result = transformCredentialInput({ issuer: { id: 'foo', bar: 'baz' } })
+        const result = transformCredentialInput({ issuer: { id: 'foo', bar: 'baz' } }, true)
         expect(result).toMatchObject({ iss: 'foo', issuer: { bar: 'baz' } })
         expect(result.issuer).not.toHaveProperty('id')
       })
@@ -695,7 +945,7 @@ describe('credential', () => {
           issuanceDate: '2020-07-02T09:58:10.284Z',
           credentialSubject: { id: 'did:example:123', foo: 'bar' }
         }
-        const result = transformCredentialInput(input)
+        const result = transformCredentialInput(input, true)
         expect(input['@context']).toEqual(['https://www.w3.org/2018/credentials/v1'])
         expect(input.type).toEqual(['VerifiableCredential'])
         expect(input.issuanceDate).toEqual('2020-07-02T09:58:10.284Z')
@@ -719,13 +969,13 @@ describe('presentation', () => {
     })
 
     it('clear vp prop if empty', () => {
-      const result = normalizePresentation({ foo: 'bar', vp: {} })
+      const result = normalizePresentation({ foo: 'bar', vp: {} }, true)
       expect(result).toMatchObject({ foo: 'bar' })
       expect(result).not.toHaveProperty('vp')
     })
 
     it('preserves app specific props in vp', () => {
-      const result = normalizePresentation({ foo: 'bar', vp: { bar: 'baz' } })
+      const result = normalizePresentation({ foo: 'bar', vp: { bar: 'baz' } }, true)
       expect(result).toMatchObject({ foo: 'bar', vp: { bar: 'baz' } })
     })
 
@@ -738,107 +988,124 @@ describe('presentation', () => {
           }
         }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.vp.verifiableCredential', () => {
         const input = { vp: { verifiableCredential: [] } }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.iss', () => {
         const input = { iss: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.aud', () => {
         const input = { aud: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.jti', () => {
         const input = { jti: '1234' }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.vp.type', () => {
         const input = { vp: { type: ['foo'] } }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.vp.@context', () => {
         const input = { vp: { '@context': ['foo'] } }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.context', () => {
         const input = { context: ['foo'] }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.iat', () => {
         const input = { iat: 123 }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.nbf', () => {
         const input = { nbf: 123 }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.exp', () => {
         const input = { exp: 123 }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
 
       it('keeps input.vp when filtered from output', () => {
         const input = { vp: {} }
         const frozen = JSON.stringify(input)
-        const unused = normalizePresentation(input)
+        const unused = normalizePresentation(input, true)
         expect(frozen).toBe(JSON.stringify(input))
       })
     })
 
     describe('verifiableCredential', () => {
-      it('merges the verifiableCredential fields as an array', () => {
+      it('merges the verifiableCredential fields as an array, keeping original', () => {
         const result = normalizePresentation({
           verifiableCredential: { foo: 'bar' },
           vp: { verifiableCredential: [{ foo: 'baz' }] }
         })
+        expect(result).toMatchObject({
+          verifiableCredential: [{ foo: 'bar' }, { foo: 'baz' }],
+          vp: { verifiableCredential: [{ foo: 'baz' }] }
+        })
+      })
+
+      it('merges the verifiableCredential fields as an array', () => {
+        const result = normalizePresentation(
+          {
+            verifiableCredential: { foo: 'bar' },
+            vp: { verifiableCredential: [{ foo: 'baz' }] }
+          },
+          true
+        )
         expect(result).toMatchObject({
           verifiableCredential: [{ foo: 'bar' }, { foo: 'baz' }]
         })
       })
 
       it('parses the underlying credentials', () => {
-        const result = normalizePresentation({
-          vp: {
-            verifiableCredential: [
-              'e30.eyJjb250ZXh0IjoidG9wIGNvbnRleHQiLCJAY29udGV4dCI6WyJhbHNvIHRvcCJdLCJ0eXBlIjpbIkEiXSwiaXNzdWVyIjp7ImNsYWltIjoiaXNzdWVyIGNsYWltIn0sImlzcyI6ImZvbyIsInN1YiI6ImJhciIsInZjIjp7IkBjb250ZXh0IjpbInZjIGNvbnRleHQiXSwidHlwZSI6WyJCIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7InNvbWV0aGluZyI6Im5vdGhpbmcifSwiYXBwU3BlY2lmaWMiOiJzb21lIGFwcCBzcGVjaWZpYyBmaWVsZCJ9LCJuYmYiOjEyMzQ1Njc4OTAsImlhdCI6MTExMTExMTExMSwiZXhwIjoxMjMxMjMxMjMxLCJhcHBTcGVjaWZpYyI6ImFub3RoZXIgYXBwIHNwZWNpZmljIGZpZWxkIn0.signature'
-            ]
-          }
-        })
+        const result = normalizePresentation(
+          {
+            vp: {
+              verifiableCredential: [
+                'e30.eyJjb250ZXh0IjoidG9wIGNvbnRleHQiLCJAY29udGV4dCI6WyJhbHNvIHRvcCJdLCJ0eXBlIjpbIkEiXSwiaXNzdWVyIjp7ImNsYWltIjoiaXNzdWVyIGNsYWltIn0sImlzcyI6ImZvbyIsInN1YiI6ImJhciIsInZjIjp7IkBjb250ZXh0IjpbInZjIGNvbnRleHQiXSwidHlwZSI6WyJCIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7InNvbWV0aGluZyI6Im5vdGhpbmcifSwiYXBwU3BlY2lmaWMiOiJzb21lIGFwcCBzcGVjaWZpYyBmaWVsZCJ9LCJuYmYiOjEyMzQ1Njc4OTAsImlhdCI6MTExMTExMTExMSwiZXhwIjoxMjMxMjMxMjMxLCJhcHBTcGVjaWZpYyI6ImFub3RoZXIgYXBwIHNwZWNpZmljIGZpZWxkIn0.signature'
+              ]
+            }
+          },
+          true
+        )
         expect(result).toMatchObject({
           verifiableCredential: [
             {
@@ -864,113 +1131,153 @@ describe('presentation', () => {
 
     describe('holder', () => {
       it('uses the iss property as holder', () => {
-        const result = normalizePresentation({ iss: 'foo' })
+        const result = normalizePresentation({ iss: 'foo' }, true)
         expect(result).toMatchObject({ holder: 'foo' })
         expect(result).not.toHaveProperty('iss')
       })
 
+      it('uses the iss property as holder, keeping original', () => {
+        const result = normalizePresentation({ iss: 'foo' })
+        expect(result).toMatchObject({ holder: 'foo', iss: 'foo' })
+      })
+
       it('preserves the holder property if present', () => {
-        const result = normalizePresentation({ iss: 'foo', holder: 'bar' })
+        const result = normalizePresentation({ iss: 'foo', holder: 'bar' }, true)
         expect(result).toMatchObject({ holder: 'bar', iss: 'foo' })
       })
     })
 
     describe('verifier', () => {
       it('merges the verifier and aud properties', () => {
-        const result = normalizePresentation({ verifier: ['foo'], aud: ['bar'] })
+        const result = normalizePresentation({ verifier: ['foo'], aud: ['bar'] }, true)
         expect(result).toMatchObject({ verifier: ['foo', 'bar'] })
         expect(result).not.toHaveProperty('aud')
       })
 
+      it('merges the verifier and aud properties', () => {
+        const result = normalizePresentation({ verifier: ['foo'], aud: ['bar'] })
+        expect(result).toMatchObject({ verifier: ['foo', 'bar'], aud: ['bar'] })
+      })
+
       it('merges the verifier and aud as arrays', () => {
-        const result = normalizePresentation({ verifier: 'foo', aud: 'bar' })
+        const result = normalizePresentation({ verifier: 'foo', aud: 'bar' }, true)
         expect(result).toMatchObject({ verifier: ['foo', 'bar'] })
         expect(result).not.toHaveProperty('aud')
       })
 
       it('unique entries in the verifier array', () => {
-        const result = normalizePresentation({ verifier: ['foo', 'bar'], aud: ['bar', 'baz'] })
+        const result = normalizePresentation({ verifier: ['foo', 'bar'], aud: ['bar', 'baz'] }, true)
         expect(result).toMatchObject({ verifier: ['foo', 'bar', 'baz'] })
         expect(result).not.toHaveProperty('aud')
       })
 
       it('preserves the holder property if present', () => {
-        const result = normalizePresentation({ iss: 'foo', holder: 'bar' })
+        const result = normalizePresentation({ iss: 'foo', holder: 'bar' }, true)
         expect(result).toMatchObject({ holder: 'bar', iss: 'foo' })
       })
     })
 
     describe('id', () => {
-      it('uses jti property as id', () => {
+      it('uses jti property as id, keeping originals', () => {
         const result = normalizePresentation({ jti: 'foo' })
+        expect(result).toMatchObject({ id: 'foo', jti: 'foo' })
+      })
+
+      it('uses jti property as id', () => {
+        const result = normalizePresentation({ jti: 'foo' }, true)
         expect(result).toMatchObject({ id: 'foo' })
         expect(result).not.toHaveProperty('jti')
       })
 
       it('preserves id property if present', () => {
-        const result = normalizePresentation({ jti: 'foo', id: 'bar' })
+        const result = normalizePresentation({ jti: 'foo', id: 'bar' }, true)
         expect(result).toMatchObject({ jti: 'foo', id: 'bar' })
       })
     })
 
     describe('type', () => {
-      it('merges type arrays', () => {
+      it('merges type arrays, keeping original', () => {
         const result = normalizePresentation({ type: ['foo'], vp: { type: ['bar'] } })
+        expect(result).toMatchObject({ type: ['foo', 'bar'], vp: { type: ['bar'] } })
+      })
+
+      it('merges type arrays', () => {
+        const result = normalizePresentation({ type: ['foo'], vp: { type: ['bar'] } }, true)
         expect(result).toMatchObject({ type: ['foo', 'bar'] })
         expect(result).not.toHaveProperty('vp')
       })
 
       it('merges type arrays for non-array types', () => {
-        const result = normalizePresentation({ type: 'foo', vp: { type: 'bar' } })
+        const result = normalizePresentation({ type: 'foo', vp: { type: 'bar' } }, true)
         expect(result).toMatchObject({ type: ['foo', 'bar'] })
         expect(result).not.toHaveProperty('vp')
       })
 
       it('unique entries in type array', () => {
-        const result = normalizePresentation({ type: ['foo', 'bar'], vp: { type: ['bar', 'baz'] } })
+        const result = normalizePresentation({ type: ['foo', 'bar'], vp: { type: ['bar', 'baz'] } }, true)
         expect(result).toMatchObject({ type: ['foo', 'bar', 'baz'] })
       })
     })
 
     describe('@context', () => {
-      it('merges @context arrays', () => {
+      it('merges @context arrays, keeping originals', () => {
         const result = normalizePresentation({ context: ['foo'], '@context': ['bar'], vp: { '@context': ['baz'] } })
+        expect(result).toMatchObject({
+          '@context': ['foo', 'bar', 'baz'],
+          context: ['foo'],
+          vp: { '@context': ['baz'] }
+        })
+      })
+
+      it('merges @context arrays', () => {
+        const result = normalizePresentation(
+          { context: ['foo'], '@context': ['bar'], vp: { '@context': ['baz'] } },
+          true
+        )
         expect(result).toMatchObject({ '@context': ['foo', 'bar', 'baz'] })
         expect(result).not.toHaveProperty('vp')
         expect(result).not.toHaveProperty('context')
       })
 
       it('merges @context arrays for non-array contexts', () => {
-        const result = normalizePresentation({ '@context': 'foo', context: 'bar', vp: { '@context': 'baz' } })
+        const result = normalizePresentation({ '@context': 'foo', context: 'bar', vp: { '@context': 'baz' } }, true)
         expect(result).toMatchObject({ '@context': ['bar', 'foo', 'baz'] })
         expect(result).not.toHaveProperty('vp')
         expect(result).not.toHaveProperty('context')
       })
 
       it('unique entries in @context array', () => {
-        const result = normalizePresentation({
-          '@context': ['foo', 'bar'],
-          context: ['bar', 'baz', undefined, null],
-          vp: { '@context': ['bar', 'baz', 'bak'], type: [], verifiableCredential: [] }
-        })
+        const result = normalizePresentation(
+          {
+            '@context': ['foo', 'bar'],
+            context: ['bar', 'baz', undefined, null],
+            vp: { '@context': ['bar', 'baz', 'bak'], type: [], verifiableCredential: [] }
+          },
+          true
+        )
         expect(result).toMatchObject({ '@context': ['bar', 'baz', 'foo', 'bak'] })
       })
     })
 
     describe('issuanceDate', () => {
       it('keeps issuanceDate property when present', () => {
-        const result = normalizePresentation({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 })
+        const result = normalizePresentation({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 }, true)
         expect(result).toMatchObject({ issuanceDate: 'yesterday', nbf: 1234567890, iat: 1111111111 })
       })
 
       it('uses nbf as issuanceDate when present', () => {
-        const result = normalizePresentation({ nbf: 1234567890, iat: 1111111111 })
+        const result = normalizePresentation({ nbf: 1234567890, iat: 1111111111 }, true)
         expect(result).toMatchObject({ issuanceDate: '2009-02-13T23:31:30.000Z', iat: 1111111111 })
         expect(result).not.toHaveProperty('nbf')
       })
 
+      it('uses nbf as issuanceDate when present, keeping original', () => {
+        const result = normalizePresentation({ nbf: 1234567890, iat: 1111111111 })
+        expect(result).toMatchObject({ issuanceDate: '2009-02-13T23:31:30.000Z', iat: 1111111111, nbf: 1234567890 })
+      })
+
       it('uses iat as issuanceDate when no nbf and no issuanceDate present', () => {
-        const result = normalizePresentation({ iat: 1111111111 })
+        const result = normalizePresentation({ iat: 1111111111 }, true)
         expect(result).toMatchObject({ issuanceDate: '2005-03-18T01:58:31.000Z' })
         expect(result).not.toHaveProperty('iat')
       })
@@ -978,12 +1285,17 @@ describe('presentation', () => {
 
     describe('expirationDate', () => {
       it('keeps expirationDate property when present', () => {
-        const result = normalizePresentation({ expirationDate: 'tomorrow', exp: 1222222222 })
+        const result = normalizePresentation({ expirationDate: 'tomorrow', exp: 1222222222 }, true)
         expect(result).toMatchObject({ expirationDate: 'tomorrow', exp: 1222222222 })
       })
 
-      it('uses exp as issuanceDate when present', () => {
+      it('uses exp as issuanceDate when present, keeping original', () => {
         const result = normalizePresentation({ exp: 1222222222 })
+        expect(result).toMatchObject({ expirationDate: '2008-09-24T02:10:22.000Z', exp: 1222222222 })
+      })
+
+      it('uses exp as issuanceDate when present', () => {
+        const result = normalizePresentation({ exp: 1222222222 }, true)
         expect(result).toMatchObject({ expirationDate: '2008-09-24T02:10:22.000Z' })
         expect(result).not.toHaveProperty('exp')
       })
@@ -1026,7 +1338,7 @@ describe('presentation', () => {
       expect(result).toMatchObject({ vp: { foo: 'bar' } })
     })
 
-    it('transforms to a valid payload', () => {
+    it('transforms to a valid payload, when keeping originals', () => {
       const presentation: PresentationPayload = {
         '@context': ['https://www.w3.org/2018/credentials/v1'],
         type: ['VerifiablePresentation', 'PublicProfile'],
@@ -1043,65 +1355,82 @@ describe('presentation', () => {
       }).not.toThrow()
     })
 
+    it('transforms to a valid payload', () => {
+      const presentation: PresentationPayload = {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiablePresentation', 'PublicProfile'],
+        holder: 'did:example:123',
+        verifier: ['did:example:234'],
+        issuanceDate: new Date().toISOString(),
+        expirationDate: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString(),
+        id: 'vp1',
+        verifiableCredential: ['header.payload.signature']
+      }
+      const transformed = transformPresentationInput(presentation, true)
+      expect(() => {
+        validateJwtPresentationPayload(transformed)
+      }).not.toThrow()
+    })
+
     describe('transformPresentationInput deep copy', () => {
       it('keeps input.context', () => {
         const input = { context: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.@context', () => {
         const input = { '@context': ['foo'] }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.vp.@context', () => {
         const input = { context: 'bar', vp: { '@context': ['foo'] } }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.type', () => {
         const input = { type: ['foo'] }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.vp.type', () => {
         const input = { type: 'bar', vp: { type: ['foo'] } }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.id', () => {
         const input = { id: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.holder', () => {
         const input = { holder: 'foo' }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.verifier', () => {
         const input = { verifier: 'foo', aud: 'bar' }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.issuanceDate', () => {
         const input = { issuanceDate: new Date().toISOString() }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.expirationDate', () => {
         const input = { expirationDate: new Date().toISOString() }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
       it('keeps input.vp.verifiableCredential', () => {
@@ -1114,37 +1443,68 @@ describe('presentation', () => {
           }
         }
         const frozen = JSON.stringify(input)
-        const unused = transformPresentationInput(input)
+        const unused = transformPresentationInput(input, true)
         expect(JSON.stringify(input)).toBe(frozen)
       })
     })
 
     describe('verifiableCredential', () => {
-      it('merges verifiableCredentials arrays', () => {
+      it('merges verifiableCredentials arrays, keeping originals', () => {
         const result = transformPresentationInput({
           verifiableCredential: [{ id: 'foo' }],
           vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] }
         })
+        expect(result).toMatchObject({
+          vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] },
+          verifiableCredential: [{ id: 'foo' }]
+        })
+      })
+
+      it('merges verifiableCredentials arrays', () => {
+        const result = transformPresentationInput(
+          {
+            verifiableCredential: [{ id: 'foo' }],
+            vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] }
+          },
+          true
+        )
         expect(result).toMatchObject({
           vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] }
         })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
 
-      it('merges verifiableCredential arrays when not array types', () => {
+      it('merges verifiableCredential arrays when not array types, keeping originals', () => {
         const result = transformPresentationInput({
           verifiableCredential: { id: 'foo' },
           vp: { verifiableCredential: { foo: 'bar' } }
         })
+        expect(result).toMatchObject({
+          vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }] },
+          verifiableCredential: { id: 'foo' }
+        })
+      })
+
+      it('merges verifiableCredential arrays when not array types', () => {
+        const result = transformPresentationInput(
+          {
+            verifiableCredential: { id: 'foo' },
+            vp: { verifiableCredential: { foo: 'bar' } }
+          },
+          true
+        )
         expect(result).toMatchObject({ vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }] } })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
 
       it('condenses JWT credentials', () => {
-        const result = transformPresentationInput({
-          verifiableCredential: { id: 'foo', proof: { jwt: 'header.payload1.signature' } },
-          vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] }
-        })
+        const result = transformPresentationInput(
+          {
+            verifiableCredential: { id: 'foo', proof: { jwt: 'header.payload1.signature' } },
+            vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] }
+          },
+          true
+        )
         expect(result).toMatchObject({
           vp: { verifiableCredential: ['header.payload1.signature', { foo: 'bar' }, 'header.payload2.signature'] }
         })
@@ -1152,40 +1512,60 @@ describe('presentation', () => {
       })
 
       it('filters empty credentials', () => {
-        const result = transformPresentationInput({
-          verifiableCredential: undefined,
-          vp: { verifiableCredential: [null, { foo: 'bar' }, 'header.payload2.signature'] }
-        })
+        const result = transformPresentationInput(
+          {
+            verifiableCredential: undefined,
+            vp: { verifiableCredential: [null, { foo: 'bar' }, 'header.payload2.signature'] }
+          },
+          true
+        )
         expect(result).toMatchObject({ vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] } })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
     })
 
     describe('context', () => {
+      it('merges @context fields, keeping originals', () => {
+        const result = transformPresentationInput(
+          { context: ['AA'], '@context': ['BB'], vp: { '@context': ['CC'] } },
+          false
+        )
+        expect(result).toMatchObject({ context: ['AA'], '@context': ['BB'], vp: { '@context': ['AA', 'BB', 'CC'] } })
+      })
+
       it('merges @context fields', () => {
-        const result = transformPresentationInput({ context: ['AA'], '@context': ['BB'], vp: { '@context': ['CC'] } })
+        const result = transformPresentationInput(
+          { context: ['AA'], '@context': ['BB'], vp: { '@context': ['CC'] } },
+          true
+        )
         expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC'] } })
         expect(result).not.toHaveProperty('context')
         expect(result).not.toHaveProperty('@context')
       })
 
       it('merges @context fields when not array types', () => {
-        const result = transformPresentationInput({
-          context: 'AA',
-          '@context': 'BB',
-          vp: { '@context': ['CC'] }
-        })
+        const result = transformPresentationInput(
+          {
+            context: 'AA',
+            '@context': 'BB',
+            vp: { '@context': ['CC'] }
+          },
+          true
+        )
         expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC'] } })
         expect(result).not.toHaveProperty('context')
         expect(result).not.toHaveProperty('@context')
       })
 
       it('keeps only unique entries in vp.@context', () => {
-        const result = transformPresentationInput({
-          context: ['AA', 'BB'],
-          '@context': ['BB', 'CC'],
-          vp: { '@context': ['CC', 'DD'] }
-        })
+        const result = transformPresentationInput(
+          {
+            context: ['AA', 'BB'],
+            '@context': ['BB', 'CC'],
+            vp: { '@context': ['CC', 'DD'] }
+          },
+          true
+        )
         expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC', 'DD'] } })
         expect(result).not.toHaveProperty('context')
         expect(result).not.toHaveProperty('@context')
@@ -1198,20 +1578,25 @@ describe('presentation', () => {
     })
 
     describe('type', () => {
+      it('merges type fields, while keeping originals', () => {
+        const result = transformPresentationInput({ type: ['AA'], vp: { type: ['BB'] } }, false)
+        expect(result).toMatchObject({ vp: { type: ['AA', 'BB'] }, type: ['AA'] })
+      })
+
       it('merges type fields', () => {
-        const result = transformPresentationInput({ type: ['AA'], vp: { type: ['BB'] } })
+        const result = transformPresentationInput({ type: ['AA'], vp: { type: ['BB'] } }, true)
         expect(result).toMatchObject({ vp: { type: ['AA', 'BB'] } })
         expect(result).not.toHaveProperty('type')
       })
 
       it('merges type fields when not array types', () => {
-        const result = transformPresentationInput({ type: 'AA', vp: { type: ['BB'] } })
+        const result = transformPresentationInput({ type: 'AA', vp: { type: ['BB'] } }, true)
         expect(result).toMatchObject({ vp: { type: ['AA', 'BB'] } })
         expect(result).not.toHaveProperty('type')
       })
 
       it('keeps only unique entries in vc.type', () => {
-        const result = transformPresentationInput({ type: ['AA', 'BB'], vp: { type: ['BB', 'CC'] } })
+        const result = transformPresentationInput({ type: ['AA', 'BB'], vp: { type: ['BB', 'CC'] } }, true)
         expect(result).toMatchObject({ vp: { type: ['AA', 'BB', 'CC'] } })
       })
 
@@ -1222,101 +1607,126 @@ describe('presentation', () => {
     })
 
     describe('jti', () => {
-      it('uses the id property as jti', () => {
+      it('uses the id property as jti, keeping original', () => {
         const result = transformPresentationInput({ id: 'foo' })
+        expect(result).toMatchObject({ jti: 'foo', id: 'foo' })
+      })
+
+      it('uses the id property as jti', () => {
+        const result = transformPresentationInput({ id: 'foo' }, true)
         expect(result).toMatchObject({ jti: 'foo' })
         expect(result).not.toHaveProperty('id')
       })
 
       it('preserves jti entry if present', () => {
-        const result = transformPresentationInput({ jti: 'bar', id: 'foo' })
+        const result = transformPresentationInput({ jti: 'bar', id: 'foo' }, true)
         expect(result).toMatchObject({ jti: 'bar', id: 'foo' })
       })
     })
 
     describe('issuanceDate', () => {
-      it('transforms the issuanceDate property to nbf', () => {
+      it('transforms the issuanceDate property to nbf, keeping original', () => {
         const result = transformPresentationInput({ issuanceDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ nbf: 1234567890, issuanceDate: '2009-02-13T23:31:30.000Z' })
+      })
+
+      it('transforms the issuanceDate property to nbf', () => {
+        const result = transformPresentationInput({ issuanceDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ nbf: 1234567890 })
         expect(result).not.toHaveProperty('issuanceDate')
       })
 
       it('preserves the issuanceDate property if it fails to be parsed as a Date', () => {
-        const result = transformPresentationInput({ issuanceDate: 'tomorrow' })
+        const result = transformPresentationInput({ issuanceDate: 'tomorrow' }, true)
         expect(result).toMatchObject({ issuanceDate: 'tomorrow' })
       })
 
       it('preserves nbf entry if present', () => {
-        const result = transformPresentationInput({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' })
+        const result = transformPresentationInput({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ nbf: 123, issuanceDate: '2009-02-13T23:31:30.000Z' })
       })
 
       it('preserves nbf entry if explicitly undefined', () => {
-        const result = transformPresentationInput({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' })
+        const result = transformPresentationInput({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ nbf: undefined, issuanceDate: '2009-02-13T23:31:30.000Z' })
       })
     })
 
     describe('expirationDate', () => {
-      it('transforms the expirationDate property to exp', () => {
+      it('transforms the expirationDate property to exp, keeping original', () => {
         const result = transformPresentationInput({ expirationDate: '2009-02-13T23:31:30.000Z' })
+        expect(result).toMatchObject({ exp: 1234567890, expirationDate: '2009-02-13T23:31:30.000Z' })
+      })
+
+      it('transforms the expirationDate property to exp', () => {
+        const result = transformPresentationInput({ expirationDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ exp: 1234567890 })
         expect(result).not.toHaveProperty('expirationDate')
       })
 
       it('preserves the expirationDate property if it fails to be parsed as a Date', () => {
-        const result = transformPresentationInput({ expirationDate: 'tomorrow' })
+        const result = transformPresentationInput({ expirationDate: 'tomorrow' }, true)
         expect(result).toMatchObject({ expirationDate: 'tomorrow' })
       })
 
       it('preserves exp entry if present', () => {
-        const result = transformPresentationInput({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' })
+        const result = transformPresentationInput({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ exp: 123, expirationDate: '2009-02-13T23:31:30.000Z' })
       })
 
       it('preserves exp entry if explicitly undefined', () => {
-        const result = transformPresentationInput({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' })
+        const result = transformPresentationInput({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' }, true)
         expect(result).toMatchObject({ exp: undefined, expirationDate: '2009-02-13T23:31:30.000Z' })
       })
     })
 
     describe('holder', () => {
+      it('uses holder as iss when of type string, keeping original', () => {
+        const result = transformPresentationInput({ holder: 'foo' }, false)
+        expect(result).toMatchObject({ iss: 'foo', holder: 'foo' })
+      })
+
       it('uses holder as iss when of type string', () => {
-        const result = transformPresentationInput({ holder: 'foo' })
+        const result = transformPresentationInput({ holder: 'foo' }, true)
         expect(result).toMatchObject({ iss: 'foo' })
         expect(result).not.toHaveProperty('holder')
       })
 
       it('preserves holder property if not string type', () => {
-        const result = transformPresentationInput({ holder: 12 })
+        const result = transformPresentationInput({ holder: 12 }, true)
         expect(result).toMatchObject({ holder: 12 })
       })
 
       it('preserves holder property if iss is present', () => {
-        const result = transformPresentationInput({ iss: 'foo', holder: 'bar' })
+        const result = transformPresentationInput({ iss: 'foo', holder: 'bar' }, true)
         expect(result).toMatchObject({ iss: 'foo', holder: 'bar' })
       })
     })
 
     describe('verifier', () => {
-      it('merges verifier and aud props into aud array', () => {
+      it('merges verifier and aud props into aud array, keeping original', () => {
         const result = transformPresentationInput({ verifier: ['foo'], aud: ['bar'] })
+        expect(result).toMatchObject({ aud: ['foo', 'bar'], verifier: ['foo'] })
+      })
+
+      it('merges verifier and aud props into aud array', () => {
+        const result = transformPresentationInput({ verifier: ['foo'], aud: ['bar'] }, true)
         expect(result).toMatchObject({ aud: ['foo', 'bar'] })
         expect(result).not.toHaveProperty('verifier')
       })
 
       it('merges verifier and aud props into aud array when different types', () => {
-        const result = transformPresentationInput({ verifier: 'foo', aud: 'bar' })
+        const result = transformPresentationInput({ verifier: 'foo', aud: 'bar' }, true)
         expect(result).toMatchObject({ aud: ['foo', 'bar'] })
       })
 
       it('filters null or undefined values in aud', () => {
-        const result = transformPresentationInput({ verifier: ['foo', null], aud: ['bar', undefined] })
+        const result = transformPresentationInput({ verifier: ['foo', null], aud: ['bar', undefined] }, true)
         expect(result).toMatchObject({ aud: ['foo', 'bar'] })
       })
 
       it('unique values in aud', () => {
-        const result = transformPresentationInput({ verifier: ['foo', 'bar'], aud: ['bar', 'baz'] })
+        const result = transformPresentationInput({ verifier: ['foo', 'bar'], aud: ['bar', 'baz'] }, true)
         expect(result).toMatchObject({ aud: ['foo', 'bar', 'baz'] })
       })
     })
