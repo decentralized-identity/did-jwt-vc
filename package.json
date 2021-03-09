@@ -25,7 +25,7 @@
   "author": "mi-xu",
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^4.8.1"
+    "did-jwt": "^5.0.0"
   },
   "repository": {
     "type": "git",
