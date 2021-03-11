@@ -199,18 +199,34 @@ export interface Issuer {
 }
 
 /**
- * Represents the Verification Options that can be passed to the verifyPresentation Method.
+ * Represents the Creation Options that can be passed to the createVerifiableCredentialJwt method.
+ */
+export interface CreateCredentialOptions {
+  removeOriginalFields?: boolean
+  [x: string]: any
+}
+
+/**
+ * Represents the Verification Options that can be passed to the verifyCredential method.
+ * These options are forwarded to the lower level verification code
+ */
+export interface VerifyCredentialOptions {
+  [x: string]: any
+}
+
+/**
+ * Represents the Verification Options that can be passed to the verifyPresentation method.
  * The verification will fail if given options are NOT satisfied.
  */
-export interface VerifyPresentationOptions {
+export interface VerifyPresentationOptions extends VerifyCredentialOptions {
   domain?: string
   challenge?: string
 }
 
 /**
- * Represents the Creation Options that can be passed to the createVerifiablePresentationJwt Method.
+ * Represents the Creation Options that can be passed to the createVerifiablePresentationJwt method.
  */
-export interface CreatePresentationOptions {
+export interface CreatePresentationOptions extends CreateCredentialOptions {
   domain?: string
   challenge?: string
 }
