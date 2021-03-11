@@ -14,14 +14,19 @@ import {
   W3CCredential,
   W3CPresentation,
   VerifiedCredential,
-  VerifiedPresentation, VerifyPresentationOptions, CreatePresentationOptions
+  VerifiedPresentation,
+  VerifyPresentationOptions,
+  CreatePresentationOptions,
+  CreateCredentialOptions,
+  VerifyCredentialOptions
 } from './types'
 import {
   transformCredentialInput,
   transformPresentationInput,
   normalizeCredential,
   normalizePresentation,
-  asArray, notEmpty
+  asArray,
+  notEmpty
 } from './converters'
 export {
   Issuer,
@@ -58,9 +63,13 @@ export {
  */
 export async function createVerifiableCredentialJwt(
   payload: JwtCredentialPayload | CredentialPayload,
-  issuer: Issuer
+  issuer: Issuer,
+  options: CreateCredentialOptions = {}
 ): Promise<JWT> {
-  const parsedPayload: JwtCredentialPayload = { iat: undefined, ...transformCredentialInput(payload) }
+  const parsedPayload: JwtCredentialPayload = {
+    iat: undefined,
+    ...transformCredentialInput(payload, options.removeOriginalFields)
+  }
   validateJwtCredentialPayload(parsedPayload)
   return createJWT(parsedPayload, {
     issuer: issuer.did || parsedPayload.iss,
@@ -89,7 +98,10 @@ export async function createVerifiablePresentationJwt(
   holder: Issuer,
   options: CreatePresentationOptions = {}
 ): Promise<JWT> {
-  const parsedPayload: JwtPresentationPayload = { iat: undefined, ...transformPresentationInput(payload) }
+  const parsedPayload: JwtPresentationPayload = {
+    iat: undefined,
+    ...transformPresentationInput(payload, options?.removeOriginalFields)
+  }
 
   // add challenge to nonce
   if (options.challenge && Object.getOwnPropertyNames(parsedPayload).indexOf('nonce') === -1) {
@@ -166,9 +178,13 @@ export function validatePresentationPayload(payload: PresentationPayload): void 
  * @param vc the credential to be verified. Currently only the JWT encoding is supported by this library
  * @param resolver a configured `Resolver` that can provide the DID document of the JWT issuer
  */
-export async function verifyCredential(vc: JWT, resolver: Resolvable): Promise<VerifiedCredential> {
-  const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver })
-  verified.verifiableCredential = normalizeCredential(verified.jwt)
+export async function verifyCredential(
+  vc: JWT,
+  resolver: Resolvable,
+  options: VerifyCredentialOptions = {}
+): Promise<VerifiedCredential> {
+  const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver, ...options })
+  verified.verifiableCredential = normalizeCredential(verified.jwt, options?.removeOriginalFields)
   validateCredentialPayload(verified.verifiableCredential)
   return verified as VerifiedCredential
 }
@@ -181,19 +197,17 @@ export async function verifyCredential(vc: JWT, resolver: Resolvable): Promise<V
  * @throws {Error} If VerifyPresentationOptions are not satisfied
  */
 export function verifyPresentationPayloadOptions(payload: JwtPresentationPayload, options: VerifyPresentationOptions) {
-
   if (options.challenge && options.challenge !== payload.nonce) {
     throw new Error(`Presentation does not contain the mandatory challenge (JWT: nonce) for : ${options.challenge}`)
   }
 
   if (options.domain) {
     // aud might be array
-    let matchedAudience;
+    let matchedAudience
     if (payload.aud) {
       const audArray = Array.isArray(payload.aud) ? payload.aud : [payload.aud]
       matchedAudience = audArray.find((item) => options.domain === item)
     }
-
 
     if (typeof matchedAudience === 'undefined') {
       throw new Error(`Presentation does not contain the mandatory domain (JWT: aud) for : ${options.domain}`)
@@ -210,12 +224,14 @@ export function verifyPresentationPayloadOptions(payload: JwtPresentationPayload
  * @param resolver a configured `Resolver` that can provide the DID document of the JWT issuer (presentation holder)
  * @param options optional verification options that need to be satisfied
  */
-export async function verifyPresentation(presentation: JWT,
-                                         resolver: Resolvable,
-                                         options: VerifyPresentationOptions = {}): Promise<VerifiedPresentation> {
-  const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver })
+export async function verifyPresentation(
+  presentation: JWT,
+  resolver: Resolvable,
+  options: VerifyPresentationOptions = {}
+): Promise<VerifiedPresentation> {
+  const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver, ...options })
   verifyPresentationPayloadOptions(verified.payload, options)
-  verified.verifiablePresentation = normalizePresentation(verified.jwt)
+  verified.verifiablePresentation = normalizePresentation(verified.jwt, options?.removeOriginalFields)
   validatePresentationPayload(verified.verifiablePresentation)
   return verified as VerifiedPresentation
 }
