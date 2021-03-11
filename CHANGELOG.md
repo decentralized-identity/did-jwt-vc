@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/decentralized-identity/did-jwt-vc/compare/1.1.0...1.2.0) (2021-03-11)
+
+
+### Features
+
+* add option to keep original fields when transforming JWT<->JOSE payload formats ([#63](https://github.com/decentralized-identity/did-jwt-vc/issues/63)) ([cf59b6f](https://github.com/decentralized-identity/did-jwt-vc/commit/cf59b6f149dae3b94fa0c6dceada432be80c3b6a)), closes [#62](https://github.com/decentralized-identity/did-jwt-vc/issues/62) [#22](https://github.com/decentralized-identity/did-jwt-vc/issues/22)
+
 # [1.1.0](https://github.com/decentralized-identity/did-jwt-vc/compare/1.0.7...1.1.0) (2021-02-24)
 
 
