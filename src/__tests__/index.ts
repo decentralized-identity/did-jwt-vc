@@ -7,7 +7,7 @@ import {
   Issuer,
   verifyPresentationPayloadOptions
 } from '../index'
-import { decodeJWT, Resolvable } from 'did-jwt'
+import { decodeJWT } from 'did-jwt'
 import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
   validateContext,
@@ -17,7 +17,7 @@ import {
   validateVpType,
   validateCredentialSubject
 } from '../validators'
-import { DIDDocument } from 'did-resolver'
+import { DIDResolutionResult, Resolver } from 'did-resolver'
 import { CreatePresentationOptions, VerifyPresentationOptions } from '../types'
 
 jest.mock('../validators')
@@ -70,21 +70,25 @@ const presentationPayload = {
     verifiableCredential: [VC_JWT]
   }
 }
-const resolver: Resolvable = {
+const resolver = {
   resolve: (did: string) =>
     Promise.resolve({
-      '@context': 'https://w3id.org/did/v1',
-      id: `${did}`,
-      publicKey: [
-        {
-          id: `${did}#owner`,
-          type: 'Secp256k1VerificationKey2018',
-          ethereumAddress: `${did.substring(9)}`,
-          controller: did
-        }
-      ]
-    } as DIDDocument)
-}
+      didDocument: {
+        '@context': 'https://w3id.org/did/v1',
+        id: `${did}`,
+        publicKey: [
+          {
+            id: `${did}#owner`,
+            type: 'EcdsaSecp256k1RecoveryMethod2020',
+            ethereumAddress: `${did.substring(9)}`,
+            controller: did
+          }
+        ]
+      },
+      didDocumentMetadata: {},
+      didResolutionMetadata: {}
+    } as DIDResolutionResult)
+} as Resolver
 
 beforeEach(() => {
   jest.resetAllMocks()

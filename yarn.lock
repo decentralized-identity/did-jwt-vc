@@ -2269,10 +2269,10 @@ did-jwt@^4.8.0:
     js-sha3 "^0.8.0"
     uint8arrays "^2.0.0"
 
-did-jwt@^4.9.0:
-  version "4.9.0"
-  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-4.9.0.tgz#d8751c331b3124f281b93970bef119eb4da9569a"
-  integrity sha512-WoImHCycUiUd5Bft/GWg/aI+3mpk/M/PY9XZYr1o+XEPj4yNJFGO/op26KV5ZVmL3xnPWG7YnnMZeo3+JoEVXw==
+did-jwt@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-5.0.1.tgz#4bdd4f500c3bcf70bc1f0e6252fb55ab88c87ab7"
+  integrity sha512-lGpAUUguGx5LSvCMkhXh8WKUprD9xMkKeo2ZPg91Eu7YLrf6W/U8nUqmjtQFHDPFN9rkpUcroFgIl5epiC/RoA==
   dependencies:
     "@babel/runtime" "^7.11.2"
     "@stablelib/ed25519" "^1.0.1"
@@ -2280,7 +2280,7 @@ did-jwt@^4.9.0:
     "@stablelib/sha256" "^1.0.0"
     "@stablelib/x25519" "^1.0.0"
     "@stablelib/xchacha20poly1305" "^1.0.0"
-    did-resolver "^2.1.2"
+    did-resolver "^3.0.1"
     elliptic "^6.5.3"
     js-sha3 "^0.8.0"
     uint8arrays "^2.0.0"
@@ -2290,10 +2290,10 @@ did-resolver@2.1.2, did-resolver@^2.1.2:
   resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-2.1.2.tgz#f1194fdbc087161809ce545e13c11a596f4a3928"
   integrity sha512-n4YGS1CzbX48U/ChLRY3SdgiV5N3B/+yh0ToS5t+Sx4QjhVZN6ZyijUSSYbFGvz+I4qImeSZOdo6RX8JaieN7A==
 
-did-resolver@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-2.2.0.tgz#ab09fb8f24d555f57ea16a745b3dabc50138b202"
-  integrity sha512-/u7dSTZFGfKepEx7mi9JOMWJzUUxnJ+8M5OqB/JeVGvhWBp/PwriB7Z/2ke00biPNOUmS6oEpHxbm8b0/4uHjg==
+did-resolver@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/did-resolver/-/did-resolver-3.0.1.tgz#b5e2b6ca9cced0790e7866101d58e72a96452585"
+  integrity sha512-Z81nHoCVgUqE3oV7ULVtaFawUC+4RKSfS/rbJYuAmWDyi2/2wXEJBmg21aZAd5/1xAeE7vwAdGfn3mXuRzCXEA==
 
 diff-sequences@^26.5.0:
   version "26.5.0"
