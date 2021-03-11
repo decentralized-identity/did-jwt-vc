@@ -1,4 +1,4 @@
-import { createJWT, verifyJWT, Resolvable } from 'did-jwt'
+import { createJWT, verifyJWT } from 'did-jwt'
 import { JWT_ALG } from './constants'
 import * as validators from './validators'
 import {
@@ -28,6 +28,7 @@ import {
   asArray,
   notEmpty
 } from './converters'
+import { Resolver } from 'did-resolver'
 export {
   Issuer,
   CredentialPayload,
@@ -180,7 +181,7 @@ export function validatePresentationPayload(payload: PresentationPayload): void 
  */
 export async function verifyCredential(
   vc: JWT,
-  resolver: Resolvable,
+  resolver: Resolver,
   options: VerifyCredentialOptions = {}
 ): Promise<VerifiedCredential> {
   const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver, ...options })
@@ -226,7 +227,7 @@ export function verifyPresentationPayloadOptions(payload: JwtPresentationPayload
  */
 export async function verifyPresentation(
   presentation: JWT,
-  resolver: Resolvable,
+  resolver: Resolver,
   options: VerifyPresentationOptions = {}
 ): Promise<VerifiedPresentation> {
   const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver, ...options })
