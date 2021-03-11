@@ -82,7 +82,7 @@ export function attestationToVcFormat(payload: any): JwtCredentialPayload {
 
 function normalizeJwtCredentialPayload(
   input: Partial<JwtCredentialPayload>,
-  removeOriginalFields: boolean = false
+  removeOriginalFields: boolean = true
 ): W3CCredential {
   let result: Partial<CredentialPayload> = deepCopy(input)
 
@@ -162,7 +162,7 @@ function normalizeJwtCredentialPayload(
   return result as W3CCredential
 }
 
-function normalizeJwtCredential(input: JWT, removeOriginalFields: boolean = false): Verifiable<W3CCredential> {
+function normalizeJwtCredential(input: JWT, removeOriginalFields: boolean = true): Verifiable<W3CCredential> {
   let decoded
   try {
     decoded = decodeJWT(input)
@@ -186,7 +186,7 @@ function normalizeJwtCredential(input: JWT, removeOriginalFields: boolean = fals
  */
 export function normalizeCredential(
   input: Partial<VerifiableCredential> | Partial<JwtCredentialPayload>,
-  removeOriginalFields: boolean = false
+  removeOriginalFields: boolean = true
 ): Verifiable<W3CCredential> {
   if (typeof input === 'string') {
     if (JWT_FORMAT.test(input)) {
@@ -223,7 +223,7 @@ type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } 
  */
 export function transformCredentialInput(
   input: Partial<CredentialPayload> | DeepPartial<JwtCredentialPayload>,
-  removeOriginalFields: boolean = false
+  removeOriginalFields: boolean = true
 ): JwtCredentialPayload {
   if (Array.isArray(input.credentialSubject)) throw Error('credentialSubject of type array not supported')
 
@@ -309,7 +309,7 @@ export function transformCredentialInput(
 
 function normalizeJwtPresentationPayload(
   input: DeepPartial<JwtPresentationPayload>,
-  removeOriginalFields: boolean = false
+  removeOriginalFields: boolean = true
 ): W3CPresentation {
   const result: Partial<PresentationPayload> = deepCopy(input)
 
@@ -390,7 +390,7 @@ function normalizeJwtPresentationPayload(
   return result as W3CPresentation
 }
 
-function normalizeJwtPresentation(input: JWT, removeOriginalFields: boolean = false): Verifiable<W3CPresentation> {
+function normalizeJwtPresentation(input: JWT, removeOriginalFields: boolean = true): Verifiable<W3CPresentation> {
   let decoded
   try {
     decoded = decodeJWT(input)
@@ -412,7 +412,7 @@ function normalizeJwtPresentation(input: JWT, removeOriginalFields: boolean = fa
  */
 export function normalizePresentation(
   input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload> | JWT,
-  removeOriginalFields: boolean = false
+  removeOriginalFields: boolean = true
 ): Verifiable<W3CPresentation> {
   if (typeof input === 'string') {
     if (JWT_FORMAT.test(input)) {
@@ -444,7 +444,7 @@ export function normalizePresentation(
  */
 export function transformPresentationInput(
   input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload>,
-  removeOriginalFields: boolean = false
+  removeOriginalFields: boolean = true
 ): JwtPresentationPayload {
   const result: Partial<JwtPresentationPayload> = deepCopy({ vp: { ...input.vp }, ...input })
 
