@@ -1,6 +1,6 @@
 {
   "name": "did-jwt-vc",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
   "main": "lib/index.js",
   "source": "src/index.ts",

@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/decentralized-identity/did-jwt-vc/compare/1.2.0...2.0.0) (2021-03-11)
+
+
+### Bug Fixes
+
+* **deps:** update did-jwt@5.0.1 and did-resolver@3.0 ([#67](https://github.com/decentralized-identity/did-jwt-vc/issues/67)) ([07bfc6b](https://github.com/decentralized-identity/did-jwt-vc/commit/07bfc6bcf6855e16e992e1fb89f99d8ab7b2c99c))
+
+
+### BREAKING CHANGES
+
+* **deps:** the type of Resolver used for verification has been upgraded to the latest spec and no longer returns just the DID Document
+
 # [1.2.0](https://github.com/decentralized-identity/did-jwt-vc/compare/1.1.0...1.2.0) (2021-03-11)
 
 
