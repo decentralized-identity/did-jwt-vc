@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/decentralized-identity/did-jwt-vc/compare/2.0.0...2.0.1) (2021-03-25)
+
+
+### Bug Fixes
+
+* **deps:** update did-jwt@5.1.1 ([#68](https://github.com/decentralized-identity/did-jwt-vc/issues/68)) ([50e3f7c](https://github.com/decentralized-identity/did-jwt-vc/commit/50e3f7c5a6fe30d659811090b45762487c5582a2))
+
 # [2.0.0](https://github.com/decentralized-identity/did-jwt-vc/compare/1.2.0...2.0.0) (2021-03-11)
 
 
