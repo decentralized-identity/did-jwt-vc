@@ -18,7 +18,8 @@ import {
   VerifyPresentationOptions,
   CreatePresentationOptions,
   CreateCredentialOptions,
-  VerifyCredentialOptions
+  VerifyCredentialOptions,
+  Resolvable
 } from './types'
 import {
   transformCredentialInput,
@@ -28,7 +29,6 @@ import {
   asArray,
   notEmpty
 } from './converters'
-import { Resolver } from 'did-resolver'
 export {
   Issuer,
   CredentialPayload,
@@ -45,7 +45,8 @@ export {
   transformCredentialInput,
   transformPresentationInput,
   normalizeCredential,
-  normalizePresentation
+  normalizePresentation,
+  Resolvable
 }
 
 /**
@@ -177,11 +178,11 @@ export function validatePresentationPayload(payload: PresentationPayload): void 
  * @return a `Promise` that resolves to a `VerifiedCredential` or rejects with `TypeError` if the input is not
  * W3C compliant
  * @param vc the credential to be verified. Currently only the JWT encoding is supported by this library
- * @param resolver a configured `Resolver` that can provide the DID document of the JWT issuer
+ * @param resolver a configured `Resolver` (or an implementation of `Resolvable`) that can provide the DID document of the JWT issuer
  */
 export async function verifyCredential(
   vc: JWT,
-  resolver: Resolver,
+  resolver: Resolvable,
   options: VerifyCredentialOptions = {}
 ): Promise<VerifiedCredential> {
   const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver, ...options })
@@ -222,12 +223,12 @@ export function verifyPresentationPayloadOptions(payload: JwtPresentationPayload
  * @return a `Promise` that resolves to a `VerifiedPresentation` or rejects with `TypeError` if the input is
  * not W3C compliant or the VerifyPresentationOptions are not satisfied.
  * @param presentation the presentation to be verified. Currently only the JWT encoding is supported by this library
- * @param resolver a configured `Resolver` that can provide the DID document of the JWT issuer (presentation holder)
+ * @param resolver a configured `Resolver` or an implementation of `Resolvable` that can provide the DID document of the JWT issuer (presentation holder)
  * @param options optional verification options that need to be satisfied
  */
 export async function verifyPresentation(
   presentation: JWT,
-  resolver: Resolver,
+  resolver: Resolvable,
   options: VerifyPresentationOptions = {}
 ): Promise<VerifiedPresentation> {
   const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver, ...options })
