@@ -17,8 +17,7 @@ import {
   validateVpType,
   validateCredentialSubject
 } from '../validators'
-import { DIDResolutionResult, Resolver } from 'did-resolver'
-import { CreatePresentationOptions, VerifyPresentationOptions } from '../types'
+import { CreatePresentationOptions, Resolvable, VerifyPresentationOptions } from '../types'
 
 jest.mock('../validators')
 
@@ -70,7 +69,7 @@ const presentationPayload = {
     verifiableCredential: [VC_JWT]
   }
 }
-const resolver = {
+const resolver: Resolvable = {
   resolve: (did: string) =>
     Promise.resolve({
       didDocument: {
@@ -87,8 +86,8 @@ const resolver = {
       },
       didDocumentMetadata: {},
       didResolutionMetadata: {}
-    } as DIDResolutionResult)
-} as Resolver
+    })
+}
 
 beforeEach(() => {
   jest.resetAllMocks()
