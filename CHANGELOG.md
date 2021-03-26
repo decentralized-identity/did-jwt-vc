@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/decentralized-identity/did-jwt-vc/compare/2.0.1...2.0.2) (2021-03-26)
+
+
+### Bug Fixes
+
+* **deps:** use Resolvable type from did-resolver ([e731e7e](https://github.com/decentralized-identity/did-jwt-vc/commit/e731e7e0549392d14909c1f78fbce343620fdfa3))
+
 ## [2.0.1](https://github.com/decentralized-identity/did-jwt-vc/compare/2.0.0...2.0.1) (2021-03-25)
 
 
