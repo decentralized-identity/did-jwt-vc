@@ -1,4 +1,5 @@
 import { createJWT, verifyJWT } from 'did-jwt'
+import { Resolvable } from 'did-resolver'
 import { JWT_ALG } from './constants'
 import * as validators from './validators'
 import {
@@ -18,8 +19,7 @@ import {
   VerifyPresentationOptions,
   CreatePresentationOptions,
   CreateCredentialOptions,
-  VerifyCredentialOptions,
-  Resolvable
+  VerifyCredentialOptions
 } from './types'
 import {
   transformCredentialInput,
@@ -45,8 +45,7 @@ export {
   transformCredentialInput,
   transformPresentationInput,
   normalizeCredential,
-  normalizePresentation,
-  Resolvable
+  normalizePresentation
 }
 
 /**

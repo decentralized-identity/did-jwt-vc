@@ -1,7 +1,4 @@
-import { Signer, JWTVerified, verifyJWT } from 'did-jwt'
-import { DIDResolutionOptions, DIDResolutionResult } from 'did-resolver'
-
-export type Resolvable = { resolve: (didUrl: string, options: DIDResolutionOptions) => Promise<DIDResolutionResult> }
+import { Signer, JWTVerified } from 'did-jwt'
 
 export interface JwtCredentialSubject {
   [x: string]: any
