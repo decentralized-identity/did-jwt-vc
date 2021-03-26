@@ -8,6 +8,7 @@ import {
   verifyPresentationPayloadOptions
 } from '../index'
 import { decodeJWT } from 'did-jwt'
+import { Resolvable } from 'did-resolver'
 import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
 import {
   validateContext,
@@ -17,7 +18,7 @@ import {
   validateVpType,
   validateCredentialSubject
 } from '../validators'
-import { CreatePresentationOptions, Resolvable, VerifyPresentationOptions } from '../types'
+import { CreatePresentationOptions, VerifyPresentationOptions } from '../types'
 
 jest.mock('../validators')
 
