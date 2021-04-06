@@ -44,7 +44,7 @@ const PRESENTATION_JWT =
   // tslint:disable-next-line: max-line-length
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU5qWTVNak15Tmprc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaUxDSm9kSFJ3Y3pvdkwzZDNkeTUzTXk1dmNtY3ZNakF4T0M5amNtVmtaVzUwYVdGc2N5OWxlR0Z0Y0d4bGN5OTJNU0pkTENKMGVYQmxJanBiSWxabGNtbG1hV0ZpYkdWRGNtVmtaVzUwYVdGc0lpd2lWVzVwZG1WeWMybDBlVVJsWjNKbFpVTnlaV1JsYm5ScFlXd2lYU3dpWTNKbFpHVnVkR2xoYkZOMVltcGxZM1FpT25zaVpHVm5jbVZsSWpwN0luUjVjR1VpT2lKQ1lXTm9aV3h2Y2tSbFozSmxaU0lzSW01aGJXVWlPaUpDWVdOallXeGhkWExEcVdGMElHVnVJRzExYzJseGRXVnpJRzUxYmNPcGNtbHhkV1Z6SW4xOWZTd2lhWE56SWpvaVpHbGtPbVYwYUhJNk1IaG1NVEl6TW1ZNE5EQm1NMkZrTjJReU0yWmpaR0ZoT0RSa05tTTJObVJoWXpJMFpXWmlNVGs0SW4wLnJGUlpVQ3czR3UwRV9JNVpKYnJicHVIVjFKTkF3cFhhaUZadUo1OWlKLVROcXVmcjRjdUdDQkVFQ0ZiZ1FGLWxwTm01MWNxU3gzWTJJZFdhVXBhdEpRQSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.bWZyEpLsx0u6v-UIcQf9TVMde1gTFsn091BY-TViUuRoUNsNQFzN-ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE'
 
-const did = (new EthrDID({
+const ethrDidIssuer = (new EthrDID({
   address: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
   privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75'
 }) as unknown) as Issuer
@@ -95,23 +95,39 @@ beforeEach(() => {
 })
 
 describe('createVerifiableCredential', () => {
+  const issuer = ethrDidIssuer
   it('creates a valid Verifiable Credential JWT with required fields', async () => {
     expect.assertions(1)
-    const vcJwt = await createVerifiableCredentialJwt(verifiableCredentialPayload, did)
+    const vcJwt = await createVerifiableCredentialJwt(verifiableCredentialPayload, issuer)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
   it('creates a valid Verifiable Credential JWT with extra optional fields', async () => {
     expect.assertions(1)
-    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, did)
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, issuer)
     const decodedVc = await decodeJWT(vcJwt)
     const { iat, ...payload } = decodedVc.payload
     expect(payload).toMatchSnapshot()
   })
+  it('creates a Verifiable Credential JWT with custom JWT alg', async () => {
+    expect.assertions(1)
+    const customIssuer = { ...issuer, alg: 'ES256K-R' }
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, customIssuer)
+    const decodedVc = await decodeJWT(vcJwt)
+    expect(decodedVc.header).toEqual({ alg: 'ES256K-R', typ: 'JWT' })
+  })
+  it('creates a Verifiable Credential JWT with custom JWT header fields', async () => {
+    expect.assertions(1)
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, issuer, {
+      header: { alg: 'ES256K-R', custom: 'field' }
+    })
+    const decodedVc = await decodeJWT(vcJwt)
+    expect(decodedVc.header).toEqual({ alg: 'ES256K-R', custom: 'field', typ: 'JWT' })
+  })
   it('calls functions to validate required fields', async () => {
     expect.assertions(4)
-    await createVerifiableCredentialJwt(verifiableCredentialPayload, did)
+    await createVerifiableCredentialJwt(verifiableCredentialPayload, issuer)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(verifiableCredentialPayload.nbf)
     expect(mockValidateContext).toHaveBeenCalledWith(verifiableCredentialPayload.vc['@context'])
     expect(mockValidateVcType).toHaveBeenCalledWith(verifiableCredentialPayload.vc.type)
@@ -120,15 +136,17 @@ describe('createVerifiableCredential', () => {
   it('calls functions to validate optional fields if they are present', async () => {
     expect.assertions(1)
     const timestamp = Math.floor(new Date().getTime())
-    await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, exp: timestamp }, did)
+    await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, exp: timestamp }, issuer)
     expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
   })
 })
 
 describe('createPresentation', () => {
+  const holder = ethrDidIssuer
+
   it('creates a valid Presentation JWT with required fields', async () => {
     expect.assertions(1)
-    const presentationJwt = await createVerifiablePresentationJwt(presentationPayload, did)
+    const presentationJwt = await createVerifiablePresentationJwt(presentationPayload, holder)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
@@ -136,7 +154,7 @@ describe('createPresentation', () => {
 
   it('creates a valid Presentation JWT with extra optional fields', async () => {
     expect.assertions(2)
-    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, did)
+    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, holder)
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
@@ -149,7 +167,11 @@ describe('createPresentation', () => {
       domain: 'TEST_DOMAIN'
     }
 
-    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, did, options)
+    const presentationJwt = await createVerifiablePresentationJwt(
+      { ...presentationPayload, extra: 42 },
+      holder,
+      options
+    )
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
@@ -166,7 +188,7 @@ describe('createPresentation', () => {
 
     const presentationJwt = await createVerifiablePresentationJwt(
       { ...presentationPayload, aud: ['EXISTING_AUD'] },
-      did,
+      holder,
       options
     )
     const decodedPresentation = await decodeJWT(presentationJwt)
@@ -182,13 +204,47 @@ describe('createPresentation', () => {
       challenge: 'TEST_CHALLENGE'
     }
 
-    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, did, options)
+    const presentationJwt = await createVerifiablePresentationJwt(
+      { ...presentationPayload, extra: 42 },
+      holder,
+      options
+    )
     const decodedPresentation = await decodeJWT(presentationJwt)
     const { iat, ...payload } = decodedPresentation.payload
     expect(payload).toMatchSnapshot()
     expect(payload).not.toHaveProperty('aud')
     expect(payload).toHaveProperty('nonce', 'TEST_CHALLENGE')
     expect(payload).toHaveProperty('extra', 42)
+  })
+
+  it('creates a Presentation JWT with custom holder alg', async () => {
+    const customHolder = { ...holder, alg: 'ES256K-R' }
+    expect.assertions(1)
+    const presentationJwt = await createVerifiablePresentationJwt({ ...presentationPayload, extra: 42 }, customHolder)
+    const decodedPresentation = await decodeJWT(presentationJwt)
+    expect(decodedPresentation.header).toEqual({ alg: 'ES256K-R', typ: 'JWT' })
+  })
+
+  it('creates a Presentation JWT with custom header options', async () => {
+    expect.assertions(1)
+    const options: CreatePresentationOptions = {
+      header: {
+        alg: 'ES256K-R',
+        custom: 'field'
+      }
+    }
+
+    const presentationJwt = await createVerifiablePresentationJwt(
+      { ...presentationPayload, extra: 42 },
+      holder,
+      options
+    )
+    const decodedPresentation = await decodeJWT(presentationJwt)
+    expect(decodedPresentation.header).toEqual({
+      alg: 'ES256K-R',
+      custom: 'field',
+      typ: 'JWT'
+    })
   })
 
   it('creates a valid Presentation JWT and does not overwrite an existing nonce property', async () => {
@@ -199,7 +255,7 @@ describe('createPresentation', () => {
 
     const presentationJwt = await createVerifiablePresentationJwt(
       { ...presentationPayload, nonce: 'EXISTING_NONCE' },
-      did,
+      holder,
       options
     )
     const decodedPresentation = await decodeJWT(presentationJwt)
@@ -211,7 +267,7 @@ describe('createPresentation', () => {
 
   it('calls functions to validate required fields', async () => {
     expect.assertions(2 + presentationPayload.vp.verifiableCredential.length)
-    await createVerifiablePresentationJwt(presentationPayload, did)
+    await createVerifiablePresentationJwt(presentationPayload, holder)
     expect(mockValidateContext).toHaveBeenCalledWith(presentationPayload.vp['@context'])
     expect(mockValidateVpType).toHaveBeenCalledWith(presentationPayload.vp.type)
     for (const vc of presentationPayload.vp.verifiableCredential) {
@@ -230,7 +286,7 @@ describe('createPresentation', () => {
             verifiableCredential: []
           }
         },
-        did
+        holder
       )
     ).rejects.toThrow(TypeError)
   })
@@ -242,7 +298,7 @@ describe('createPresentation', () => {
         ...presentationPayload,
         exp: timestamp
       },
-      did
+      holder
     )
     expect(mockValidateTimestamp).toHaveBeenCalledWith(timestamp)
   })
