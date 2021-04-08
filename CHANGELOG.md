@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/decentralized-identity/did-jwt-vc/compare/2.0.2...2.1.0) (2021-04-08)
+
+
+### Features
+
+* add ability to add to the JWT header of the VC/VP ([#71](https://github.com/decentralized-identity/did-jwt-vc/issues/71)) ([79d2d76](https://github.com/decentralized-identity/did-jwt-vc/commit/79d2d7696a5e929a574d2e0671fc1258f768e90e)), closes [#69](https://github.com/decentralized-identity/did-jwt-vc/issues/69)
+
 ## [2.0.2](https://github.com/decentralized-identity/did-jwt-vc/compare/2.0.1...2.0.2) (2021-03-26)
 
 
