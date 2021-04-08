@@ -72,11 +72,17 @@ export async function createVerifiableCredentialJwt(
     ...transformCredentialInput(payload, options.removeOriginalFields)
   }
   validateJwtCredentialPayload(parsedPayload)
-  return createJWT(parsedPayload, {
-    issuer: issuer.did || parsedPayload.iss,
-    signer: issuer.signer,
-    alg: issuer.alg || JWT_ALG
-  })
+  return createJWT(
+    parsedPayload,
+    {
+      issuer: issuer.did || parsedPayload.iss,
+      signer: issuer.signer
+    },
+    {
+      ...options.header,
+      alg: issuer.alg || options.header?.alg || JWT_ALG
+    }
+  )
 }
 
 /**
@@ -116,11 +122,17 @@ export async function createVerifiablePresentationJwt(
   }
 
   validateJwtPresentationPayload(parsedPayload)
-  return createJWT(parsedPayload, {
-    issuer: holder.did || parsedPayload.iss,
-    signer: holder.signer,
-    alg: holder.alg || JWT_ALG
-  })
+  return createJWT(
+    parsedPayload,
+    {
+      issuer: holder.did || parsedPayload.iss,
+      signer: holder.signer
+    },
+    {
+      ...options.header,
+      alg: holder.alg || options.header?.alg || JWT_ALG
+    }
+  )
 }
 
 export function validateJwtCredentialPayload(payload: JwtCredentialPayload): void {
