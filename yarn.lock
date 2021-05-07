@@ -1289,10 +1289,10 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
-"@types/faker@5.5.3":
-  version "5.5.3"
-  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-5.5.3.tgz#80978e52862e5df9e7a96befdfdd8fad882f6350"
-  integrity sha512-InxkM6sCFQTI6YQl29M/XGlO19ecv/EHH5X5zLEFdge2/qya8oIT0XkJUKTqheVYWJtGi+FBAfP7hbbunDiOmg==
+"@types/faker@5.5.4":
+  version "5.5.4"
+  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-5.5.4.tgz#0dd8fb8ece85db3a35f5d5dae4531e7e4d92beef"
+  integrity sha512-1XxsrH9DjjjhLdi0J4MoGXcrjAmbTn1HR4Jyxs0MQVyESo9p7+AkHIl3Nd3jsUnoNzRCB8iFX/V9PLIPo73IeA==
 
 "@types/graceful-fs@^4.1.2":
   version "4.1.3"
