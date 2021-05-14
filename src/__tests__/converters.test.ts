@@ -426,6 +426,23 @@ describe('credential', () => {
       })
     })
 
+    describe('other W3C fields', () => {
+      it('keeps evidence property when present', () => {
+        const result = normalizeCredential({ vc: { evidence: 'foo'} })
+        expect(result).toMatchObject({ evidence: 'foo' })
+      })
+
+      it('keeps credentialStatus property when present', () => {
+        const result = normalizeCredential({ vc: { credentialStatus: 'foo'} })
+        expect(result).toMatchObject({ credentialStatus: 'foo' })
+      })
+
+      it('keeps termsOfUse property when present', () => {
+        const result = normalizeCredential({ vc: { termsOfUse: 'foo'} })
+        expect(result).toMatchObject({ termsOfUse: 'foo' })
+      })
+    })
+
     describe('JWT payload', () => {
       it('rejects unknown JSON string payload', () => {
         expect(() => {
@@ -925,6 +942,26 @@ describe('credential', () => {
         expect(input.issuer.id).toEqual('did:example:567')
       })
     })
+
+    describe('other fields W3C fields', () => {
+      it('maps evidence to vc', () => {
+        const result = transformCredentialInput({ evidence: 'foo' })
+        expect(result).toMatchObject({ vc: { evidence: 'foo' } })
+        expect(result).not.toHaveProperty('evidence')
+      })
+
+      it('maps credentialStatus to vc', () => {
+        const result = transformCredentialInput({ credentialStatus: 'foo' })
+        expect(result).toMatchObject({ vc: { credentialStatus: 'foo' } })
+        expect(result).not.toHaveProperty('credentialStatus')
+      })
+
+      it('maps termsOfUse to vc', () => {
+        const result = transformCredentialInput({ termsOfUse: 'foo' })
+        expect(result).toMatchObject({ vc: { termsOfUse: 'foo' } })
+        expect(result).not.toHaveProperty('termsOfUse')
+      })
+    })
   })
 })
 
@@ -955,8 +992,7 @@ describe('presentation', () => {
       it('keeps input.proof if jwt', () => {
         const input = {
           proof: {
-            jwt:
-              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU5qWTVNak15Tmprc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaUxDSm9kSFJ3Y3pvdkwzZDNkeTUzTXk1dmNtY3ZNakF4T0M5amNtVmtaVzUwYVdGc2N5OWxlR0Z0Y0d4bGN5OTJNU0pkTENKMGVYQmxJanBiSWxabGNtbG1hV0ZpYkdWRGNtVmtaVzUwYVdGc0lpd2lWVzVwZG1WeWMybDBlVVJsWjNKbFpVTnlaV1JsYm5ScFlXd2lYU3dpWTNKbFpHVnVkR2xoYkZOMVltcGxZM1FpT25zaVpHVm5jbVZsSWpwN0luUjVjR1VpT2lKQ1lXTm9aV3h2Y2tSbFozSmxaU0lzSW01aGJXVWlPaUpDWVdOallXeGhkWExEcVdGMElHVnVJRzExYzJseGRXVnpJRzUxYmNPcGNtbHhkV1Z6SW4xOWZTd2lhWE56SWpvaVpHbGtPbVYwYUhJNk1IaG1NVEl6TW1ZNE5EQm1NMkZrTjJReU0yWmpaR0ZoT0RSa05tTTJObVJoWXpJMFpXWmlNVGs0SW4wLnJGUlpVQ3czR3UwRV9JNVpKYnJicHVIVjFKTkF3cFhhaUZadUo1OWlKLVROcXVmcjRjdUdDQkVFQ0ZiZ1FGLWxwTm01MWNxU3gzWTJJZFdhVXBhdEpRQSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.bWZyEpLsx0u6v-UIcQf9TVMde1gTFsn091BY-TViUuRoUNsNQFzN-ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE'
+            jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU5qWTVNak15Tmprc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaUxDSm9kSFJ3Y3pvdkwzZDNkeTUzTXk1dmNtY3ZNakF4T0M5amNtVmtaVzUwYVdGc2N5OWxlR0Z0Y0d4bGN5OTJNU0pkTENKMGVYQmxJanBiSWxabGNtbG1hV0ZpYkdWRGNtVmtaVzUwYVdGc0lpd2lWVzVwZG1WeWMybDBlVVJsWjNKbFpVTnlaV1JsYm5ScFlXd2lYU3dpWTNKbFpHVnVkR2xoYkZOMVltcGxZM1FpT25zaVpHVm5jbVZsSWpwN0luUjVjR1VpT2lKQ1lXTm9aV3h2Y2tSbFozSmxaU0lzSW01aGJXVWlPaUpDWVdOallXeGhkWExEcVdGMElHVnVJRzExYzJseGRXVnpJRzUxYmNPcGNtbHhkV1Z6SW4xOWZTd2lhWE56SWpvaVpHbGtPbVYwYUhJNk1IaG1NVEl6TW1ZNE5EQm1NMkZrTjJReU0yWmpaR0ZoT0RSa05tTTJObVJoWXpJMFpXWmlNVGs0SW4wLnJGUlpVQ3czR3UwRV9JNVpKYnJicHVIVjFKTkF3cFhhaUZadUo1OWlKLVROcXVmcjRjdUdDQkVFQ0ZiZ1FGLWxwTm01MWNxU3gzWTJJZFdhVXBhdEpRQSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.bWZyEpLsx0u6v-UIcQf9TVMde1gTFsn091BY-TViUuRoUNsNQFzN-ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE'
           }
         }
         const frozen = JSON.stringify(input)

@@ -20,6 +20,9 @@ export interface JwtCredentialPayload {
     '@context': string[] | string
     type: string[] | string
     credentialSubject: JwtCredentialSubject
+    credentialStatus?: CredentialStatus
+    evidence?: any
+    termsOfUse?: any
     [x: string]: any
   }
   nbf?: number
@@ -66,6 +69,8 @@ interface FixedCredentialPayload {
     [x: string]: any
   }
   credentialStatus?: CredentialStatus
+  evidence?: any
+  termsOfUse?: any
 }
 
 /**
