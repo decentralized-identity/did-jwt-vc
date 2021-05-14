@@ -427,19 +427,34 @@ describe('credential', () => {
     })
 
     describe('other W3C fields', () => {
-      it('keeps evidence property when present', () => {
+      it('uses evidence from vc', () => {
         const result = normalizeCredential({ vc: { evidence: 'foo'} })
         expect(result).toMatchObject({ evidence: 'foo' })
       })
 
-      it('keeps credentialStatus property when present', () => {
+      it('uses evidence from vc, keeping originals', () => {
+        const result = normalizeCredential({ vc: { evidence: 'foo' } }, false)
+        expect(result).toMatchObject({ evidence: 'foo', vc: { evidence: 'foo'} })
+      })
+
+      it('uses credentialStatus from vc', () => {
         const result = normalizeCredential({ vc: { credentialStatus: 'foo'} })
         expect(result).toMatchObject({ credentialStatus: 'foo' })
       })
 
-      it('keeps termsOfUse property when present', () => {
+      it('uses credentialStatus from vc, keeping originals', () => {
+        const result = normalizeCredential({ vc: { credentialStatus: 'foo' } }, false)
+        expect(result).toMatchObject({ credentialStatus: 'foo', vc: { credentialStatus: 'foo'} })
+      })
+
+      it('uses termsOfUse from vc', () => {
         const result = normalizeCredential({ vc: { termsOfUse: 'foo'} })
         expect(result).toMatchObject({ termsOfUse: 'foo' })
+      })
+
+      it('uses termsOfUse from vc, keeping originals', () => {
+        const result = normalizeCredential({ vc: { termsOfUse: 'foo' } }, false)
+        expect(result).toMatchObject({ termsOfUse: 'foo', vc: { termsOfUse: 'foo'} })
       })
     })
 
@@ -950,16 +965,31 @@ describe('credential', () => {
         expect(result).not.toHaveProperty('evidence')
       })
 
+      it('maps evidence to vc, keeping originals', () => {
+        const result = transformCredentialInput({ evidence: 'foo' }, false)
+        expect(result).toMatchObject({ evidence: 'foo', vc: { evidence: 'foo' } })
+      })
+
       it('maps credentialStatus to vc', () => {
         const result = transformCredentialInput({ credentialStatus: 'foo' })
         expect(result).toMatchObject({ vc: { credentialStatus: 'foo' } })
         expect(result).not.toHaveProperty('credentialStatus')
       })
 
+      it('maps credentialStatus to vc, keeping originals', () => {
+        const result = transformCredentialInput({ credentialStatus: 'foo' }, false)
+        expect(result).toMatchObject({ credentialStatus: 'foo', vc: { credentialStatus: 'foo' } })
+      })
+
       it('maps termsOfUse to vc', () => {
         const result = transformCredentialInput({ termsOfUse: 'foo' })
         expect(result).toMatchObject({ vc: { termsOfUse: 'foo' } })
         expect(result).not.toHaveProperty('termsOfUse')
+      })
+
+      it('maps termsOfUse to vc, keeping originals', () => {
+        const result = transformCredentialInput({ termsOfUse: 'foo' }, false)
+        expect(result).toMatchObject({ termsOfUse: 'foo', vc: { termsOfUse: 'foo' } })
       })
     })
   })
