@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.1...2.1.2) (2021-05-28)
+
+
+### Bug Fixes
+
+* mapp additional W3C spec fields to and from JWT VC ([#75](https://github.com/decentralized-identity/did-jwt-vc/issues/75)) ([e0482dc](https://github.com/decentralized-identity/did-jwt-vc/commit/e0482dcdf6e079dc4d55e253edc87ab231818c19)), closes [#73](https://github.com/decentralized-identity/did-jwt-vc/issues/73)
+
 ## [2.1.1](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.0...2.1.1) (2021-05-18)
 
 
