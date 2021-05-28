@@ -122,6 +122,21 @@ function normalizeJwtCredentialPayload(
     delete result.vc?.type
   }
 
+  result.evidence = input.vc?.evidence
+  if (removeOriginalFields) {
+    delete result.vc?.evidence
+  }
+
+  result.credentialStatus = input.vc?.credentialStatus
+  if (removeOriginalFields) {
+    delete result.vc?.credentialStatus
+  }
+
+  result.termsOfUse = input.vc?.termsOfUse
+  if (removeOriginalFields) {
+    delete result.vc?.termsOfUse
+  }
+
   const contextArray: string[] = [
     ...asArray(input.context),
     ...asArray(input['@context']),
@@ -236,9 +251,10 @@ export function transformCredentialInput(
       delete credentialSubject.id
     }
   }
-  result.vc.credentialSubject = credentialSubject
+
+  result.vc.credentialStatus = input.credentialStatus
   if (removeOriginalFields) {
-    delete result.credentialSubject
+    delete result.credentialStatus
   }
 
   const contextEntries = [
@@ -302,6 +318,22 @@ export function transformCredentialInput(
     } else {
       // nop
     }
+  }
+
+  // additional W3C VC fields to map:
+  result.vc.credentialSubject = credentialSubject
+  if (removeOriginalFields) {
+    delete result.credentialSubject
+  }
+
+  result.vc.evidence = input.evidence
+  if (removeOriginalFields) {
+    delete result.evidence
+  }
+
+  result.vc.termsOfUse = input.termsOfUse
+  if (removeOriginalFields) {
+    delete result.termsOfUse
   }
 
   return result as JwtCredentialPayload
