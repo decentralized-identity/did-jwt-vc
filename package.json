@@ -61,7 +61,7 @@
     "codecov": "3.8.2",
     "ethr-did": "2.1.4",
     "faker": "5.5.3",
-    "jest": "27.0.1",
+    "jest": "27.0.3",
     "prettier": "2.3.0",
     "semantic-release": "17.4.3",
     "ts-jest": "27.0.1",
