@@ -252,11 +252,6 @@ export function transformCredentialInput(
     }
   }
 
-  result.vc.credentialStatus = input.credentialStatus
-  if (removeOriginalFields) {
-    delete result.credentialStatus
-  }
-
   const contextEntries = [
     ...asArray(input.context),
     ...asArray(input['@context']),
@@ -320,20 +315,24 @@ export function transformCredentialInput(
     }
   }
 
-  // additional W3C VC fields to map:
   result.vc.credentialSubject = credentialSubject
   if (removeOriginalFields) {
     delete result.credentialSubject
   }
 
-  result.vc.evidence = input.evidence
-  if (removeOriginalFields) {
-    delete result.evidence
-  }
+  // additional W3C VC fields to map:
+  // these may exist at the top-level of a W3C credential, but should be moved inside vc when transforming to JWT
+  const additionalPropNames = ['evidence', 'termsOfUse', 'refreshService', 'credentialSchema', 'credentialStatus']
 
-  result.vc.termsOfUse = input.termsOfUse
-  if (removeOriginalFields) {
-    delete result.termsOfUse
+  for (let prop of additionalPropNames) {
+    if (input[prop]) {
+      if (!result.vc[prop]) {
+        result.vc[prop] = input[prop]
+      }
+      if (removeOriginalFields) {
+        delete result[prop]
+      }
+    }
   }
 
   return result as JwtCredentialPayload
