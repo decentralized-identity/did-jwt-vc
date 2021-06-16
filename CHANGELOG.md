@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.2...2.1.3) (2021-06-16)
+
+
+### Bug Fixes
+
+* w3c additional props should not be overwritten inside JWT ([#78](https://github.com/decentralized-identity/did-jwt-vc/issues/78)) ([d2a5c44](https://github.com/decentralized-identity/did-jwt-vc/commit/d2a5c443f3ca9696fe9e15b9e8d5af8e004851a0))
+
 ## [2.1.2](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.1...2.1.2) (2021-05-28)
 
 
