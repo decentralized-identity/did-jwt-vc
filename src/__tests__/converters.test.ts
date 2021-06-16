@@ -427,33 +427,33 @@ describe('credential', () => {
 
     describe('other W3C fields', () => {
       it('uses evidence from vc', () => {
-        const result = normalizeCredential({ vc: { evidence: 'foo'} })
+        const result = normalizeCredential({ vc: { evidence: 'foo' } })
         expect(result).toMatchObject({ evidence: 'foo' })
       })
 
       it('uses evidence from vc, keeping originals', () => {
         const result = normalizeCredential({ vc: { evidence: 'foo' } }, false)
-        expect(result).toMatchObject({ evidence: 'foo', vc: { evidence: 'foo'} })
+        expect(result).toMatchObject({ evidence: 'foo', vc: { evidence: 'foo' } })
       })
 
       it('uses credentialStatus from vc', () => {
-        const result = normalizeCredential({ vc: { credentialStatus: 'foo'} })
+        const result = normalizeCredential({ vc: { credentialStatus: 'foo' } })
         expect(result).toMatchObject({ credentialStatus: 'foo' })
       })
 
       it('uses credentialStatus from vc, keeping originals', () => {
         const result = normalizeCredential({ vc: { credentialStatus: 'foo' } }, false)
-        expect(result).toMatchObject({ credentialStatus: 'foo', vc: { credentialStatus: 'foo'} })
+        expect(result).toMatchObject({ credentialStatus: 'foo', vc: { credentialStatus: 'foo' } })
       })
 
       it('uses termsOfUse from vc', () => {
-        const result = normalizeCredential({ vc: { termsOfUse: 'foo'} })
+        const result = normalizeCredential({ vc: { termsOfUse: 'foo' } })
         expect(result).toMatchObject({ termsOfUse: 'foo' })
       })
 
       it('uses termsOfUse from vc, keeping originals', () => {
         const result = normalizeCredential({ vc: { termsOfUse: 'foo' } }, false)
-        expect(result).toMatchObject({ termsOfUse: 'foo', vc: { termsOfUse: 'foo'} })
+        expect(result).toMatchObject({ termsOfUse: 'foo', vc: { termsOfUse: 'foo' } })
       })
     })
 
@@ -969,6 +969,11 @@ describe('credential', () => {
         expect(result).toMatchObject({ evidence: 'foo', vc: { evidence: 'foo' } })
       })
 
+      it('does not overwrite existing evidence', () => {
+        const result = transformCredentialInput({ vc: { evidence: 'foo' } })
+        expect(result).toMatchObject({ vc: { evidence: 'foo' } })
+      })
+
       it('maps credentialStatus to vc', () => {
         const result = transformCredentialInput({ credentialStatus: 'foo' })
         expect(result).toMatchObject({ vc: { credentialStatus: 'foo' } })
@@ -989,6 +994,19 @@ describe('credential', () => {
       it('maps termsOfUse to vc, keeping originals', () => {
         const result = transformCredentialInput({ termsOfUse: 'foo' }, false)
         expect(result).toMatchObject({ termsOfUse: 'foo', vc: { termsOfUse: 'foo' } })
+      })
+
+      it('does not overwrite existing termsOfUse', () => {
+        const result = transformCredentialInput({ vc: { termsOfUse: 'foo' } })
+        expect(result).toMatchObject({ vc: { termsOfUse: 'foo' } })
+      })
+
+      it('does not introduce new keys', () => {
+        const result = transformCredentialInput({ vc: { foo: 'bar' } })
+        expect(result.vc).not.toHaveProperty('credentialSchema')
+        expect(result.vc).not.toHaveProperty('credentialStatus')
+        expect(result.vc).not.toHaveProperty('evidence')
+        expect(result.vc).not.toHaveProperty('termsOfUse')
       })
     })
   })
