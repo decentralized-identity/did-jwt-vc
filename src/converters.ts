@@ -7,44 +7,28 @@ import {
   W3CCredential,
   Verifiable,
   PresentationPayload,
-  W3CPresentation
+  W3CPresentation,
 } from './types'
 import { decodeJWT } from 'did-jwt'
 import { JWT_FORMAT, DEFAULT_JWT_PROOF_TYPE, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 
-export function asArray(input: any) {
-  return Array.isArray(input) ? input : [input]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function asArray(arg: any | any[]): any[] {
+  return Array.isArray(arg) ? arg : [arg]
 }
 
-function deepCopy<T>(obj: T): T {
-  let copy
-
-  // Handle the 3 simple types, and null or undefined
-  if (null === obj || 'object' !== typeof obj) return obj
-
-  // Handle Date
-  if (obj instanceof Date) {
-    copy = new Date()
-    copy.setTime(obj.getTime())
-    return copy
-  }
-
-  // Handle Array
-  if (obj instanceof Array) {
-    copy = obj.map(deepCopy)
-    return copy
-  }
-
-  // Handle Object
-  if (obj instanceof Object) {
-    copy = {}
-    for (const key of Object.keys(obj)) {
-      copy[key] = deepCopy(obj[key])
-    }
-    return copy
-  }
-
-  throw new Error("Unable to copy obj! Its type isn't supported.")
+function deepCopy<T>(source: T): T {
+  return Array.isArray(source)
+    ? source.map((item) => deepCopy(item))
+    : source instanceof Date
+    ? new Date(source.getTime())
+    : source && typeof source === 'object'
+    ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
+        Object.defineProperty(o, prop, Object.getOwnPropertyDescriptor(source, prop) as NonNullable<PropertyDescriptor>)
+        o[prop] = deepCopy(source[prop as keyof T])
+        return o
+      }, Object.create(Object.getPrototypeOf(source)))
+    : (source as T)
 }
 
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
@@ -56,16 +40,18 @@ function cleanUndefined<T>(input: T): T {
     return input
   }
   const obj = { ...input }
-  Object.keys(obj).forEach((key) => obj[key] === undefined && delete obj[key])
+  Object.keys(obj).forEach((key) => obj[key as keyof T] === undefined && delete obj[key as keyof T])
   return obj
 }
 
-export function isLegacyAttestationFormat(payload: any): boolean {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isLegacyAttestationFormat(payload: Record<string, any>): boolean {
   // payload is an object and has all the required fields of old attestation format
-  return payload instanceof Object && payload.sub && payload.iss && payload.claim && payload.iat
+  return typeof payload === 'object' && payload.sub && payload.iss && payload.claim && payload.iat
 }
 
-export function attestationToVcFormat(payload: any): JwtCredentialPayload {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function attestationToVcFormat(payload: Record<string, any>): JwtCredentialPayload {
   const { iat, nbf, claim, vc, ...rest } = payload
   const result: JwtCredentialPayload = {
     ...rest,
@@ -73,8 +59,8 @@ export function attestationToVcFormat(payload: any): JwtCredentialPayload {
     vc: {
       '@context': [DEFAULT_CONTEXT],
       type: [DEFAULT_VC_TYPE],
-      credentialSubject: payload.claim
-    }
+      credentialSubject: claim,
+    },
   }
   if (vc) payload.issVc = vc
   return result
@@ -82,7 +68,7 @@ export function attestationToVcFormat(payload: any): JwtCredentialPayload {
 
 function normalizeJwtCredentialPayload(
   input: Partial<JwtCredentialPayload>,
-  removeOriginalFields: boolean = true
+  removeOriginalFields = true
 ): W3CCredential {
   let result: Partial<CredentialPayload> = deepCopy(input)
 
@@ -92,7 +78,7 @@ function normalizeJwtCredentialPayload(
 
   // FIXME: handle case when credentialSubject(s) are not object types
   result.credentialSubject = { ...input.credentialSubject, ...input.vc?.credentialSubject }
-  if (input.sub && !input.credentialSubject?.id) {
+  if (input.sub && !input.credentialSubject?.id && result.credentialSubject) {
     result.credentialSubject.id = input.sub
     if (removeOriginalFields) {
       delete result.sub
@@ -140,7 +126,7 @@ function normalizeJwtCredentialPayload(
   const contextArray: string[] = [
     ...asArray(input.context),
     ...asArray(input['@context']),
-    ...asArray(input.vc?.['@context'])
+    ...asArray(input.vc?.['@context']),
   ].filter(notEmpty)
   result['@context'] = [...new Set(contextArray)]
   if (removeOriginalFields) {
@@ -177,7 +163,7 @@ function normalizeJwtCredentialPayload(
   return result as W3CCredential
 }
 
-function normalizeJwtCredential(input: JWT, removeOriginalFields: boolean = true): Verifiable<W3CCredential> {
+function normalizeJwtCredential(input: JWT, removeOriginalFields = true): Verifiable<W3CCredential> {
   let decoded
   try {
     decoded = decodeJWT(input)
@@ -188,8 +174,8 @@ function normalizeJwtCredential(input: JWT, removeOriginalFields: boolean = true
     ...normalizeJwtCredentialPayload(decoded.payload, removeOriginalFields),
     proof: {
       type: DEFAULT_JWT_PROOF_TYPE,
-      jwt: input
-    }
+      jwt: input,
+    },
   }
 }
 
@@ -201,13 +187,13 @@ function normalizeJwtCredential(input: JWT, removeOriginalFields: boolean = true
  */
 export function normalizeCredential(
   input: Partial<VerifiableCredential> | Partial<JwtCredentialPayload>,
-  removeOriginalFields: boolean = true
+  removeOriginalFields = true
 ): Verifiable<W3CCredential> {
   if (typeof input === 'string') {
     if (JWT_FORMAT.test(input)) {
       return normalizeJwtCredential(input, removeOriginalFields)
     } else {
-      let parsed: object
+      let parsed: Record<string, unknown>
       try {
         parsed = JSON.parse(input)
       } catch (e) {
@@ -228,7 +214,7 @@ export function normalizeCredential(
 /**
  * type used to signal a very loose input is accepted
  */
-type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T
+type DeepPartial<T> = T extends Record<string, unknown> ? { [K in keyof T]?: DeepPartial<T[K]> } : T
 
 /**
  * Transforms a W3C Credential payload into a JWT compatible encoding.
@@ -238,11 +224,15 @@ type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } 
  */
 export function transformCredentialInput(
   input: Partial<CredentialPayload> | DeepPartial<JwtCredentialPayload>,
-  removeOriginalFields: boolean = true
+  removeOriginalFields = true
 ): JwtCredentialPayload {
   if (Array.isArray(input.credentialSubject)) throw Error('credentialSubject of type array not supported')
 
-  const result: Partial<JwtCredentialPayload> = deepCopy({ vc: { ...input.vc }, ...input })
+  const result: Partial<JwtCredentialPayload> = deepCopy({
+    vc: { ...input.vc },
+    ...input,
+  }) as Partial<JwtCredentialPayload>
+  result.vc = result.vc as NonNullable<typeof result.vc>
 
   const credentialSubject = { ...input.credentialSubject, ...input.vc?.credentialSubject }
   if (!input.sub) {
@@ -255,7 +245,7 @@ export function transformCredentialInput(
   const contextEntries = [
     ...asArray(input.context),
     ...asArray(input['@context']),
-    ...asArray(input.vc?.['@context'])
+    ...asArray(input.vc?.['@context']),
   ].filter(notEmpty)
   result.vc['@context'] = [...new Set(contextEntries)]
   if (removeOriginalFields) {
@@ -324,7 +314,7 @@ export function transformCredentialInput(
   // these may exist at the top-level of a W3C credential, but should be moved inside vc when transforming to JWT
   const additionalPropNames = ['evidence', 'termsOfUse', 'refreshService', 'credentialSchema', 'credentialStatus']
 
-  for (let prop of additionalPropNames) {
+  for (const prop of additionalPropNames) {
     if (input[prop]) {
       if (!result.vc[prop]) {
         result.vc[prop] = input[prop]
@@ -340,13 +330,13 @@ export function transformCredentialInput(
 
 function normalizeJwtPresentationPayload(
   input: DeepPartial<JwtPresentationPayload>,
-  removeOriginalFields: boolean = true
+  removeOriginalFields = true
 ): W3CPresentation {
   const result: Partial<PresentationPayload> = deepCopy(input)
 
   result.verifiableCredential = [
     ...asArray(input.verifiableCredential),
-    ...asArray(input.vp?.verifiableCredential)
+    ...asArray(input.vp?.verifiableCredential),
   ].filter(notEmpty)
   result.verifiableCredential = result.verifiableCredential.map((cred) => {
     return normalizeCredential(cred, removeOriginalFields)
@@ -386,7 +376,7 @@ function normalizeJwtPresentationPayload(
   const contexts = [
     ...asArray(input.context),
     ...asArray(input['@context']),
-    ...asArray(input.vp?.['@context'])
+    ...asArray(input.vp?.['@context']),
   ].filter(notEmpty)
   result['@context'] = [...new Set(contexts)]
   if (removeOriginalFields) {
@@ -421,7 +411,7 @@ function normalizeJwtPresentationPayload(
   return result as W3CPresentation
 }
 
-function normalizeJwtPresentation(input: JWT, removeOriginalFields: boolean = true): Verifiable<W3CPresentation> {
+function normalizeJwtPresentation(input: JWT, removeOriginalFields = true): Verifiable<W3CPresentation> {
   let decoded
   try {
     decoded = decodeJWT(input)
@@ -432,8 +422,8 @@ function normalizeJwtPresentation(input: JWT, removeOriginalFields: boolean = tr
     ...normalizeJwtPresentationPayload(decoded.payload, removeOriginalFields),
     proof: {
       type: DEFAULT_JWT_PROOF_TYPE,
-      jwt: input
-    }
+      jwt: input,
+    },
   }
 }
 
@@ -443,13 +433,13 @@ function normalizeJwtPresentation(input: JWT, removeOriginalFields: boolean = tr
  */
 export function normalizePresentation(
   input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload> | JWT,
-  removeOriginalFields: boolean = true
+  removeOriginalFields = true
 ): Verifiable<W3CPresentation> {
   if (typeof input === 'string') {
     if (JWT_FORMAT.test(input)) {
       return normalizeJwtPresentation(input, removeOriginalFields)
     } else {
-      let parsed: object
+      let parsed: Record<string, unknown>
       try {
         parsed = JSON.parse(input)
       } catch (e) {
@@ -475,14 +465,18 @@ export function normalizePresentation(
  */
 export function transformPresentationInput(
   input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload>,
-  removeOriginalFields: boolean = true
+  removeOriginalFields = true
 ): JwtPresentationPayload {
-  const result: Partial<JwtPresentationPayload> = deepCopy({ vp: { ...input.vp }, ...input })
+  const result: Partial<JwtPresentationPayload> = deepCopy({
+    vp: { ...input.vp },
+    ...input,
+  }) as Partial<JwtPresentationPayload>
+  result.vp = result.vp as NonNullable<typeof result.vp>
 
   const contextEntries = [
     ...asArray(input.context),
     ...asArray(input['@context']),
-    ...asArray(input.vp?.['@context'])
+    ...asArray(input.vp?.['@context']),
   ].filter(notEmpty)
   result.vp['@context'] = [...new Set(contextEntries)]
   if (removeOriginalFields) {
@@ -525,7 +519,7 @@ export function transformPresentationInput(
 
   result.vp.verifiableCredential = [
     ...asArray(result.verifiableCredential),
-    ...asArray(result.vp?.verifiableCredential)
+    ...asArray(result.vp?.verifiableCredential),
   ]
     .filter(notEmpty)
     .map((credential: VerifiableCredential) => {

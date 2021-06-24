@@ -1,8 +1,7 @@
 import { Signer, JWTVerified, JWTHeader } from 'did-jwt'
 
-export interface JwtCredentialSubject {
-  [x: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type JwtCredentialSubject = Record<string, any>
 
 export interface CredentialStatus {
   id: string
@@ -16,19 +15,21 @@ export interface CredentialStatus {
 export interface JwtCredentialPayload {
   iss?: string
   sub?: string
-  vc: {
+  vc: Extensible<{
     '@context': string[] | string
     type: string[] | string
     credentialSubject: JwtCredentialSubject
     credentialStatus?: CredentialStatus
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     evidence?: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     termsOfUse?: any
-    [x: string]: any
-  }
+  }>
   nbf?: number
   aud?: string | string[]
   exp?: number
   jti?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
 
@@ -37,22 +38,22 @@ export interface JwtCredentialPayload {
  * @see https://www.w3.org/TR/vc-data-model/#jwt-encoding
  */
 export interface JwtPresentationPayload {
-  vp: {
+  vp: Extensible<{
     '@context': string[] | string
     type: string[] | string
     verifiableCredential: VerifiableCredential[] | VerifiableCredential
-    [x: string]: any
-  }
+  }>
   iss?: string
   aud?: string | string[]
   nbf?: number
   exp?: number
   jti?: string
   nonce?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
 
-export type IssuerType = { id: string; [x: string]: any } | string
+export type IssuerType = Extensible<{ id: string }> | string
 export type DateType = string | Date
 /**
  * used as input when creating Verifiable Credentials
@@ -64,12 +65,13 @@ interface FixedCredentialPayload {
   issuer: IssuerType
   issuanceDate: DateType
   expirationDate?: DateType
-  credentialSubject: {
+  credentialSubject: Extensible<{
     id?: string
-    [x: string]: any
-  }
+  }>
   credentialStatus?: CredentialStatus
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evidence?: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   termsOfUse?: any
 }
 
@@ -94,6 +96,7 @@ interface NarrowCredentialDefinitions {
  * Replaces the matching property types of T with the ones in U
  */
 type Replace<T, U> = Omit<T, keyof U> & U
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Extensible<T> = T & { [x: string]: any }
 
 /**
@@ -146,6 +149,7 @@ export type W3CPresentation = Extensible<Replace<FixedPresentationPayload, Narro
 
 export interface Proof {
   type?: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
 
@@ -220,7 +224,7 @@ export interface CreateCredentialOptions {
    * If the issuer or holder does not list an `alg`, then the one specified in `header` will be used
    */
   header?: Partial<JWTHeader>
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
 
@@ -228,9 +232,8 @@ export interface CreateCredentialOptions {
  * Represents the Verification Options that can be passed to the verifyCredential method.
  * These options are forwarded to the lower level verification code
  */
-export interface VerifyCredentialOptions {
-  [x: string]: any
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type VerifyCredentialOptions = Record<string, any>
 
 /**
  * Represents the Verification Options that can be passed to the verifyPresentation method.

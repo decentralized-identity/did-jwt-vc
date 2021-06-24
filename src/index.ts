@@ -19,7 +19,7 @@ import {
   VerifyPresentationOptions,
   CreatePresentationOptions,
   CreateCredentialOptions,
-  VerifyCredentialOptions
+  VerifyCredentialOptions,
 } from './types'
 import {
   transformCredentialInput,
@@ -27,7 +27,7 @@ import {
   normalizeCredential,
   normalizePresentation,
   asArray,
-  notEmpty
+  notEmpty,
 } from './converters'
 export {
   Issuer,
@@ -45,7 +45,7 @@ export {
   transformCredentialInput,
   transformPresentationInput,
   normalizeCredential,
-  normalizePresentation
+  normalizePresentation,
 }
 
 /**
@@ -69,18 +69,18 @@ export async function createVerifiableCredentialJwt(
 ): Promise<JWT> {
   const parsedPayload: JwtCredentialPayload = {
     iat: undefined,
-    ...transformCredentialInput(payload, options.removeOriginalFields)
+    ...transformCredentialInput(payload, options.removeOriginalFields),
   }
   validateJwtCredentialPayload(parsedPayload)
   return createJWT(
     parsedPayload,
     {
-      issuer: issuer.did || parsedPayload.iss,
-      signer: issuer.signer
+      issuer: issuer.did || parsedPayload.iss || '',
+      signer: issuer.signer,
     },
     {
       ...options.header,
-      alg: issuer.alg || options.header?.alg || JWT_ALG
+      alg: issuer.alg || options.header?.alg || JWT_ALG,
     }
   )
 }
@@ -107,7 +107,7 @@ export async function createVerifiablePresentationJwt(
 ): Promise<JWT> {
   const parsedPayload: JwtPresentationPayload = {
     iat: undefined,
-    ...transformPresentationInput(payload, options?.removeOriginalFields)
+    ...transformPresentationInput(payload, options?.removeOriginalFields),
   }
 
   // add challenge to nonce
@@ -125,12 +125,12 @@ export async function createVerifiablePresentationJwt(
   return createJWT(
     parsedPayload,
     {
-      issuer: holder.did || parsedPayload.iss,
-      signer: holder.signer
+      issuer: holder.did || parsedPayload.iss || '',
+      signer: holder.signer,
     },
     {
       ...options.header,
-      alg: holder.alg || options.header?.alg || JWT_ALG
+      alg: holder.alg || options.header?.alg || JWT_ALG,
     }
   )
 }
@@ -197,7 +197,7 @@ export async function verifyCredential(
   options: VerifyCredentialOptions = {}
 ): Promise<VerifiedCredential> {
   const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver, ...options })
-  verified.verifiableCredential = normalizeCredential(verified.jwt, options?.removeOriginalFields)
+  verified.verifiableCredential = normalizeCredential(verified.jwt as string, options?.removeOriginalFields)
   validateCredentialPayload(verified.verifiableCredential)
   return verified as VerifiedCredential
 }
@@ -209,7 +209,10 @@ export async function verifyCredential(
  * @param options the VerifyPresentationOptions that contain the optional values to verify.
  * @throws {Error} If VerifyPresentationOptions are not satisfied
  */
-export function verifyPresentationPayloadOptions(payload: JwtPresentationPayload, options: VerifyPresentationOptions) {
+export function verifyPresentationPayloadOptions(
+  payload: JwtPresentationPayload,
+  options: VerifyPresentationOptions
+): void {
   if (options.challenge && options.challenge !== payload.nonce) {
     throw new Error(`Presentation does not contain the mandatory challenge (JWT: nonce) for : ${options.challenge}`)
   }
@@ -243,8 +246,8 @@ export async function verifyPresentation(
   options: VerifyPresentationOptions = {}
 ): Promise<VerifiedPresentation> {
   const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver, ...options })
-  verifyPresentationPayloadOptions(verified.payload, options)
-  verified.verifiablePresentation = normalizePresentation(verified.jwt, options?.removeOriginalFields)
+  verifyPresentationPayloadOptions(verified.payload as JwtPresentationPayload, options)
+  verified.verifiablePresentation = normalizePresentation(verified.jwt as string, options?.removeOriginalFields)
   validatePresentationPayload(verified.verifiablePresentation)
   return verified as VerifiedPresentation
 }

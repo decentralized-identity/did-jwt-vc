@@ -5,7 +5,7 @@ import {
   verifyPresentation,
   createVerifiablePresentationJwt,
   Issuer,
-  verifyPresentationPayloadOptions
+  verifyPresentationPayloadOptions,
 } from '../index'
 import { decodeJWT } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
@@ -16,7 +16,7 @@ import {
   validateTimestamp,
   validateVcType,
   validateVpType,
-  validateCredentialSubject
+  validateCredentialSubject,
 } from '../validators'
 import { CreatePresentationOptions, VerifyPresentationOptions } from '../types'
 
@@ -46,7 +46,7 @@ const PRESENTATION_JWT =
 
 const ethrDidIssuer = new EthrDID({
   identifier: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-  privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75'
+  privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75',
 }) as Issuer
 
 const verifiableCredentialPayload = {
@@ -58,17 +58,17 @@ const verifiableCredentialPayload = {
     credentialSubject: {
       degree: {
         type: 'BachelorDegree',
-        name: 'Baccalauréat en musiques numériques'
-      }
-    }
-  }
+        name: 'Baccalauréat en musiques numériques',
+      },
+    },
+  },
 }
 const presentationPayload = {
   vp: {
     '@context': [DEFAULT_CONTEXT, EXTRA_CONTEXT_A],
     type: [DEFAULT_VP_TYPE],
-    verifiableCredential: [VC_JWT]
-  }
+    verifiableCredential: [VC_JWT],
+  },
 }
 const resolver: Resolvable = {
   resolve: (did: string) =>
@@ -81,13 +81,13 @@ const resolver: Resolvable = {
             id: `${did}#owner`,
             type: 'EcdsaSecp256k1RecoveryMethod2020',
             ethereumAddress: `${did.substring(9)}`,
-            controller: did
-          }
-        ]
+            controller: did,
+          },
+        ],
       },
       didDocumentMetadata: {},
-      didResolutionMetadata: {}
-    })
+      didResolutionMetadata: {},
+    }),
 }
 
 beforeEach(() => {
@@ -120,7 +120,7 @@ describe('createVerifiableCredential', () => {
   it('creates a Verifiable Credential JWT with custom JWT header fields', async () => {
     expect.assertions(1)
     const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, extra: 42 }, issuer, {
-      header: { alg: 'ES256K-R', custom: 'field' }
+      header: { alg: 'ES256K-R', custom: 'field' },
     })
     const decodedVc = await decodeJWT(vcJwt)
     expect(decodedVc.header).toEqual({ alg: 'ES256K-R', custom: 'field', typ: 'JWT' })
@@ -164,7 +164,7 @@ describe('createPresentation', () => {
   it('creates a valid Presentation JWT with domain option', async () => {
     expect.assertions(4)
     const options: CreatePresentationOptions = {
-      domain: 'TEST_DOMAIN'
+      domain: 'TEST_DOMAIN',
     }
 
     const presentationJwt = await createVerifiablePresentationJwt(
@@ -183,7 +183,7 @@ describe('createPresentation', () => {
   it('creates a valid Presentation JWT with domain option and existing aud', async () => {
     expect.assertions(3)
     const options: CreatePresentationOptions = {
-      domain: 'TEST_DOMAIN'
+      domain: 'TEST_DOMAIN',
     }
 
     const presentationJwt = await createVerifiablePresentationJwt(
@@ -201,7 +201,7 @@ describe('createPresentation', () => {
   it('creates a valid Presentation JWT with challenge option', async () => {
     expect.assertions(4)
     const options: CreatePresentationOptions = {
-      challenge: 'TEST_CHALLENGE'
+      challenge: 'TEST_CHALLENGE',
     }
 
     const presentationJwt = await createVerifiablePresentationJwt(
@@ -230,8 +230,8 @@ describe('createPresentation', () => {
     const options: CreatePresentationOptions = {
       header: {
         alg: 'ES256K-R',
-        custom: 'field'
-      }
+        custom: 'field',
+      },
     }
 
     const presentationJwt = await createVerifiablePresentationJwt(
@@ -243,14 +243,14 @@ describe('createPresentation', () => {
     expect(decodedPresentation.header).toEqual({
       alg: 'ES256K-R',
       custom: 'field',
-      typ: 'JWT'
+      typ: 'JWT',
     })
   })
 
   it('creates a valid Presentation JWT and does not overwrite an existing nonce property', async () => {
     expect.assertions(3)
     const options: CreatePresentationOptions = {
-      challenge: 'TEST_CHALLENGE'
+      challenge: 'TEST_CHALLENGE',
     }
 
     const presentationJwt = await createVerifiablePresentationJwt(
@@ -283,8 +283,8 @@ describe('createPresentation', () => {
           vp: {
             '@context': presentationPayload.vp['@context'],
             type: presentationPayload.vp.type,
-            verifiableCredential: []
-          }
+            verifiableCredential: [],
+          },
         },
         holder
       )
@@ -296,7 +296,7 @@ describe('createPresentation', () => {
     await createVerifiablePresentationJwt(
       {
         ...presentationPayload,
-        exp: timestamp
+        exp: timestamp,
       },
       holder
     )
@@ -337,7 +337,7 @@ describe('verifyPresentation', () => {
 
   it('rejects a Presentation without matching challenge', () => {
     const options: VerifyPresentationOptions = {
-      challenge: 'TEST_CHALLENGE'
+      challenge: 'TEST_CHALLENGE',
     }
     expect(verifyPresentation(PRESENTATION_JWT, resolver, options)).rejects.toThrow(
       'Presentation does not contain the mandatory challenge (JWT: nonce) for : TEST_CHALLENGE'
@@ -346,7 +346,7 @@ describe('verifyPresentation', () => {
 
   it('rejects a Presentation without matching domain', () => {
     const options: VerifyPresentationOptions = {
-      domain: 'TEST_DOMAIN'
+      domain: 'TEST_DOMAIN',
     }
     expect(verifyPresentation(PRESENTATION_JWT, resolver, options)).rejects.toThrow(
       'Presentation does not contain the mandatory domain (JWT: aud) for : TEST_DOMAIN'
@@ -369,7 +369,7 @@ describe('verifyPresentationPayloadOptions', () => {
 
   it('verifies a payload with challenge options present', () => {
     const options: VerifyPresentationOptions = {
-      challenge: 'TEST_CHALLENGE'
+      challenge: 'TEST_CHALLENGE',
     }
 
     const payload = { nonce: 'TEST_CHALLENGE', ...presentationPayload }
@@ -379,7 +379,7 @@ describe('verifyPresentationPayloadOptions', () => {
 
   it('verifies a payload with domain options present (single aud)', () => {
     const options: VerifyPresentationOptions = {
-      domain: 'TEST_DOMAIN'
+      domain: 'TEST_DOMAIN',
     }
 
     const payload = { aud: 'TEST_DOMAIN', ...presentationPayload }
@@ -389,7 +389,7 @@ describe('verifyPresentationPayloadOptions', () => {
 
   it('verifies a payload with domain options present (array aud)', () => {
     const options: VerifyPresentationOptions = {
-      domain: 'TEST_DOMAIN'
+      domain: 'TEST_DOMAIN',
     }
 
     const payload = { aud: ['OTHER_AUD', 'TEST_DOMAIN'], ...presentationPayload }
@@ -399,7 +399,7 @@ describe('verifyPresentationPayloadOptions', () => {
 
   it('throws if payload is missing challenge', () => {
     const options: VerifyPresentationOptions = {
-      challenge: 'TEST_CHALLENGE'
+      challenge: 'TEST_CHALLENGE',
     }
     expect(() => verifyPresentationPayloadOptions(presentationPayload, options)).toThrow(
       'Presentation does not contain the mandatory challenge (JWT: nonce) for : TEST_CHALLENGE'
@@ -408,7 +408,7 @@ describe('verifyPresentationPayloadOptions', () => {
 
   it('throws if payload is missing domain', () => {
     const options: VerifyPresentationOptions = {
-      domain: 'TEST_DOMAIN'
+      domain: 'TEST_DOMAIN',
     }
     expect(() => verifyPresentationPayloadOptions(presentationPayload, options)).toThrow(
       'Presentation does not contain the mandatory domain (JWT: aud) for : TEST_DOMAIN'
