@@ -1,5 +1,6 @@
 [![npm](https://img.shields.io/npm/dt/did-jwt-vc.svg)](https://www.npmjs.com/package/did-jwt-vc)
 [![npm](https://img.shields.io/npm/v/did-jwt-vc.svg)](https://www.npmjs.com/package/did-jwt-vc)
+[![codecov](https://codecov.io/gh/decentralized-identity/did-jwt-vc/branch/master/graph/badge.svg)](https://codecov.io/gh/decentralized-identity/did-jwt-vc)
 
 # did-jwt-vc
 
