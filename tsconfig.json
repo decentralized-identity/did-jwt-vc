@@ -12,18 +12,17 @@
     "sourceMap": true,
     "outDir": "lib",
     "strict": true,
-    "noImplicitThis": false,
     "moduleResolution": "node",
     "types": [
       "jest"
     ],
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true
   },
   "exclude": [
     "**/__tests__/*",
     "node_modules",
-    "lib",
-    "esm"
+    "lib"
   ]
 }
