@@ -2,7 +2,7 @@ import {
   normalizeCredential,
   transformCredentialInput,
   normalizePresentation,
-  transformPresentationInput
+  transformPresentationInput,
 } from '../converters'
 import { DEFAULT_JWT_PROOF_TYPE } from '../constants'
 import { CredentialPayload, PresentationPayload } from '../types'
@@ -43,97 +43,97 @@ describe('credential', () => {
 
     describe('normalizeCredential deep copy of input', () => {
       it('keeps proof property if proof is jwt', () => {
-        let input = {
+        const input = {
           foo: 'bar',
           proof: {
             jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjcwMjQ5NzQsIm5hbWUiOiJib2IiLCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.2lP3YDOBj9pirxmPAJojQ-q6Rp7w4wA59ZLm19HdqC2leuxlZEQ5w8y0tzpH8n2I25aQ0vVB6j6TimCNLFasqQE',
-            bar: 'baz'
-          }
+            bar: 'baz',
+          },
         }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.sub', () => {
-        let input = { sub: 'foo', bar: 'baz' }
+        const input = { sub: 'foo', bar: 'baz' }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.credentialSubject', () => {
-        let input = { vc: { credentialSubject: { bar: 'foo' }, bar: 'baz' }, baz: 'bak' }
+        const input = { vc: { credentialSubject: { bar: 'foo' }, bar: 'baz' }, baz: 'bak' }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.iss', () => {
-        let input = { iss: 'foo' }
+        const input = { iss: 'foo' }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.jti', () => {
-        let input = { jti: 'foo' }
+        const input = { jti: 'foo' }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.type array', () => {
-        let input = { vc: { type: ['foo'] } }
+        const input = { vc: { type: ['foo'] } }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.type string', () => {
-        let input = { vc: { type: 'foo' } }
+        const input = { vc: { type: 'foo' } }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.context array', () => {
-        let input = { context: ['foo'] }
+        const input = { context: ['foo'] }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.context string', () => {
-        let input = { context: 'foo' }
+        const input = { context: 'foo' }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.@context array', () => {
-        let input = { vc: { '@context': ['foo'] } }
+        const input = { vc: { '@context': ['foo'] } }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc.@context string', () => {
-        let input = { vc: { '@context': 'foo' } }
+        const input = { vc: { '@context': 'foo' } }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.nbf', () => {
-        let input = { nbf: 123 }
+        const input = { nbf: 123 }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.iat', () => {
-        let input = { iat: 123 }
+        const input = { iat: 123 }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.exp', () => {
-        let input = { exp: 123 }
+        const input = { exp: 123 }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
       })
       it('keeps input.vc when it is filtered from output', () => {
-        let input = { vc: {} }
+        const input = { vc: {} }
         const frozen = JSON.stringify(input)
         const unused = normalizeCredential(input)
         expect(frozen).toBe(JSON.stringify(input))
@@ -165,7 +165,7 @@ describe('credential', () => {
       it('merges credentialSubject objects', () => {
         const result = normalizeCredential({
           credentialSubject: { foo: 'bar' },
-          vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] }
+          vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] },
         })
         expect(result).toMatchObject({ credentialSubject: { foo: 'bar', bar: 'baz' } })
       })
@@ -174,20 +174,20 @@ describe('credential', () => {
         const result = normalizeCredential(
           {
             credentialSubject: { foo: 'bar' },
-            vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] }
+            vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] },
           },
           false
         )
         expect(result).toMatchObject({
           credentialSubject: { foo: 'bar', bar: 'baz' },
-          vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] }
+          vc: { credentialSubject: { bar: 'baz' }, '@context': [], type: [] },
         })
       })
 
       it('merges credentialSubject objects with JWT precedence', () => {
         const result = normalizeCredential({
           credentialSubject: { foo: 'bar' },
-          vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] }
+          vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] },
         })
         expect(result).toMatchObject({ credentialSubject: { foo: 'bazzz' } })
       })
@@ -196,13 +196,13 @@ describe('credential', () => {
         const result = normalizeCredential(
           {
             credentialSubject: { foo: 'bar' },
-            vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] }
+            vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] },
           },
           false
         )
         expect(result).toMatchObject({
           credentialSubject: { foo: 'bazzz' },
-          vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] }
+          vc: { credentialSubject: { foo: 'bazzz' }, '@context': [], type: [] },
         })
       })
     })
@@ -210,14 +210,14 @@ describe('credential', () => {
     describe('issuer', () => {
       it('accepts null issuer', () => {
         const result = normalizeCredential({
-          issuer: null
+          issuer: null,
         })
         expect(result).toMatchObject({})
       })
 
       it('parses iss as issuer id', () => {
         const result = normalizeCredential({
-          iss: 'foo'
+          iss: 'foo',
         })
         expect(result).toMatchObject({ issuer: { id: 'foo' } })
         expect(result).not.toHaveProperty('iss')
@@ -226,7 +226,7 @@ describe('credential', () => {
       it('parses iss as issuer id but keeps originals', () => {
         const result = normalizeCredential(
           {
-            iss: 'foo'
+            iss: 'foo',
           },
           false
         )
@@ -237,8 +237,8 @@ describe('credential', () => {
         const result = normalizeCredential({
           iss: 'foo',
           issuer: {
-            id: 'bar'
-          }
+            id: 'bar',
+          },
         })
         expect(result).toMatchObject({ iss: 'foo', issuer: { id: 'bar' } })
       })
@@ -247,8 +247,8 @@ describe('credential', () => {
         const result = normalizeCredential({
           iss: 'foo',
           issuer: {
-            bar: 'baz'
-          }
+            bar: 'baz',
+          },
         })
         expect(result).toMatchObject({ issuer: { id: 'foo', bar: 'baz' } })
         expect(result).not.toHaveProperty('iss')
@@ -259,8 +259,8 @@ describe('credential', () => {
           {
             iss: 'foo',
             issuer: {
-              bar: 'baz'
-            }
+              bar: 'baz',
+            },
           },
           false
         )
@@ -270,7 +270,7 @@ describe('credential', () => {
       it('keeps issuer if it is not an object', () => {
         const result = normalizeCredential({
           iss: 'foo',
-          issuer: 'baz'
+          issuer: 'baz',
         })
         expect(result).toMatchObject({ issuer: 'baz', iss: 'foo' })
       })
@@ -355,7 +355,7 @@ describe('credential', () => {
         const result = normalizeCredential({
           context: 'baz',
           '@context': 'bar',
-          vc: { '@context': 'foo', type: [], credentialSubject: {} }
+          vc: { '@context': 'foo', type: [], credentialSubject: {} },
         })
         expect(result).toMatchObject({ '@context': ['baz', 'bar', 'foo'] })
       })
@@ -364,7 +364,7 @@ describe('credential', () => {
         const result = normalizeCredential({
           context: 'baz',
           '@context': ['bar'],
-          vc: { '@context': ['foo', 'baz', 'bar'] }
+          vc: { '@context': ['foo', 'baz', 'bar'] },
         })
         expect(result).toMatchObject({ '@context': ['baz', 'bar', 'foo'] })
         expect(result).not.toHaveProperty('vc')
@@ -481,7 +481,7 @@ describe('credential', () => {
         '@context': ['also top'],
         type: ['A'],
         issuer: {
-          claim: 'issuer claim'
+          claim: 'issuer claim',
         },
         iss: 'foo',
         sub: 'bar',
@@ -489,14 +489,14 @@ describe('credential', () => {
           '@context': ['vc context'],
           type: ['B'],
           credentialSubject: {
-            something: 'nothing'
+            something: 'nothing',
           },
-          appSpecific: 'some app specific field'
+          appSpecific: 'some app specific field',
         },
         nbf: 1234567890,
         iat: 1111111111,
         exp: 1231231231,
-        appSpecific: 'another app specific field'
+        appSpecific: 'another app specific field',
       }
 
       const expectedComplexOutput = {
@@ -504,19 +504,19 @@ describe('credential', () => {
         type: ['A', 'B'],
         issuer: {
           id: 'foo',
-          claim: 'issuer claim'
+          claim: 'issuer claim',
         },
         credentialSubject: {
           id: 'bar',
-          something: 'nothing'
+          something: 'nothing',
         },
         issuanceDate: '2009-02-13T23:31:30.000Z',
         expirationDate: '2009-01-06T08:40:31.000Z',
         iat: 1111111111,
         vc: {
-          appSpecific: 'some app specific field'
+          appSpecific: 'some app specific field',
         },
-        appSpecific: 'another app specific field'
+        appSpecific: 'another app specific field',
       }
 
       const expectedComplexOutputKeepingOriginals = {
@@ -527,11 +527,11 @@ describe('credential', () => {
         sub: 'bar',
         issuer: {
           id: 'foo',
-          claim: 'issuer claim'
+          claim: 'issuer claim',
         },
         credentialSubject: {
           id: 'bar',
-          something: 'nothing'
+          something: 'nothing',
         },
         issuanceDate: '2009-02-13T23:31:30.000Z',
         expirationDate: '2009-01-06T08:40:31.000Z',
@@ -542,11 +542,11 @@ describe('credential', () => {
           '@context': ['vc context'],
           type: ['B'],
           credentialSubject: {
-            something: 'nothing'
+            something: 'nothing',
           },
-          appSpecific: 'some app specific field'
+          appSpecific: 'some app specific field',
         },
-        appSpecific: 'another app specific field'
+        appSpecific: 'another app specific field',
       }
 
       it('accepts VerifiableCredential as string', () => {
@@ -633,8 +633,8 @@ describe('credential', () => {
         id: 'vc1',
         credentialSubject: {
           id: 'did:example:123',
-          name: 'Alice'
-        }
+          name: 'Alice',
+        },
       }
       const transformed = transformCredentialInput(credential)
       expect(() => {
@@ -726,7 +726,7 @@ describe('credential', () => {
       it('merges credentialSubject properties', () => {
         const result = transformCredentialInput({
           vc: { credentialSubject: { foo: 'bar' } },
-          credentialSubject: { bar: 'baz' }
+          credentialSubject: { bar: 'baz' },
         })
         expect(result).toMatchObject({ vc: { credentialSubject: { foo: 'bar', bar: 'baz' } } })
       })
@@ -735,13 +735,13 @@ describe('credential', () => {
         const result = transformCredentialInput(
           {
             vc: { credentialSubject: { foo: 'bar' } },
-            credentialSubject: { bar: 'baz' }
+            credentialSubject: { bar: 'baz' },
           },
           false
         )
         expect(result).toMatchObject({
           vc: { credentialSubject: { foo: 'bar', bar: 'baz' } },
-          credentialSubject: { bar: 'baz' }
+          credentialSubject: { bar: 'baz' },
         })
       })
     })
@@ -765,7 +765,7 @@ describe('credential', () => {
         const result = transformCredentialInput({
           context: ['AA', 'BB'],
           '@context': ['BB', 'CC'],
-          vc: { '@context': ['CC', 'DD'] }
+          vc: { '@context': ['CC', 'DD'] },
         })
         expect(result).toMatchObject({ vc: { '@context': ['AA', 'BB', 'CC', 'DD'] } })
         expect(result).not.toHaveProperty('context')
@@ -777,14 +777,14 @@ describe('credential', () => {
           {
             context: ['AA', 'BB'],
             '@context': ['BB', 'CC'],
-            vc: { '@context': ['CC', 'DD'] }
+            vc: { '@context': ['CC', 'DD'] },
           },
           false
         )
         expect(result).toMatchObject({
           vc: { '@context': ['AA', 'BB', 'CC', 'DD'] },
           context: ['AA', 'BB'],
-          '@context': ['BB', 'CC']
+          '@context': ['BB', 'CC'],
         })
       })
 
@@ -946,7 +946,7 @@ describe('credential', () => {
           type: ['VerifiableCredential'],
           issuer: { id: 'did:example:567' },
           issuanceDate: '2020-07-02T09:58:10.284Z',
-          credentialSubject: { id: 'did:example:123', foo: 'bar' }
+          credentialSubject: { id: 'did:example:123', foo: 'bar' },
         }
         const result = transformCredentialInput(input)
         expect(input['@context']).toEqual(['https://www.w3.org/2018/credentials/v1'])
@@ -1039,8 +1039,8 @@ describe('presentation', () => {
       it('keeps input.proof if jwt', () => {
         const input = {
           proof: {
-            jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU5qWTVNak15Tmprc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaUxDSm9kSFJ3Y3pvdkwzZDNkeTUzTXk1dmNtY3ZNakF4T0M5amNtVmtaVzUwYVdGc2N5OWxlR0Z0Y0d4bGN5OTJNU0pkTENKMGVYQmxJanBiSWxabGNtbG1hV0ZpYkdWRGNtVmtaVzUwYVdGc0lpd2lWVzVwZG1WeWMybDBlVVJsWjNKbFpVTnlaV1JsYm5ScFlXd2lYU3dpWTNKbFpHVnVkR2xoYkZOMVltcGxZM1FpT25zaVpHVm5jbVZsSWpwN0luUjVjR1VpT2lKQ1lXTm9aV3h2Y2tSbFozSmxaU0lzSW01aGJXVWlPaUpDWVdOallXeGhkWExEcVdGMElHVnVJRzExYzJseGRXVnpJRzUxYmNPcGNtbHhkV1Z6SW4xOWZTd2lhWE56SWpvaVpHbGtPbVYwYUhJNk1IaG1NVEl6TW1ZNE5EQm1NMkZrTjJReU0yWmpaR0ZoT0RSa05tTTJObVJoWXpJMFpXWmlNVGs0SW4wLnJGUlpVQ3czR3UwRV9JNVpKYnJicHVIVjFKTkF3cFhhaUZadUo1OWlKLVROcXVmcjRjdUdDQkVFQ0ZiZ1FGLWxwTm01MWNxU3gzWTJJZFdhVXBhdEpRQSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.bWZyEpLsx0u6v-UIcQf9TVMde1gTFsn091BY-TViUuRoUNsNQFzN-ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE'
-          }
+            jwt: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjgwNDUyNjMsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIiwiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvZXhhbXBsZXMvdjEiXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU5qWTVNak15Tmprc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaUxDSm9kSFJ3Y3pvdkwzZDNkeTUzTXk1dmNtY3ZNakF4T0M5amNtVmtaVzUwYVdGc2N5OWxlR0Z0Y0d4bGN5OTJNU0pkTENKMGVYQmxJanBiSWxabGNtbG1hV0ZpYkdWRGNtVmtaVzUwYVdGc0lpd2lWVzVwZG1WeWMybDBlVVJsWjNKbFpVTnlaV1JsYm5ScFlXd2lYU3dpWTNKbFpHVnVkR2xoYkZOMVltcGxZM1FpT25zaVpHVm5jbVZsSWpwN0luUjVjR1VpT2lKQ1lXTm9aV3h2Y2tSbFozSmxaU0lzSW01aGJXVWlPaUpDWVdOallXeGhkWExEcVdGMElHVnVJRzExYzJseGRXVnpJRzUxYmNPcGNtbHhkV1Z6SW4xOWZTd2lhWE56SWpvaVpHbGtPbVYwYUhJNk1IaG1NVEl6TW1ZNE5EQm1NMkZrTjJReU0yWmpaR0ZoT0RSa05tTTJObVJoWXpJMFpXWmlNVGs0SW4wLnJGUlpVQ3czR3UwRV9JNVpKYnJicHVIVjFKTkF3cFhhaUZadUo1OWlKLVROcXVmcjRjdUdDQkVFQ0ZiZ1FGLWxwTm01MWNxU3gzWTJJZFdhVXBhdEpRQSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.bWZyEpLsx0u6v-UIcQf9TVMde1gTFsn091BY-TViUuRoUNsNQFzN-ViNNCvoTQ-swSHwbELW7-EGPAcHLOMiIwE',
+          },
         }
         const frozen = JSON.stringify(input)
         const unused = normalizePresentation(input)
@@ -1130,23 +1130,23 @@ describe('presentation', () => {
         const result = normalizePresentation(
           {
             verifiableCredential: { foo: 'bar' },
-            vp: { verifiableCredential: [{ foo: 'baz' }] }
+            vp: { verifiableCredential: [{ foo: 'baz' }] },
           },
           false
         )
         expect(result).toMatchObject({
           verifiableCredential: [{ foo: 'bar' }, { foo: 'baz' }],
-          vp: { verifiableCredential: [{ foo: 'baz' }] }
+          vp: { verifiableCredential: [{ foo: 'baz' }] },
         })
       })
 
       it('merges the verifiableCredential fields as an array', () => {
         const result = normalizePresentation({
           verifiableCredential: { foo: 'bar' },
-          vp: { verifiableCredential: [{ foo: 'baz' }] }
+          vp: { verifiableCredential: [{ foo: 'baz' }] },
         })
         expect(result).toMatchObject({
-          verifiableCredential: [{ foo: 'bar' }, { foo: 'baz' }]
+          verifiableCredential: [{ foo: 'bar' }, { foo: 'baz' }],
         })
       })
 
@@ -1154,9 +1154,9 @@ describe('presentation', () => {
         const result = normalizePresentation({
           vp: {
             verifiableCredential: [
-              'e30.eyJjb250ZXh0IjoidG9wIGNvbnRleHQiLCJAY29udGV4dCI6WyJhbHNvIHRvcCJdLCJ0eXBlIjpbIkEiXSwiaXNzdWVyIjp7ImNsYWltIjoiaXNzdWVyIGNsYWltIn0sImlzcyI6ImZvbyIsInN1YiI6ImJhciIsInZjIjp7IkBjb250ZXh0IjpbInZjIGNvbnRleHQiXSwidHlwZSI6WyJCIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7InNvbWV0aGluZyI6Im5vdGhpbmcifSwiYXBwU3BlY2lmaWMiOiJzb21lIGFwcCBzcGVjaWZpYyBmaWVsZCJ9LCJuYmYiOjEyMzQ1Njc4OTAsImlhdCI6MTExMTExMTExMSwiZXhwIjoxMjMxMjMxMjMxLCJhcHBTcGVjaWZpYyI6ImFub3RoZXIgYXBwIHNwZWNpZmljIGZpZWxkIn0.signature'
-            ]
-          }
+              'e30.eyJjb250ZXh0IjoidG9wIGNvbnRleHQiLCJAY29udGV4dCI6WyJhbHNvIHRvcCJdLCJ0eXBlIjpbIkEiXSwiaXNzdWVyIjp7ImNsYWltIjoiaXNzdWVyIGNsYWltIn0sImlzcyI6ImZvbyIsInN1YiI6ImJhciIsInZjIjp7IkBjb250ZXh0IjpbInZjIGNvbnRleHQiXSwidHlwZSI6WyJCIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7InNvbWV0aGluZyI6Im5vdGhpbmcifSwiYXBwU3BlY2lmaWMiOiJzb21lIGFwcCBzcGVjaWZpYyBmaWVsZCJ9LCJuYmYiOjEyMzQ1Njc4OTAsImlhdCI6MTExMTExMTExMSwiZXhwIjoxMjMxMjMxMjMxLCJhcHBTcGVjaWZpYyI6ImFub3RoZXIgYXBwIHNwZWNpZmljIGZpZWxkIn0.signature',
+            ],
+          },
         })
         expect(result).toMatchObject({
           verifiableCredential: [
@@ -1172,10 +1172,10 @@ describe('presentation', () => {
               expirationDate: '2009-01-06T08:40:31.000Z',
               proof: {
                 type: 'JwtProof2020',
-                jwt: 'e30.eyJjb250ZXh0IjoidG9wIGNvbnRleHQiLCJAY29udGV4dCI6WyJhbHNvIHRvcCJdLCJ0eXBlIjpbIkEiXSwiaXNzdWVyIjp7ImNsYWltIjoiaXNzdWVyIGNsYWltIn0sImlzcyI6ImZvbyIsInN1YiI6ImJhciIsInZjIjp7IkBjb250ZXh0IjpbInZjIGNvbnRleHQiXSwidHlwZSI6WyJCIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7InNvbWV0aGluZyI6Im5vdGhpbmcifSwiYXBwU3BlY2lmaWMiOiJzb21lIGFwcCBzcGVjaWZpYyBmaWVsZCJ9LCJuYmYiOjEyMzQ1Njc4OTAsImlhdCI6MTExMTExMTExMSwiZXhwIjoxMjMxMjMxMjMxLCJhcHBTcGVjaWZpYyI6ImFub3RoZXIgYXBwIHNwZWNpZmljIGZpZWxkIn0.signature'
-              }
-            }
-          ]
+                jwt: 'e30.eyJjb250ZXh0IjoidG9wIGNvbnRleHQiLCJAY29udGV4dCI6WyJhbHNvIHRvcCJdLCJ0eXBlIjpbIkEiXSwiaXNzdWVyIjp7ImNsYWltIjoiaXNzdWVyIGNsYWltIn0sImlzcyI6ImZvbyIsInN1YiI6ImJhciIsInZjIjp7IkBjb250ZXh0IjpbInZjIGNvbnRleHQiXSwidHlwZSI6WyJCIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7InNvbWV0aGluZyI6Im5vdGhpbmcifSwiYXBwU3BlY2lmaWMiOiJzb21lIGFwcCBzcGVjaWZpYyBmaWVsZCJ9LCJuYmYiOjEyMzQ1Njc4OTAsImlhdCI6MTExMTExMTExMSwiZXhwIjoxMjMxMjMxMjMxLCJhcHBTcGVjaWZpYyI6ImFub3RoZXIgYXBwIHNwZWNpZmljIGZpZWxkIn0.signature',
+              },
+            },
+          ],
         })
       })
     })
@@ -1279,7 +1279,7 @@ describe('presentation', () => {
         expect(result).toMatchObject({
           '@context': ['foo', 'bar', 'baz'],
           context: ['foo'],
-          vp: { '@context': ['baz'] }
+          vp: { '@context': ['baz'] },
         })
       })
 
@@ -1301,7 +1301,7 @@ describe('presentation', () => {
         const result = normalizePresentation({
           '@context': ['foo', 'bar'],
           context: ['bar', 'baz', undefined, null],
-          vp: { '@context': ['bar', 'baz', 'bak'], type: [], verifiableCredential: [] }
+          vp: { '@context': ['bar', 'baz', 'bak'], type: [], verifiableCredential: [] },
         })
         expect(result).toMatchObject({ '@context': ['bar', 'baz', 'foo', 'bak'] })
       })
@@ -1395,7 +1395,7 @@ describe('presentation', () => {
         issuanceDate: new Date().toISOString(),
         expirationDate: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString(),
         id: 'vp1',
-        verifiableCredential: ['header.payload.signature']
+        verifiableCredential: ['header.payload.signature'],
       }
       const transformed = transformPresentationInput(presentation, false)
       expect(() => {
@@ -1412,7 +1412,7 @@ describe('presentation', () => {
         issuanceDate: new Date().toISOString(),
         expirationDate: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString(),
         id: 'vp1',
-        verifiableCredential: ['header.payload.signature']
+        verifiableCredential: ['header.payload.signature'],
       }
       const transformed = transformPresentationInput(presentation)
       expect(() => {
@@ -1487,8 +1487,8 @@ describe('presentation', () => {
             'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjY5MjMyNjksInN1YiI6ImRpZDpldGhyOjB4NDM1ZGYzZWRhNTcxNTRjZjhjZjc5MjYwNzk4ODFmMjkxMmY1NGRiNCIsIm5iZiI6MTU2Mjk1MDI4MiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVW5pdmVyc2l0eURlZ3JlZUNyZWRlbnRpYWwiXSwiY3JlZGVudGlhbFN1YmplY3QiOnsiZGVncmVlIjp7InR5cGUiOiJCYWNoZWxvckRlZ3JlZSIsIm5hbWUiOiJCYWNjYWxhdXLDqWF0IGVuIG11c2lxdWVzIG51bcOpcmlxdWVzIn19fSwiaXNzIjoiZGlkOmV0aHI6MHhmMTIzMmY4NDBmM2FkN2QyM2ZjZGFhODRkNmM2NmRhYzI0ZWZiMTk4In0.rFRZUCw3Gu0E_I5ZJbrbpuHV1JNAwpXaiFZuJ59iJ-TNqufr4cuGCBEECFbgQF-lpNm51cqSx3Y2IdWaUpatJQA',
           vp: {
             verifiableCredential:
-              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjcwMjQ5NzQsIm5hbWUiOiJib2IiLCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.2lP3YDOBj9pirxmPAJojQ-q6Rp7w4wA59ZLm19HdqC2leuxlZEQ5w8y0tzpH8n2I25aQ0vVB6j6TimCNLFasqQE'
-          }
+              'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NkstUiJ9.eyJpYXQiOjE1NjcwMjQ5NzQsIm5hbWUiOiJib2IiLCJpc3MiOiJkaWQ6ZXRocjoweGYzYmVhYzMwYzQ5OGQ5ZTI2ODY1ZjM0ZmNhYTU3ZGJiOTM1YjBkNzQifQ.2lP3YDOBj9pirxmPAJojQ-q6Rp7w4wA59ZLm19HdqC2leuxlZEQ5w8y0tzpH8n2I25aQ0vVB6j6TimCNLFasqQE',
+          },
         }
         const frozen = JSON.stringify(input)
         const unused = transformPresentationInput(input)
@@ -1501,23 +1501,23 @@ describe('presentation', () => {
         const result = transformPresentationInput(
           {
             verifiableCredential: [{ id: 'foo' }],
-            vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] }
+            vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] },
           },
           false
         )
         expect(result).toMatchObject({
           vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] },
-          verifiableCredential: [{ id: 'foo' }]
+          verifiableCredential: [{ id: 'foo' }],
         })
       })
 
       it('merges verifiableCredentials arrays', () => {
         const result = transformPresentationInput({
           verifiableCredential: [{ id: 'foo' }],
-          vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] }
+          vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload.signature'] },
         })
         expect(result).toMatchObject({
-          vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] }
+          vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }, 'header.payload.signature'] },
         })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
@@ -1526,20 +1526,20 @@ describe('presentation', () => {
         const result = transformPresentationInput(
           {
             verifiableCredential: { id: 'foo' },
-            vp: { verifiableCredential: { foo: 'bar' } }
+            vp: { verifiableCredential: { foo: 'bar' } },
           },
           false
         )
         expect(result).toMatchObject({
           vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }] },
-          verifiableCredential: { id: 'foo' }
+          verifiableCredential: { id: 'foo' },
         })
       })
 
       it('merges verifiableCredential arrays when not array types', () => {
         const result = transformPresentationInput({
           verifiableCredential: { id: 'foo' },
-          vp: { verifiableCredential: { foo: 'bar' } }
+          vp: { verifiableCredential: { foo: 'bar' } },
         })
         expect(result).toMatchObject({ vp: { verifiableCredential: [{ id: 'foo' }, { foo: 'bar' }] } })
         expect(result).not.toHaveProperty('verifiableCredential')
@@ -1548,10 +1548,10 @@ describe('presentation', () => {
       it('condenses JWT credentials', () => {
         const result = transformPresentationInput({
           verifiableCredential: { id: 'foo', proof: { jwt: 'header.payload1.signature' } },
-          vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] }
+          vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] },
         })
         expect(result).toMatchObject({
-          vp: { verifiableCredential: ['header.payload1.signature', { foo: 'bar' }, 'header.payload2.signature'] }
+          vp: { verifiableCredential: ['header.payload1.signature', { foo: 'bar' }, 'header.payload2.signature'] },
         })
         expect(result).not.toHaveProperty('verifiableCredential')
       })
@@ -1559,7 +1559,7 @@ describe('presentation', () => {
       it('filters empty credentials', () => {
         const result = transformPresentationInput({
           verifiableCredential: undefined,
-          vp: { verifiableCredential: [null, { foo: 'bar' }, 'header.payload2.signature'] }
+          vp: { verifiableCredential: [null, { foo: 'bar' }, 'header.payload2.signature'] },
         })
         expect(result).toMatchObject({ vp: { verifiableCredential: [{ foo: 'bar' }, 'header.payload2.signature'] } })
         expect(result).not.toHaveProperty('verifiableCredential')
@@ -1586,7 +1586,7 @@ describe('presentation', () => {
         const result = transformPresentationInput({
           context: 'AA',
           '@context': 'BB',
-          vp: { '@context': ['CC'] }
+          vp: { '@context': ['CC'] },
         })
         expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC'] } })
         expect(result).not.toHaveProperty('context')
@@ -1597,7 +1597,7 @@ describe('presentation', () => {
         const result = transformPresentationInput({
           context: ['AA', 'BB'],
           '@context': ['BB', 'CC'],
-          vp: { '@context': ['CC', 'DD'] }
+          vp: { '@context': ['CC', 'DD'] },
         })
         expect(result).toMatchObject({ vp: { '@context': ['AA', 'BB', 'CC', 'DD'] } })
         expect(result).not.toHaveProperty('context')

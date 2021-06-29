@@ -1,10 +1,11 @@
 import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './constants'
 import { JwtCredentialSubject, DateType } from './types'
-import { VerifiableCredential } from 'src'
+import { VerifiableCredential } from '.'
 import { asArray } from './converters'
 
-function isDateObject(input: any) {
-  return input && Object.prototype.toString.call(input) === '[object Date]' && !isNaN(input)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isDateObject(input: any): input is Date {
+  return input && !isNaN(input) && Object.prototype.toString.call(input) === '[object Date]'
 }
 
 export function validateJwtFormat(value: VerifiableCredential): void {

@@ -2,30 +2,32 @@
   "name": "did-jwt-vc",
   "version": "2.1.3",
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
-  "main": "lib/index.js",
   "source": "src/index.ts",
-  "types": "lib/index.d.ts",
+  "main": "./lib/index.js",
+  "module": "./lib/index.module.js",
+  "types": "./lib/index.d.ts",
   "files": [
     "lib",
-    "src",
-    "esm",
-    "tutorial"
+    "src"
   ],
   "scripts": {
     "test": "jest",
-    "build": "npm run format && npm test && npm run build:js",
-    "build:js": "tsc",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json",
-    "release": "semantic-release --debug",
     "test:ci": "jest --coverage && codecov",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint"
+    "build:js": "microbundle",
+    "build": "yarn lint && yarn build:js && yarn test",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint --ignore-pattern \"src/**/*.test.[jt]s\" \"src/**/*.[jt]s\"",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn test:ci && yarn format && yarn lint",
+    "release": "semantic-release --debug"
   },
   "author": "mi-xu",
+  "contributors": [
+    "Mircea Nistor <mircea.nistor@mesh.xyz>"
+  ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^5.4.0",
+    "did-jwt": "^5.6.1",
     "did-resolver": "^3.1.0"
   },
   "repository": {
@@ -33,41 +35,43 @@
     "url": "https://github.com/decentralized-identity/did-jwt-vc.git"
   },
   "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json"
-    ],
-    "coverageDirectory": "./coverage/",
+    "clearMocks": true,
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/**/*.d.ts",
-      "!**/node_modules/**"
+      "!**/node_modules/**",
+      "!**/__tests__/**"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.test.[jt]s"
+    ]
   },
   "devDependencies": {
+    "@babel/core": "7.14.6",
+    "@babel/preset-env": "7.14.7",
+    "@babel/preset-typescript": "7.14.5",
     "@semantic-release/changelog": "5.0.1",
     "@semantic-release/git": "9.0.0",
     "@types/faker": "5.5.6",
     "@types/jest": "26.0.23",
-    "@types/node": "14.17.4",
+    "@typescript-eslint/eslint-plugin": "4.28.0",
+    "@typescript-eslint/parser": "4.28.0",
+    "@types/node": "15.12.4",
     "codecov": "3.8.2",
+    "eslint": "7.29.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-jest": "24.3.6",
+    "eslint-plugin-prettier": "3.4.0",
     "ethr-did": "2.1.4",
     "faker": "5.5.3",
     "jest": "27.0.5",
+    "microbundle": "0.13.3",
     "prettier": "2.3.1",
     "semantic-release": "17.4.4",
-    "ts-jest": "27.0.3",
-    "tslint": "6.1.3",
-    "tslint-config-prettier": "1.18.0",
-    "tslint-eslint-rules": "5.4.0",
     "typescript": "4.3.4"
+  },
+  "engines": {
+    "node": ">=14"
   }
 }

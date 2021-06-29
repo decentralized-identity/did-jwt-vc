@@ -1,7 +1,13 @@
+[![npm](https://img.shields.io/npm/dt/did-jwt-vc.svg)](https://www.npmjs.com/package/did-jwt-vc)
+[![npm](https://img.shields.io/npm/v/did-jwt-vc.svg)](https://www.npmjs.com/package/did-jwt-vc)
+[![codecov](https://codecov.io/gh/decentralized-identity/did-jwt-vc/branch/master/graph/badge.svg)](https://codecov.io/gh/decentralized-identity/did-jwt-vc)
+
 # did-jwt-vc
+
 Create and verify W3C Verifiable Credentials and Presentations in JWT format
 
 ## Installation
+
 ```
 npm install did-jwt-vc
 ```
@@ -19,7 +25,7 @@ import * as EthrDID from 'ethr-did'
 import { Issuer } from 'did-jwt-vc'
 
 const issuer: Issuer = new EthrDID({
-  address: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
+  identifier: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
   privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75'
 })
 ```
@@ -91,7 +97,7 @@ import { getResolver } from 'ethr-did-resolver'
 
 // see also https://github.com/decentralized-identity/ethr-did-resolver#multi-network-configuration
 const providerConfig = {
-  rpcUrl: 'https://mainnet.infura.io/v3/<YOUR Infura.io PROJECT ID>',
+  rpcUrl: 'https://mainnet.infura.io/v3/<YOUR infura.io PROJECT ID>',
   registry: '0xdca7ef03e98e0dc2b855be647c39abe984fcf21b'
 }
 const resolver = new Resolver(getResolver(providerConfig))
@@ -216,13 +222,13 @@ console.log(verifiedVP)
 
 #### Notes on verification and proof properties
 
-The result of the verification methods, when successful, also conveniently contain the decoded and parsed payloads, in
-a format that closely matches the [W3C data model](https://www.w3.org/TR/vc-data-model/) for verifiable credentials and presentations. 
-This makes it easier to work with both credential encodings in the same system.
-This parsed payload also shows a `proof` property that lists the full JWT credential or presentation.
+The result of the verification methods, when successful, also conveniently contain the decoded and parsed payloads, in a
+format that closely matches the [W3C data model](https://www.w3.org/TR/vc-data-model/) for verifiable credentials and
+presentations. This makes it easier to work with both credential encodings in the same system. This parsed payload also
+shows a `proof` property that lists the full JWT credential or presentation.
 
-The `JwtProof2020` is a synthetic proof type, usable for differentiating credentials by type.
-It is not a registered W3C VC Data Model algorithm and should not be treated as such.
+The `JwtProof2020` is a synthetic proof type, usable for differentiating credentials by type. It is not a registered W3C
+VC Data Model algorithm and should not be treated as such.
 
 Also note that the `@context` fields that appear in this parsed payload are the same as the ones in the incoming JWT.
 This means that the parsed payload will probably not be suitable for an LD-processor.
