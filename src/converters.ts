@@ -517,18 +517,21 @@ export function transformPresentationInput(
     }
   }
 
-  result.vp.verifiableCredential = [
-    ...asArray(result.verifiableCredential),
-    ...asArray(result.vp?.verifiableCredential),
-  ]
-    .filter(notEmpty)
-    .map((credential: VerifiableCredential) => {
-      if (typeof credential === 'object' && credential.proof?.jwt) {
-        return credential.proof.jwt
-      } else {
-        return credential
-      }
-    })
+  if (result.verifiableCredential || result.vp?.verifiableCredential) {
+    result.vp.verifiableCredential = [
+      ...asArray(result.verifiableCredential),
+      ...asArray(result.vp?.verifiableCredential),
+    ]
+      .filter(notEmpty)
+      .map((credential: VerifiableCredential) => {
+        if (typeof credential === 'object' && credential.proof?.jwt) {
+          return credential.proof.jwt
+        } else {
+          return credential
+        }
+      })
+  }
+
   if (removeOriginalFields) {
     delete result.verifiableCredential
   }

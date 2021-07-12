@@ -41,7 +41,7 @@ export interface JwtPresentationPayload {
   vp: Extensible<{
     '@context': string[] | string
     type: string[] | string
-    verifiableCredential: VerifiableCredential[] | VerifiableCredential
+    verifiableCredential?: VerifiableCredential[] | VerifiableCredential
   }>
   iss?: string
   aud?: string | string[]
@@ -118,7 +118,7 @@ export interface FixedPresentationPayload {
   '@context': string | string[]
   type: string | string[]
   id?: string
-  verifiableCredential: VerifiableCredential[]
+  verifiableCredential?: VerifiableCredential[]
   holder: string
   verifier?: string | string[]
   issuanceDate?: string
@@ -135,7 +135,7 @@ interface NarrowPresentationDefinitions {
   '@context': string[]
   type: string[]
   verifier: string[]
-  verifiableCredential: Verifiable<W3CCredential>[]
+  verifiableCredential?: Verifiable<W3CCredential>[]
 }
 
 /**
