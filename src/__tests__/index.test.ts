@@ -279,7 +279,6 @@ describe('createPresentation', () => {
         vp: {
           '@context': presentationPayload.vp['@context'],
           type: presentationPayload.vp.type,
-          verifiableCredential: [],
         },
       },
       holder

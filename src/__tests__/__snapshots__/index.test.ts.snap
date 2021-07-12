@@ -30,7 +30,6 @@ Object {
     "type": Array [
       "VerifiablePresentation",
     ],
-    "verifiableCredential": Array [],
   },
 }
 `;
