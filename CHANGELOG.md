@@ -1,3 +1,10 @@
+## [2.1.4](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.3...2.1.4) (2021-07-13)
+
+
+### Bug Fixes
+
+* allow VPs without VCs ([#83](https://github.com/decentralized-identity/did-jwt-vc/issues/83)) ([e534b4d](https://github.com/decentralized-identity/did-jwt-vc/commit/e534b4dc1747da1071d489c2301e18e28f24f56b))
+
 ## [2.1.3](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.2...2.1.3) (2021-06-16)
 
 
