@@ -19,6 +19,21 @@ Object {
 }
 `;
 
+exports[`createPresentation creates a valid Presentation JWT if there are no credentials 1`] = `
+Object {
+  "iss": "did:ethr:0xF1232F840f3aD7d23FcDaA84d6C66dac24EFb198",
+  "vp": Object {
+    "@context": Array [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/2018/credentials/examples/v1",
+    ],
+    "type": Array [
+      "VerifiablePresentation",
+    ],
+  },
+}
+`;
+
 exports[`createPresentation creates a valid Presentation JWT with challenge option 1`] = `
 Object {
   "extra": 42,

@@ -154,14 +154,14 @@ export function validateCredentialPayload(payload: CredentialPayload): void {
 export function validateJwtPresentationPayload(payload: JwtPresentationPayload): void {
   validators.validateContext(payload.vp['@context'])
   validators.validateVpType(payload.vp.type)
-  if (payload.vp.verifiableCredential.length < 1) {
-    throw new TypeError('vp.verifiableCredential must not be empty')
-  }
-  for (const vc of asArray(payload.vp.verifiableCredential)) {
-    if (typeof vc === 'string') {
-      validators.validateJwtFormat(vc)
-    } else {
-      validateCredentialPayload(vc)
+  // empty credential array is allowed
+  if (payload.vp.verifiableCredential && payload.vp.verifiableCredential.length >= 1) {
+    for (const vc of asArray(payload.vp.verifiableCredential)) {
+      if (typeof vc === 'string') {
+        validators.validateJwtFormat(vc)
+      } else {
+        validateCredentialPayload(vc)
+      }
     }
   }
   if (payload.exp) validators.validateTimestamp(payload.exp)
@@ -170,14 +170,14 @@ export function validateJwtPresentationPayload(payload: JwtPresentationPayload):
 export function validatePresentationPayload(payload: PresentationPayload): void {
   validators.validateContext(payload['@context'])
   validators.validateVpType(payload.type)
-  if (payload.verifiableCredential.length < 1) {
-    throw new TypeError('vp.verifiableCredential must not be empty')
-  }
-  for (const vc of payload.verifiableCredential) {
-    if (typeof vc === 'string') {
-      validators.validateJwtFormat(vc)
-    } else {
-      validateCredentialPayload(vc)
+  // empty credential array is allowed
+  if (payload.verifiableCredential && payload.verifiableCredential.length >= 1) {
+    for (const vc of payload.verifiableCredential) {
+      if (typeof vc === 'string') {
+        validators.validateJwtFormat(vc)
+      } else {
+        validateCredentialPayload(vc)
+      }
     }
   }
   if (payload.expirationDate) validators.validateTimestamp(payload.expirationDate)
