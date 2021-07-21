@@ -1,3 +1,10 @@
+## [2.1.5](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.4...2.1.5) (2021-07-21)
+
+
+### Bug Fixes
+
+* **build:** revert to tsc for compilation ([#85](https://github.com/decentralized-identity/did-jwt-vc/issues/85)) ([b7dedea](https://github.com/decentralized-identity/did-jwt-vc/commit/b7dedea4847ea402fd049ee4e15d144650e90a94)), closes [#84](https://github.com/decentralized-identity/did-jwt-vc/issues/84)
+
 ## [2.1.4](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.3...2.1.4) (2021-07-13)
 
 
