@@ -1,3 +1,10 @@
+## [2.1.6](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.5...2.1.6) (2021-07-22)
+
+
+### Bug Fixes
+
+* **build:** revert back to microbundle and module output ([d28729a](https://github.com/decentralized-identity/did-jwt-vc/commit/d28729abb906e817e6822dd38abdbdd3f89f1c66)), closes [#84](https://github.com/decentralized-identity/did-jwt-vc/issues/84)
+
 ## [2.1.5](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.4...2.1.5) (2021-07-21)
 
 
