@@ -3,6 +3,10 @@ import {
   JWT,
   JwtPresentationPayload,
   JwtCredentialPayload,
+  JWT_FORMAT,
+  DEFAULT_JWT_PROOF_TYPE,
+  DEFAULT_CONTEXT,
+  DEFAULT_VC_TYPE,
   CredentialPayload,
   W3CCredential,
   Verifiable,
@@ -10,7 +14,6 @@ import {
   W3CPresentation,
 } from './types'
 import { decodeJWT } from 'did-jwt'
-import { JWT_FORMAT, DEFAULT_JWT_PROOF_TYPE, DEFAULT_CONTEXT, DEFAULT_VC_TYPE } from './constants'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asArray(arg: any | any[]): any[] {

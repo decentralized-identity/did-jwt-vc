@@ -9,7 +9,7 @@ import {
 } from '../index'
 import { decodeJWT } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
-import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../constants'
+import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../types'
 import {
   validateContext,
   validateJwtFormat,

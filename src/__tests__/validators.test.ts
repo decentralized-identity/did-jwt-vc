@@ -1,5 +1,5 @@
 import * as validators from '../validators'
-import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE } from '../constants'
+import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE } from '../types'
 
 export const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
 export const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'

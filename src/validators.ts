@@ -1,4 +1,4 @@
-import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './constants'
+import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './types'
 import { JwtCredentialSubject, DateType } from './types'
 import { VerifiableCredential } from '.'
 import { asArray } from './converters'

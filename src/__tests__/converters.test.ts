@@ -4,7 +4,7 @@ import {
   normalizePresentation,
   transformPresentationInput,
 } from '../converters'
-import { DEFAULT_JWT_PROOF_TYPE } from '../constants'
+import { DEFAULT_JWT_PROOF_TYPE } from '../types'
 import { CredentialPayload, PresentationPayload } from '../types'
 import { validateJwtCredentialPayload, validateJwtPresentationPayload } from '..'
 

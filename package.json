@@ -4,6 +4,7 @@
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
   "source": "src/index.ts",
   "main": "./lib/index.js",
+  "module": "./lib/index.module.js",
   "types": "./lib/index.d.ts",
   "files": [
     "lib",
@@ -12,7 +13,7 @@
   "scripts": {
     "test": "jest",
     "test:ci": "jest --coverage && codecov",
-    "build:js": "tsc",
+    "build:js": "microbundle",
     "build": "yarn lint && yarn build:js && yarn test",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint --ignore-pattern \"src/**/*.test.[jt]s\" \"src/**/*.[jt]s\"",
@@ -65,6 +66,7 @@
     "ethr-did": "2.1.4",
     "faker": "5.5.3",
     "jest": "27.0.6",
+    "microbundle": "^0.13.3",
     "prettier": "2.3.2",
     "semantic-release": "17.4.4",
     "typescript": "4.3.5"
