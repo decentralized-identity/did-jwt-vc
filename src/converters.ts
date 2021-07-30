@@ -15,6 +15,14 @@ import {
 } from './types'
 import { decodeJWT } from 'did-jwt'
 
+/*
+ * Additional W3C VC fields:
+ * These are defined as optional top-level properties in the W3C spec but are not mapped to top-level JWT names,
+ * so they should be moved inside the "vc" object when transforming to a JWT.
+ * Conversely, they should be moved out of the "vc" object when transforming from a JWT to W3C JSON.
+ */
+const additionalPropNames = ['evidence', 'termsOfUse', 'refreshService', 'credentialSchema', 'credentialStatus']
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function asArray(arg: any | any[]): any[] {
   return Array.isArray(arg) ? arg : [arg]
@@ -111,19 +119,15 @@ function normalizeJwtCredentialPayload(
     delete result.vc?.type
   }
 
-  result.evidence = input.vc?.evidence
-  if (removeOriginalFields) {
-    delete result.vc?.evidence
-  }
-
-  result.credentialStatus = input.vc?.credentialStatus
-  if (removeOriginalFields) {
-    delete result.vc?.credentialStatus
-  }
-
-  result.termsOfUse = input.vc?.termsOfUse
-  if (removeOriginalFields) {
-    delete result.vc?.termsOfUse
+  for (const prop of additionalPropNames) {
+    if (input.vc && input.vc[prop]) {
+      if (!result[prop]) {
+        result[prop] = input.vc[prop]
+      }
+      if (removeOriginalFields) {
+        delete result.vc[prop]
+      }
+    }
   }
 
   const contextArray: string[] = [
@@ -312,10 +316,6 @@ export function transformCredentialInput(
   if (removeOriginalFields) {
     delete result.credentialSubject
   }
-
-  // additional W3C VC fields to map:
-  // these may exist at the top-level of a W3C credential, but should be moved inside vc when transforming to JWT
-  const additionalPropNames = ['evidence', 'termsOfUse', 'refreshService', 'credentialSchema', 'credentialStatus']
 
   for (const prop of additionalPropNames) {
     if (input[prop]) {
