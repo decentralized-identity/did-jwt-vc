@@ -1,4 +1,4 @@
-import { Signer, JWTVerified, JWTHeader } from 'did-jwt'
+import { Signer, JWTVerified, JWTHeader, JWTOptions } from 'did-jwt'
 
 export const JWT_ALG = 'ES256K'
 export const DID_FORMAT = /^did:([a-zA-Z0-9_]+):([:[a-zA-Z0-9_.-]+)(\/[^#]*)?(#.*)?$/
@@ -232,6 +232,12 @@ export interface CreateCredentialOptions {
    * If the issuer or holder does not list an `alg`, then the one specified in `header` will be used
    */
   header?: Partial<JWTHeader>
+
+  /**
+   * Allows including or overriding some header parameters for the resulting JWT.
+   */
+  jwt?: Partial<JWTOptions>
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }

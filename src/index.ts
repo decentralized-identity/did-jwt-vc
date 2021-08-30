@@ -75,6 +75,7 @@ export async function createVerifiableCredentialJwt(
   return createJWT(
     parsedPayload,
     {
+      ...options.jwt,
       issuer: issuer.did || parsedPayload.iss || '',
       signer: issuer.signer,
     },
