@@ -126,6 +126,7 @@ export async function createVerifiablePresentationJwt(
   return createJWT(
     parsedPayload,
     {
+      ...options,
       issuer: holder.did || parsedPayload.iss || '',
       signer: holder.signer,
     },
