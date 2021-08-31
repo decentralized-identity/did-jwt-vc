@@ -122,6 +122,17 @@ describe('createVerifiableCredential', () => {
     const decodedVc = await decodeJWT(vcJwt)
     expect(decodedVc.header).toEqual({ alg: 'ES256K-R', custom: 'field', typ: 'JWT' })
   })
+  it('creates a Verifiable Credential JWT with exp field using expiresIn of did-jwt', async () => {
+    expect.assertions(1)
+    const nbf = Math.floor(Date.now() / 1000)
+    const expiresIn = 86400
+    const vcJwt = await createVerifiableCredentialJwt({ ...verifiableCredentialPayload, nbf }, issuer, {
+      expiresIn,
+      header: { alg: 'ES256K-R' },
+    })
+    const decodedVc = await decodeJWT(vcJwt)
+    expect(decodedVc.payload.exp).toEqual(nbf + expiresIn)
+  })
   it('calls functions to validate required fields', async () => {
     expect.assertions(4)
     await createVerifiableCredentialJwt(verifiableCredentialPayload, issuer)

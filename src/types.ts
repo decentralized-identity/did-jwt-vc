@@ -1,4 +1,4 @@
-import { Signer, JWTVerified, JWTHeader } from 'did-jwt'
+import { Signer, JWTVerified, JWTHeader, JWTOptions } from 'did-jwt'
 
 export const JWT_ALG = 'ES256K'
 export const DID_FORMAT = /^did:([a-zA-Z0-9_]+):([:[a-zA-Z0-9_.-]+)(\/[^#]*)?(#.*)?$/
@@ -218,7 +218,7 @@ export interface Issuer {
 /**
  * Represents the Creation Options that can be passed to the createVerifiableCredentialJwt method.
  */
-export interface CreateCredentialOptions {
+export interface CreateCredentialOptions extends Partial<JWTOptions> {
   /**
    * Determines whether the JSON->JWT transformation will remove the original fields from the input payload.
    * See https://www.w3.org/TR/vc-data-model/#jwt-encoding
@@ -232,6 +232,7 @@ export interface CreateCredentialOptions {
    * If the issuer or holder does not list an `alg`, then the one specified in `header` will be used
    */
   header?: Partial<JWTHeader>
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
