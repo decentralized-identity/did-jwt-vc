@@ -1,3 +1,10 @@
+## [2.1.7](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.6...2.1.7) (2021-08-31)
+
+
+### Bug Fixes
+
+* forward JWT options when creating a VC or VP ([#90](https://github.com/decentralized-identity/did-jwt-vc/issues/90)) ([13cea08](https://github.com/decentralized-identity/did-jwt-vc/commit/13cea0868a8126b9314b27283e72f6f3325eb943)), closes [#89](https://github.com/decentralized-identity/did-jwt-vc/issues/89)
+
 ## [2.1.6](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.5...2.1.6) (2021-07-22)
 
 
