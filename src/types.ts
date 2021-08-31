@@ -218,7 +218,7 @@ export interface Issuer {
 /**
  * Represents the Creation Options that can be passed to the createVerifiableCredentialJwt method.
  */
-export interface CreateCredentialOptions {
+export interface CreateCredentialOptions extends Partial<JWTOptions> {
   /**
    * Determines whether the JSON->JWT transformation will remove the original fields from the input payload.
    * See https://www.w3.org/TR/vc-data-model/#jwt-encoding
@@ -232,11 +232,6 @@ export interface CreateCredentialOptions {
    * If the issuer or holder does not list an `alg`, then the one specified in `header` will be used
    */
   header?: Partial<JWTHeader>
-
-  /**
-   * Allows including or overriding some header parameters for the resulting JWT.
-   */
-  jwt?: Partial<JWTOptions>
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
