@@ -62,7 +62,7 @@
     "eslint": "7.31.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-jest": "24.3.6",
-    "eslint-plugin-prettier": "3.4.0",
+    "eslint-plugin-prettier": "4.0.0",
     "ethr-did": "2.1.4",
     "faker": "5.5.3",
     "jest": "27.0.6",
