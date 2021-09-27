@@ -51,8 +51,8 @@
     "@babel/core": "7.14.6",
     "@babel/preset-env": "7.14.7",
     "@babel/preset-typescript": "7.14.5",
-    "@semantic-release/changelog": "5.0.1",
-    "@semantic-release/git": "9.0.0",
+    "@semantic-release/changelog": "6.0.0",
+    "@semantic-release/git": "10.0.0",
     "@types/faker": "5.5.7",
     "@types/jest": "27.0.1",
     "@types/node": "15.12.4",
@@ -68,7 +68,7 @@
     "jest": "27.0.6",
     "microbundle": "^0.13.3",
     "prettier": "2.3.2",
-    "semantic-release": "17.4.4",
+    "semantic-release": "18.0.0",
     "typescript": "4.3.5"
   },
   "engines": {
