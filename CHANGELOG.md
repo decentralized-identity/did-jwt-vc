@@ -1,3 +1,10 @@
+## [2.1.8](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.7...2.1.8) (2021-11-23)
+
+
+### Bug Fixes
+
+* normalizeCredential overwrite of "evidence" when "vc" is missing ([#86](https://github.com/decentralized-identity/did-jwt-vc/issues/86)) ([0039298](https://github.com/decentralized-identity/did-jwt-vc/commit/003929800f5310cf88af8618f3a19a41c05e859e))
+
 ## [2.1.7](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.6...2.1.7) (2021-08-31)
 
 
