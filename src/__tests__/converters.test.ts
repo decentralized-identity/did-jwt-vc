@@ -436,6 +436,27 @@ describe('credential', () => {
         expect(result).toMatchObject({ evidence: 'foo', vc: { evidence: 'foo' } })
       })
 
+      it('does not insert evidence when using credentialSubject instead of vc object', () => {
+        const result = normalizeCredential({
+          credentialSubject: {
+            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+          },
+        })
+        expect(result).not.toHaveProperty('evidence')
+      })
+
+      it('does not overwrite evidence when passed at top-level', () => {
+        const result = normalizeCredential({
+          credentialSubject: {
+            id: 'did:example:ebfeb1f712ebc6f1c276e12ec21',
+          },
+          evidence: {
+            foo: 'bar',
+          },
+        })
+        expect(result.evidence).toMatchObject({ foo: 'bar' })
+      })
+
       it('uses credentialStatus from vc', () => {
         const result = normalizeCredential({ vc: { credentialStatus: 'foo' } })
         expect(result).toMatchObject({ credentialStatus: 'foo' })
@@ -957,7 +978,7 @@ describe('credential', () => {
       })
     })
 
-    describe('other fields W3C fields', () => {
+    describe('other W3C fields', () => {
       it('maps evidence to vc', () => {
         const result = transformCredentialInput({ evidence: 'foo' })
         expect(result).toMatchObject({ vc: { evidence: 'foo' } })
