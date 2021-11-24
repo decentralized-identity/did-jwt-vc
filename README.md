@@ -21,13 +21,13 @@ npm install did-jwt-vc
 Create an `Issuer` object to sign JWTs using, for example [ethr-did](https://github.com/uport-project/ethr-did)
 
 ```typescript
-import * as EthrDID from 'ethr-did'
+import { EthrDID } from 'ethr-did'
 import { Issuer } from 'did-jwt-vc'
 
-const issuer: Issuer = new EthrDID({
+const issuer = new EthrDID({
   identifier: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
   privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75'
-})
+}) as Issuer
 ```
 
 The `Issuer` object must contain a `did` attribute, an `alg` property that is used in the JWT header and a `signer`
