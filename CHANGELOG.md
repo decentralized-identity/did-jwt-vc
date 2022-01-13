@@ -1,3 +1,10 @@
+## [2.1.9](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.8...2.1.9) (2022-01-13)
+
+
+### Bug Fixes
+
+* **deps:** bump dependencies to latest ([7cb7a88](https://github.com/decentralized-identity/did-jwt-vc/commit/7cb7a88d31cbfc388da1363eefb641212505ca19))
+
 ## [2.1.8](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.7...2.1.8) (2021-11-23)
 
 
