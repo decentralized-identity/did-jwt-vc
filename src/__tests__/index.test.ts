@@ -1,24 +1,34 @@
 import { EthrDID } from 'ethr-did'
 import {
   createVerifiableCredentialJwt,
-  verifyCredential,
-  verifyPresentation,
   createVerifiablePresentationJwt,
   Issuer,
+  JwtCredentialPayload,
+  verifyCredential,
+  verifyPresentation,
   verifyPresentationPayloadOptions,
 } from '../index'
-import { decodeJWT } from 'did-jwt'
+import { decodeJWT, ES256KSigner } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
-import { DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, DEFAULT_CONTEXT } from '../types'
+import {
+  CreatePresentationOptions,
+  DEFAULT_CONTEXT,
+  DEFAULT_VC_TYPE,
+  DEFAULT_VP_TYPE,
+  VerifyPresentationOptions,
+} from '../types'
 import {
   validateContext,
+  validateCredentialSubject,
   validateJwtFormat,
   validateTimestamp,
   validateVcType,
   validateVpType,
-  validateCredentialSubject,
 } from '../validators'
-import { CreatePresentationOptions, VerifyPresentationOptions } from '../types'
+import elliptic from 'elliptic'
+import * as u8a from 'uint8arrays'
+
+const secp256k1 = new elliptic.ec('secp256k1')
 
 jest.mock('../validators')
 
@@ -30,7 +40,6 @@ const mockValidateVcType = <jest.Mock<typeof validateVcType>>validateVcType
 const mockValidateVpType = <jest.Mock<typeof validateVpType>>validateVpType
 const mockValidateCredentialSubject = <jest.Mock<typeof validateCredentialSubject>>validateCredentialSubject
 
-const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
 const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
 const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
 const EXTRA_TYPE_A = 'UniversityDegreeCredential'
@@ -417,5 +426,66 @@ describe('verifyPresentationPayloadOptions', () => {
     expect(() => verifyPresentationPayloadOptions(presentationPayload, options)).toThrow(
       'Presentation does not contain the mandatory domain (JWT: aud) for : TEST_DOMAIN'
     )
+  })
+})
+
+describe('github #98', () => {
+  it('verifies a JWT issued by a DID with publicKeyJwk', async () => {
+    const did = `did:ion:long-form-mock`
+    const privateKeyHex = '278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f'
+    const pubKey = secp256k1.keyFromPrivate(privateKeyHex, 'hex').getPublic()
+    const publicKeyJwk = {
+      kty: 'EC',
+      crv: 'secp256k1',
+      x: u8a.toString(pubKey.getX().toBuffer(), 'base64url'),
+      y: u8a.toString(pubKey.getY().toBuffer(), 'base64url'),
+    }
+
+    const localResolver: Resolvable = {
+      resolve: (did: string) =>
+        Promise.resolve({
+          '@context': 'https://w3id.org/did-resolution/v1',
+          didDocument: {
+            id: did,
+            '@context': ['https://www.w3.org/ns/did/v1'],
+            verificationMethod: [
+              {
+                id: '#key-1',
+                controller: '',
+                type: 'EcdsaSecp256k1VerificationKey2019',
+                publicKeyJwk,
+              },
+            ],
+            authentication: ['#key-1'],
+          },
+          didDocumentMetadata: {},
+          didResolutionMetadata: {},
+        }),
+    }
+
+    const issuer: Issuer = {
+      did,
+      signer: ES256KSigner(privateKeyHex, false),
+      alg: 'ES256K',
+    }
+
+    const vcPayload: JwtCredentialPayload = {
+      nbf: 1562950282,
+      vc: {
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        type: ['VerifiableCredential'],
+        credentialSubject: {
+          degree: {
+            type: 'Stemgerechtigd',
+            name: 'Je mag stemmen',
+          },
+        },
+      },
+    }
+
+    const vcJwt = await createVerifiableCredentialJwt(vcPayload, issuer, { header: { alg: 'ES256K' } })
+
+    const verifiedVC = await verifyCredential(vcJwt, localResolver, { header: { alg: 'ES256K' } })
+    expect(verifiedVC.issuer).toEqual('did:ion:long-form-mock')
   })
 })
