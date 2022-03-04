@@ -148,7 +148,7 @@ describe('createVerifiableCredential', () => {
     expect(mockValidateTimestamp).toHaveBeenCalledWith(verifiableCredentialPayload.nbf)
     expect(mockValidateContext).toHaveBeenCalledWith(verifiableCredentialPayload.vc['@context'])
     expect(mockValidateVcType).toHaveBeenCalledWith(verifiableCredentialPayload.vc.type)
-    expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialPayload.vc.credentialSubject)
+    expect(mockValidateCredentialSubject).toHaveBeenCalledWith(verifiableCredentialPayload.vc)
   })
   it('calls functions to validate optional fields if they are present', async () => {
     expect.assertions(1)

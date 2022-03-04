@@ -140,7 +140,7 @@ export async function createVerifiablePresentationJwt(
 export function validateJwtCredentialPayload(payload: JwtCredentialPayload): void {
   validators.validateContext(payload.vc['@context'])
   validators.validateVcType(payload.vc.type)
-  validators.validateCredentialSubject(payload.vc.credentialSubject)
+  validators.validateCredentialSubject(payload.vc)
   if (payload.nbf) validators.validateTimestamp(payload.nbf)
   if (payload.exp) validators.validateTimestamp(payload.exp)
 }
@@ -148,7 +148,7 @@ export function validateJwtCredentialPayload(payload: JwtCredentialPayload): voi
 export function validateCredentialPayload(payload: CredentialPayload): void {
   validators.validateContext(payload['@context'])
   validators.validateVcType(payload.type)
-  validators.validateCredentialSubject(payload.credentialSubject)
+  validators.validateCredentialSubject(payload)
   if (payload.issuanceDate) validators.validateTimestamp(payload.issuanceDate)
   if (payload.expirationDate) validators.validateTimestamp(payload.expirationDate)
 }

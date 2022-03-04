@@ -81,11 +81,48 @@ describe('validators', () => {
   })
 
   describe('validateCredentialSubject', () => {
-    it('does not throw if the value is an object with at least one attribute', () => {
-      expect(() => validators.validateCredentialSubject({ name: 'test' })).not.toThrow()
+    it('does not throw if the payload contains a `credentialSubject` property', () => {
+      expect(() => validators.validateCredentialSubject({ credentialSubject: { name: 'test' } })).not.toThrow()
     })
-    it('throws a TypeError if the value is an object with no attributes', () => {
+    it('does not throw if the payload contains a `vc.credentialSubject` property', () => {
+      expect(() => validators.validateCredentialSubject({ vc: { credentialSubject: { name: 'test' } } })).not.toThrow()
+    })
+    it('does not throw if the payload contains an empty `credentialSubject` property', () => {
+      expect(() => validators.validateCredentialSubject({ credentialSubject: {} })).not.toThrow()
+    })
+    it('does not throw if the payload contains an empty `vc.credentialSubject` property', () => {
+      expect(() => validators.validateCredentialSubject({ vc: { credentialSubject: {} } })).not.toThrow()
+    })
+    it('does not throw if the value is an array of objects with at least one non-empty entry', () => {
+      expect(() => validators.validateCredentialSubject({ credentialSubject: [{ name: 'test' }] })).not.toThrow()
+    })
+    it('does not throw if the value is an array of objects with at least one entry', () => {
+      expect(() => validators.validateCredentialSubject({ credentialSubject: [{}] })).not.toThrow()
+    })
+
+    it('throws a TypeError if the credential does not have a credentialSubject property', () => {
       expect(() => validators.validateCredentialSubject({})).toThrow(TypeError)
+    })
+    it('throws a TypeError if the credential does not have a vc.credentialSubject property', () => {
+      expect(() => validators.validateCredentialSubject({})).toThrow(TypeError)
+    })
+    it('throws a TypeError if the credentialSubject is null', () => {
+      expect(() => validators.validateCredentialSubject({ credentialSubject: null })).toThrow(TypeError)
+    })
+    it('throws a TypeError if the vc.credentialSubject is null', () => {
+      expect(() => validators.validateCredentialSubject({ vc: { credentialSubject: null } })).toThrow(TypeError)
+    })
+    it('throws a TypeError if the credentialSubject is undefined', () => {
+      expect(() => validators.validateCredentialSubject({ credentialSubject: undefined })).toThrow(TypeError)
+    })
+    it('throws a TypeError if the vc.credentialSubject is undefined', () => {
+      expect(() => validators.validateCredentialSubject({ vc: { credentialSubject: undefined } })).toThrow(TypeError)
+    })
+    it('throws a TypeError if the credentialSubject is an empty array', () => {
+      expect(() => validators.validateCredentialSubject({ credentialSubject: [] })).toThrow(TypeError)
+    })
+    it('throws a TypeError if the vc.credentialSubject is an empty array', () => {
+      expect(() => validators.validateCredentialSubject({ vc: { credentialSubject: [] } })).toThrow(TypeError)
     })
   })
 })

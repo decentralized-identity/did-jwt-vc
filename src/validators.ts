@@ -1,5 +1,12 @@
-import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './types'
-import { JwtCredentialSubject, DateType } from './types'
+import {
+  CredentialPayload,
+  DateType,
+  DEFAULT_CONTEXT,
+  DEFAULT_VC_TYPE,
+  DEFAULT_VP_TYPE,
+  JWT_FORMAT,
+  JwtCredentialPayload,
+} from './types'
 import { VerifiableCredential } from '.'
 import { asArray } from './converters'
 
@@ -54,8 +61,16 @@ export function validateVpType(value: string | string[]): void {
   }
 }
 
-export function validateCredentialSubject(value: JwtCredentialSubject): void {
-  if (Object.keys(value).length === 0) {
+/**
+ * Checks that the credential payload has a `credentialSubject` property
+ *
+ * See https://www.w3.org/TR/vc-data-model/#credential-subject
+ *
+ * @param credentialPayload the credential payload
+ */
+export function validateCredentialSubject(credentialPayload: Partial<CredentialPayload | JwtCredentialPayload>): void {
+  const credentialSubject = credentialPayload?.credentialSubject || credentialPayload?.vc?.credentialSubject
+  if (!credentialSubject || (Array.isArray(credentialSubject) && credentialSubject.length == 0)) {
     throw new TypeError('credentialSubject must not be empty')
   }
 }

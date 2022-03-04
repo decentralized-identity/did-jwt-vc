@@ -6,6 +6,15 @@ export const JWT_FORMAT = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]
 export const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1'
 export const DEFAULT_VC_TYPE = 'VerifiableCredential'
 export const DEFAULT_VP_TYPE = 'VerifiablePresentation'
+
+/**
+ * This is a synthetic Proof type used when JWT credentials are expressed as JSON, after being parsed and interpreted
+ * according to the rules expressed in {@link https://w3c.github.io/vc-data-model/#jwt-encoding the data model}
+ *
+ * This synthetic proof type is only used for convenience, and credentials using this proof type MUST NOT be
+ * transmitted or interpreted directly. The actual verifiable credential string (that is signed and integrity
+ * protected) MUST be extracted from the `*.proof.jwt` property.
+ */
 export const DEFAULT_JWT_PROOF_TYPE = 'JwtProof2020'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,6 +46,7 @@ export interface JwtCredentialPayload {
   aud?: string | string[]
   exp?: number
   jti?: string
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
@@ -57,12 +67,14 @@ export interface JwtPresentationPayload {
   exp?: number
   jti?: string
   nonce?: string
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
 
 export type IssuerType = Extensible<{ id: string }> | string
 export type DateType = string | Date
+
 /**
  * used as input when creating Verifiable Credentials
  */
@@ -109,13 +121,15 @@ type Extensible<T> = T & { [x: string]: any }
 
 /**
  * This data type represents a parsed VerifiableCredential.
- * It is meant to be an unambiguous representation of the properties of a Credential and is usually the result of a transformation method.
+ * It is meant to be an unambiguous representation of the properties of a Credential and is usually the result of a
+ * transformation method.
  *
  * `issuer` is always an object with an `id` property and potentially other app specific issuer claims
  * `issuanceDate` is an ISO DateTime string
  * `expirationDate`, is a nullable ISO DateTime string
  *
- * Any JWT specific properties are transformed to the broader W3C variant and any app specific properties are left intact
+ * Any JWT specific properties are transformed to the broader W3C variant and any app specific properties are left
+ * intact
  */
 export type W3CCredential = Extensible<Replace<FixedCredentialPayload, NarrowCredentialDefinitions>>
 
@@ -148,15 +162,18 @@ interface NarrowPresentationDefinitions {
 
 /**
  * This data type represents a parsed Presentation payload.
- * It is meant to be an unambiguous representation of the properties of a Presentation and is usually the result of a transformation method.
+ * It is meant to be an unambiguous representation of the properties of a Presentation and is usually the result of a
+ * transformation method.
  *
  * The `verifiableCredential` array should contain parsed `Verifiable<Credential>` elements.
- * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are left intact.
+ * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are
+ * left intact.
  */
 export type W3CPresentation = Extensible<Replace<FixedPresentationPayload, NarrowPresentationDefinitions>>
 
 export interface Proof {
   type?: string
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
