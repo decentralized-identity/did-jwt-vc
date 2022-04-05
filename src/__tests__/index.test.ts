@@ -8,7 +8,7 @@ import {
   verifyPresentation,
   verifyPresentationPayloadOptions,
 } from '../index'
-import { decodeJWT, ES256KSigner } from 'did-jwt'
+import { decodeJWT, ES256KSigner, hexToBytes } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
 import {
   CreatePresentationOptions,
@@ -465,7 +465,7 @@ describe('github #98', () => {
 
     const issuer: Issuer = {
       did,
-      signer: ES256KSigner(privateKeyHex, false),
+      signer: ES256KSigner(hexToBytes(privateKeyHex), false),
       alg: 'ES256K',
     }
 
