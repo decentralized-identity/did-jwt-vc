@@ -22,7 +22,7 @@ describe('validators', () => {
       expect(() => validators.validateTimestamp(new Date().getTime())).toThrow(TypeError)
     })
     it('throws a TypeError if the value is not an integer', () => {
-      expect(() => validators.validateTimestamp(new Date().getTime() / 1000)).toThrow(TypeError)
+      expect(() => validators.validateTimestamp(1653060380105)).toThrow(TypeError)
     })
   })
 
