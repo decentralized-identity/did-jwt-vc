@@ -2,22 +2,31 @@
   "name": "did-jwt-vc",
   "version": "2.1.11",
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
+  "type": "module",
   "source": "src/index.ts",
-  "main": "./lib/index.js",
+  "main": "./lib/index.cjs",
   "module": "./lib/index.module.js",
+  "unpkg": "./lib/index.umd.js",
   "types": "./lib/index.d.ts",
+  "umd:main": "./lib/index.umd.js",
   "files": [
     "lib",
-    "src"
+    "dist",
+    "src",
+    "LICENSE"
   ],
+  "exports": {
+    ".": {
+      "require": "./lib/index.cjs",
+      "import": "./lib/index.module.js"
+    }
+  },
   "scripts": {
     "test": "jest",
-    "test:ci": "jest --coverage && codecov",
-    "build:js": "microbundle",
-    "build": "yarn lint && yarn build:js && yarn test",
+    "test:ci": "jest --coverage",
+    "build": "microbundle --compress=false",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint --ignore-pattern \"src/**/*.test.[jt]s\" \"src/**/*.[jt]s\"",
-    "prepare": "yarn build",
     "prepublishOnly": "yarn test:ci && yarn format && yarn lint",
     "release": "semantic-release --debug"
   },
@@ -59,7 +68,6 @@
     "@types/node": "16.11.19",
     "@typescript-eslint/eslint-plugin": "5.9.1",
     "@typescript-eslint/parser": "5.9.1",
-    "codecov": "3.8.3",
     "eslint": "8.6.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-jest": "26.1.0",
