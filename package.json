@@ -2,22 +2,31 @@
   "name": "did-jwt-vc",
   "version": "2.1.11",
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
+  "type": "module",
   "source": "src/index.ts",
-  "main": "./lib/index.js",
+  "main": "./lib/index.cjs",
   "module": "./lib/index.module.js",
+  "unpkg": "./lib/index.umd.js",
   "types": "./lib/index.d.ts",
+  "umd:main": "./lib/index.umd.js",
   "files": [
     "lib",
-    "src"
+    "dist",
+    "src",
+    "LICENSE"
   ],
+  "exports": {
+    ".": {
+      "require": "./lib/index.cjs",
+      "import": "./lib/index.module.js"
+    }
+  },
   "scripts": {
     "test": "jest",
-    "test:ci": "jest --coverage && codecov",
-    "build:js": "microbundle",
-    "build": "yarn lint && yarn build:js && yarn test",
+    "test:ci": "jest --coverage",
+    "build": "microbundle --compress=false",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint --ignore-pattern \"src/**/*.test.[jt]s\" \"src/**/*.[jt]s\"",
-    "prepare": "yarn build",
     "prepublishOnly": "yarn test:ci && yarn format && yarn lint",
     "release": "semantic-release --debug"
   },
@@ -27,8 +36,8 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^6.1.0",
-    "did-resolver": "^3.1.5"
+    "did-jwt": "^6.1.2",
+    "did-resolver": "^3.2.2"
   },
   "repository": {
     "type": "git",
@@ -48,29 +57,28 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "7.16.7",
-    "@babel/preset-env": "7.16.8",
-    "@babel/preset-typescript": "7.16.7",
+    "@babel/core": "7.18.2",
+    "@babel/preset-env": "7.17.12",
+    "@babel/preset-typescript": "7.17.12",
     "@semantic-release/changelog": "6.0.1",
     "@semantic-release/git": "10.0.1",
     "@types/elliptic": "6.4.14",
-    "@types/faker": "6.6.8",
-    "@types/jest": "27.4.0",
-    "@types/node": "16.11.19",
-    "@typescript-eslint/eslint-plugin": "5.9.1",
-    "@typescript-eslint/parser": "5.9.1",
-    "codecov": "3.8.3",
-    "eslint": "8.6.0",
-    "eslint-config-prettier": "8.3.0",
-    "eslint-plugin-jest": "26.1.0",
+    "@types/faker": "6.6.9",
+    "@types/jest": "28.1.1",
+    "@types/node": "17.0.40",
+    "@typescript-eslint/eslint-plugin": "5.27.0",
+    "@typescript-eslint/parser": "5.27.0",
+    "eslint": "8.17.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-jest": "26.5.3",
     "eslint-plugin-prettier": "4.0.0",
-    "ethr-did": "2.1.5",
+    "ethr-did": "2.2.3",
     "faker": "6.6.6",
     "jest": "28.1.0",
-    "microbundle": "0.14.2",
-    "prettier": "2.5.1",
+    "microbundle": "0.15.0",
+    "prettier": "2.6.2",
     "semantic-release": "19.0.2",
-    "typescript": "4.5.4"
+    "typescript": "4.7.3"
   },
   "engines": {
     "node": ">=14"
