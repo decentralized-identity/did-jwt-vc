@@ -1,3 +1,10 @@
+## [2.1.12](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.11...2.1.12) (2022-06-06)
+
+
+### Bug Fixes
+
+* **ci:** groom the build scripts and dependencies ([#114](https://github.com/decentralized-identity/did-jwt-vc/issues/114)) ([381d973](https://github.com/decentralized-identity/did-jwt-vc/commit/381d9731d043672da992c4ce704cd8b0f16c2a2c))
+
 ## [2.1.11](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.10...2.1.11) (2022-05-22)
 
 
