@@ -1,3 +1,10 @@
+## [2.1.14](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.13...2.1.14) (2022-08-03)
+
+
+### Bug Fixes
+
+* **deps:** update did-resolver and did-jwt dependencies ([#117](https://github.com/decentralized-identity/did-jwt-vc/issues/117)) ([d07dd45](https://github.com/decentralized-identity/did-jwt-vc/commit/d07dd459d8f949463f728833e631629a92dbc009))
+
 ## [2.1.13](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.12...2.1.13) (2022-06-29)
 
 
