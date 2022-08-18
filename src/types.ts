@@ -1,4 +1,4 @@
-import { Signer, JWTVerified, JWTHeader, JWTOptions } from 'did-jwt'
+import { Signer, JWTVerified, JWTHeader, JWTOptions, JWTVerifyOptions } from 'did-jwt'
 
 export const JWT_ALG = 'ES256K'
 export const DID_FORMAT = /^did:([a-zA-Z0-9_]+):([:[a-zA-Z0-9_.-]+)(\/[^#]*)?(#.*)?$/
@@ -37,6 +37,7 @@ export interface JwtCredentialPayload {
   aud?: string | string[]
   exp?: number
   jti?: string
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
@@ -57,12 +58,14 @@ export interface JwtPresentationPayload {
   exp?: number
   jti?: string
   nonce?: string
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
 
 export type IssuerType = Extensible<{ id: string }> | string
 export type DateType = string | Date
+
 /**
  * used as input when creating Verifiable Credentials
  */
@@ -109,13 +112,15 @@ type Extensible<T> = T & { [x: string]: any }
 
 /**
  * This data type represents a parsed VerifiableCredential.
- * It is meant to be an unambiguous representation of the properties of a Credential and is usually the result of a transformation method.
+ * It is meant to be an unambiguous representation of the properties of a Credential and is usually the result of a
+ * transformation method.
  *
  * `issuer` is always an object with an `id` property and potentially other app specific issuer claims
  * `issuanceDate` is an ISO DateTime string
  * `expirationDate`, is a nullable ISO DateTime string
  *
- * Any JWT specific properties are transformed to the broader W3C variant and any app specific properties are left intact
+ * Any JWT specific properties are transformed to the broader W3C variant and any app specific properties are left
+ * intact
  */
 export type W3CCredential = Extensible<Replace<FixedCredentialPayload, NarrowCredentialDefinitions>>
 
@@ -148,15 +153,18 @@ interface NarrowPresentationDefinitions {
 
 /**
  * This data type represents a parsed Presentation payload.
- * It is meant to be an unambiguous representation of the properties of a Presentation and is usually the result of a transformation method.
+ * It is meant to be an unambiguous representation of the properties of a Presentation and is usually the result of a
+ * transformation method.
  *
  * The `verifiableCredential` array should contain parsed `Verifiable<Credential>` elements.
- * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are left intact.
+ * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are
+ * left intact.
  */
 export type W3CPresentation = Extensible<Replace<FixedPresentationPayload, NarrowPresentationDefinitions>>
 
 export interface Proof {
   type?: string
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }
@@ -242,7 +250,38 @@ export interface CreateCredentialOptions extends Partial<JWTOptions> {
  * These options are forwarded to the lower level verification code
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type VerifyCredentialOptions = Record<string, any>
+export interface VerifyCredentialOptions extends JWTVerifyOptions {
+  /**
+   * When transforming the result of the verification into a W3C VerifiableCredential, this property dictates whether
+   * the JWT specific properties are removed from the payload or not. Defaults to `true`.
+   */
+  removeOriginalFields?: boolean
+
+  /**
+   * Use this to override the default checks performed during verification
+   */
+  policies?: VerifyCredentialPolicies
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [x: string]: any
+}
+
+export interface VerifyCredentialPolicies {
+  // tweak the time at which the credential should be valid (UNIX timestamp, in seconds)
+  now?: number
+  // when false skips issuanceDate check
+  issuanceDate?: boolean
+  // when false skips expirationDate check
+  expirationDate?: boolean
+  // when false skips format checks
+  format?: boolean
+
+  /**
+   * Other policies are forwarded to lower level libs
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [x: string]: any
+}
 
 /**
  * Represents the Verification Options that can be passed to the verifyPresentation method.

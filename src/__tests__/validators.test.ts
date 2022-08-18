@@ -19,10 +19,10 @@ describe('validators', () => {
       expect(() => validators.validateTimestamp(Math.floor(new Date().getTime() / 1000))).not.toThrow()
     })
     it('throws a TypeError if the value is a millisecond timestamp', () => {
-      expect(() => validators.validateTimestamp(new Date().getTime())).toThrow(TypeError)
+      expect(() => validators.validateTimestamp(new Date().getTime())).toThrow(/^schema_error:.*/)
     })
     it('throws a TypeError if the value is not an integer', () => {
-      expect(() => validators.validateTimestamp(1653060380105 / 1000)).toThrow(TypeError)
+      expect(() => validators.validateTimestamp(1653060380105 / 1000)).toThrow(/^schema_error:.*/)
     })
   })
 
@@ -34,10 +34,10 @@ describe('validators', () => {
       expect(() => validators.validateContext([DEFAULT_CONTEXT, EXTRA_CONTEXT_A, EXTRA_CONTEXT_B])).not.toThrow()
     })
     it('throws a TypeError the value contains no contexts', () => {
-      expect(() => validators.validateContext([])).toThrow(TypeError)
+      expect(() => validators.validateContext([])).toThrow(/^schema_error:.*/)
     })
     it('throws a TypeError the value is missing the default context', () => {
-      expect(() => validators.validateContext([EXTRA_CONTEXT_A, EXTRA_CONTEXT_B])).toThrow(TypeError)
+      expect(() => validators.validateContext([EXTRA_CONTEXT_A, EXTRA_CONTEXT_B])).toThrow(/^schema_error:.*/)
     })
   })
 
@@ -49,10 +49,10 @@ describe('validators', () => {
       expect(() => validators.validateVcType([DEFAULT_VC_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])).not.toThrow()
     })
     it('throws a TypeError the value contains no types', () => {
-      expect(() => validators.validateVcType([])).toThrow(TypeError)
+      expect(() => validators.validateVcType([])).toThrow(/^schema_error:.*/)
     })
     it('throws a TypeError the value is missing the default type', () => {
-      expect(() => validators.validateVcType([EXTRA_TYPE_A, EXTRA_TYPE_B])).toThrow(TypeError)
+      expect(() => validators.validateVcType([EXTRA_TYPE_A, EXTRA_TYPE_B])).toThrow(/^schema_error:.*/)
     })
   })
 
@@ -64,10 +64,10 @@ describe('validators', () => {
       expect(() => validators.validateVpType([DEFAULT_VP_TYPE, EXTRA_TYPE_A, EXTRA_TYPE_B])).not.toThrow()
     })
     it('throws a TypeError the value contains no types', () => {
-      expect(() => validators.validateVpType([])).toThrow(TypeError)
+      expect(() => validators.validateVpType([])).toThrow(/^schema_error:.*/)
     })
     it('throws a TypeError the value is missing the default type', () => {
-      expect(() => validators.validateVpType([EXTRA_TYPE_A, EXTRA_TYPE_B])).toThrow(TypeError)
+      expect(() => validators.validateVpType([EXTRA_TYPE_A, EXTRA_TYPE_B])).toThrow(/^schema_error:.*/)
     })
   })
 
@@ -76,7 +76,7 @@ describe('validators', () => {
       expect(() => validators.validateJwtFormat(VC_JWT)).not.toThrow()
     })
     it('throws a TypeError if the value is not a valid JWT format', () => {
-      expect(() => validators.validateJwtFormat('not a jwt')).toThrow(TypeError)
+      expect(() => validators.validateJwtFormat('not a jwt')).toThrow(/^format_error:.*/)
     })
   })
 
@@ -85,7 +85,7 @@ describe('validators', () => {
       expect(() => validators.validateCredentialSubject({ name: 'test' })).not.toThrow()
     })
     it('throws a TypeError if the value is an object with no attributes', () => {
-      expect(() => validators.validateCredentialSubject({})).toThrow(TypeError)
+      expect(() => validators.validateCredentialSubject({})).toThrow(/^schema_error:.*/)
     })
   })
 })

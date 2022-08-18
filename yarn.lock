@@ -4440,10 +4440,10 @@ did-jwt@^6.1.2:
     multiformats "^9.6.5"
     uint8arrays "^3.0.0"
 
-did-jwt@^6.2.2:
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-6.2.2.tgz#6a3e84bb0d75dee510ba2481f31b9c1530a41cc8"
-  integrity sha512-/OJBpNkNIUGZW5L5GzuSivpB+RvRhOdRKMQ9a3KAzyTNI85RUoxelqYDwmUOA6i+MKVeJQaONf4beT03ACgQ/w==
+did-jwt@^6.5.0:
+  version "6.5.0"
+  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-6.5.0.tgz#0179ed25db32c111a667563c0d7b54e5d6ecb939"
+  integrity sha512-yfdqk2N6+161Yeay4HMC5daic/HRIsc+W1r7JQlNtL14fmQyaPgJxnxpXdc7Qmwd+pMlfpi1oOEtraExDE6MzQ==
   dependencies:
     "@stablelib/ed25519" "^1.0.2"
     "@stablelib/random" "^1.0.1"
