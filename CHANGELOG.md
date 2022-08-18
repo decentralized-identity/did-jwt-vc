@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.14...3.0.0) (2022-08-18)
+
+
+### Features
+
+* add verification policies ([#119](https://github.com/decentralized-identity/did-jwt-vc/issues/119)) ([d44e803](https://github.com/decentralized-identity/did-jwt-vc/commit/d44e80355a4e266fbf30bed3ef5df4401861de6b)), closes [#118](https://github.com/decentralized-identity/did-jwt-vc/issues/118)
+
+
+### BREAKING CHANGES
+
+* The error messages are now prefixed with recognizable error codes. This is a breaking change if you were checking the exact error messages being returned before. Otherwise, it is safe to upgrade without issues.
+
 ## [2.1.14](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.13...2.1.14) (2022-08-03)
 
 
