@@ -2,33 +2,36 @@ import { createJWT, verifyJWT } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
 import * as validators from './validators'
 import {
-  JwtCredentialPayload,
-  Issuer,
-  JwtPresentationPayload,
-  JWT,
-  VerifiablePresentation,
-  VerifiableCredential,
+  CreateCredentialOptions,
+  CreatePresentationOptions,
   CredentialPayload,
+  Issuer,
+  JWT,
+  JWT_ALG,
+  JwtCredentialPayload,
+  JwtPresentationPayload,
   PresentationPayload,
   Verifiable,
-  W3CCredential,
-  W3CPresentation,
+  VerifiableCredential,
+  VerifiablePresentation,
   VerifiedCredential,
   VerifiedPresentation,
-  VerifyPresentationOptions,
-  CreatePresentationOptions,
-  CreateCredentialOptions,
   VerifyCredentialOptions,
-  JWT_ALG,
+  VerifyCredentialPolicies,
+  VerifyPresentationOptions,
+  W3CCredential,
+  W3CPresentation,
 } from './types'
 import {
-  transformCredentialInput,
-  transformPresentationInput,
+  asArray,
   normalizeCredential,
   normalizePresentation,
-  asArray,
   notEmpty,
+  transformCredentialInput,
+  transformPresentationInput,
 } from './converters'
+import { VC_ERROR, VC_JWT_ERROR } from './errors'
+
 export {
   Issuer,
   CredentialPayload,
@@ -46,19 +49,30 @@ export {
   transformPresentationInput,
   normalizeCredential,
   normalizePresentation,
+  VC_JWT_ERROR,
+}
+
+export {
+  CreateCredentialOptions,
+  CreatePresentationOptions,
+  VerifyCredentialOptions,
+  VerifyCredentialPolicies,
+  VerifyPresentationOptions,
 }
 
 /**
  * Creates a VerifiableCredential given a `CredentialPayload` or `JwtCredentialPayload` and an `Issuer`.
  *
  * This method transforms the payload into the [JWT encoding](https://www.w3.org/TR/vc-data-model/#jwt-encoding)
- * described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum spec
+ * described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum
+ * spec
  * required spec.
  *
  * The `issuer` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
  *
- * @param payload `CredentialPayload` or `JwtCredentialPayload`
- * @param issuer `Issuer` the DID, signer and algorithm that will sign the token
+ * @param payload - `CredentialPayload` or `JwtCredentialPayload`
+ * @param issuer - `Issuer` the DID, signer and algorithm that will sign the token
+ * @param options - Use these options to tweak the creation of the JWT Credential. These are forwarded to did-jwt.
  * @return a `Promise` that resolves to the JWT encoded verifiable credential or rejects with `TypeError` if the
  * `payload` is not W3C compliant
  */
@@ -90,14 +104,16 @@ export async function createVerifiableCredentialJwt(
  * Creates a VerifiablePresentation JWT given a `PresentationPayload` or `JwtPresentationPayload` and an `Issuer`.
  *
  * This method transforms the payload into the [JWT encoding](https://www.w3.org/TR/vc-data-model/#jwt-encoding)
- * described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum spec
+ * described in the [W3C VC spec](https://www.w3.org/TR/vc-data-model) and then validated to conform to the minimum
+ * spec
  * required spec.
  *
  * The `holder` is then used to assign an algorithm, override the `iss` field of the payload and then sign the JWT.
  *
- * @param payload `PresentationPayload` or `JwtPresentationPayload`
- * @param holder `Issuer` of the Presentation JWT (holder of the VC), signer and algorithm that will sign the token
- * @param options `CreatePresentationOptions` allows to pass additional values to the resulting JWT payload
+ * @param payload - `PresentationPayload` or `JwtPresentationPayload`
+ * @param holder - `Issuer` of the Presentation JWT (holder of the VC), signer and algorithm that will sign the token
+ * @param options - `CreatePresentationOptions` allows to pass additional values to the resulting JWT payload. These
+ *   options are forwarded to did-jwt.
  * @return a `Promise` that resolves to the JWT encoded verifiable presentation or rejects with `TypeError` if the
  * `payload` is not W3C compliant
  */
@@ -190,25 +206,32 @@ export function validatePresentationPayload(payload: PresentationPayload): void 
  *
  * @return a `Promise` that resolves to a `VerifiedCredential` or rejects with `TypeError` if the input is not
  * W3C compliant
- * @param vc the credential to be verified. Currently only the JWT encoding is supported by this library
- * @param resolver a configured `Resolver` (or an implementation of `Resolvable`) that can provide the DID document of the JWT issuer
+ * @param vc - the credential to be verified. Currently only the JWT encoding is supported by this library
+ * @param resolver - a configured `Resolver` (or an implementation of `Resolvable`) that can provide the DID document
+ *   of the JWT issuer
+ * @param options - optional tweaks to the verification process. These are forwarded to did-jwt.
  */
 export async function verifyCredential(
   vc: JWT,
   resolver: Resolvable,
   options: VerifyCredentialOptions = {}
 ): Promise<VerifiedCredential> {
+  const nbf = options?.policies?.issuanceDate === false ? false : undefined
+  const exp = options?.policies?.expirationDate === false ? false : undefined
+  options = { ...options, policies: { ...options?.policies, nbf, exp, iat: nbf } }
   const verified: Partial<VerifiedCredential> = await verifyJWT(vc, { resolver, ...options })
   verified.verifiableCredential = normalizeCredential(verified.jwt as string, options?.removeOriginalFields)
-  validateCredentialPayload(verified.verifiableCredential)
+  if (options?.policies?.format !== false) {
+    validateCredentialPayload(verified.verifiableCredential)
+  }
   return verified as VerifiedCredential
 }
 
 /**
  * Verifies that the given JwtPresentationPayload contains the appropriate options from VerifyPresentationOptions
  *
- * @param payload the JwtPresentationPayload to verify against
- * @param options the VerifyPresentationOptions that contain the optional values to verify.
+ * @param payload - the JwtPresentationPayload to verify against
+ * @param options - the VerifyPresentationOptions that contain the optional values to verify.
  * @throws {Error} If VerifyPresentationOptions are not satisfied
  */
 export function verifyPresentationPayloadOptions(
@@ -216,11 +239,13 @@ export function verifyPresentationPayloadOptions(
   options: VerifyPresentationOptions
 ): void {
   if (options.challenge && options.challenge !== payload.nonce) {
-    throw new Error(`Presentation does not contain the mandatory challenge (JWT: nonce) for : ${options.challenge}`)
+    throw new Error(
+      `${VC_ERROR.AUTH_ERROR}: Presentation does not contain the mandatory challenge (JWT: nonce) for : ${options.challenge}`
+    )
   }
 
   if (options.domain) {
-    // aud might be array
+    // aud might be an array
     let matchedAudience
     if (payload.aud) {
       const audArray = Array.isArray(payload.aud) ? payload.aud : [payload.aud]
@@ -228,7 +253,9 @@ export function verifyPresentationPayloadOptions(
     }
 
     if (typeof matchedAudience === 'undefined') {
-      throw new Error(`Presentation does not contain the mandatory domain (JWT: aud) for : ${options.domain}`)
+      throw new Error(
+        `${VC_ERROR.AUTH_ERROR}: Presentation does not contain the mandatory domain (JWT: aud) for : ${options.domain}`
+      )
     }
   }
 }
@@ -238,18 +265,27 @@ export function verifyPresentationPayloadOptions(
  *
  * @return a `Promise` that resolves to a `VerifiedPresentation` or rejects with `TypeError` if the input is
  * not W3C compliant or the VerifyPresentationOptions are not satisfied.
- * @param presentation the presentation to be verified. Currently only the JWT encoding is supported by this library
- * @param resolver a configured `Resolver` or an implementation of `Resolvable` that can provide the DID document of the JWT issuer (presentation holder)
- * @param options optional verification options that need to be satisfied
+ * @param presentation - the presentation to be verified. Currently only the JWT encoding is supported by this library
+ * @param resolver - a configured `Resolver` or an implementation of `Resolvable` that can provide the DID document of
+ *   the JWT issuer (presentation holder)
+ * @param options - optional verification options that need to be satisfied. These are also forwarded to did-jwt.
  */
 export async function verifyPresentation(
   presentation: JWT,
   resolver: Resolvable,
   options: VerifyPresentationOptions = {}
 ): Promise<VerifiedPresentation> {
-  const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, { resolver, ...options })
+  const nbf = options?.policies?.issuanceDate === false ? false : undefined
+  const exp = options?.policies?.expirationDate === false ? false : undefined
+  options = { audience: options.domain, ...options, policies: { ...options?.policies, nbf, exp, iat: nbf } }
+  const verified: Partial<VerifiedPresentation> = await verifyJWT(presentation, {
+    resolver,
+    ...options,
+  })
   verifyPresentationPayloadOptions(verified.payload as JwtPresentationPayload, options)
   verified.verifiablePresentation = normalizePresentation(verified.jwt as string, options?.removeOriginalFields)
-  validatePresentationPayload(verified.verifiablePresentation)
+  if (options?.policies?.format !== false) {
+    validatePresentationPayload(verified.verifiablePresentation)
+  }
   return verified as VerifiedPresentation
 }

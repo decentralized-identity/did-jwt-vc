@@ -2,6 +2,7 @@ import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from '.
 import { JwtCredentialSubject, DateType } from './types'
 import { VerifiableCredential } from '.'
 import { asArray } from './converters'
+import { VC_ERROR } from './errors'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isDateObject(input: any): input is Date {
@@ -10,7 +11,7 @@ function isDateObject(input: any): input is Date {
 
 export function validateJwtFormat(value: VerifiableCredential): void {
   if (typeof value === 'string' && !value.match(JWT_FORMAT)) {
-    throw new TypeError(`"${value}" is not a valid JWT format`)
+    throw new TypeError(`${VC_ERROR.FORMAT_ERROR}: "${value}" is not a valid JWT format`)
   }
 }
 
@@ -24,38 +25,38 @@ export function validateJwtFormat(value: VerifiableCredential): void {
 export function validateTimestamp(value: number | DateType): void {
   if (typeof value === 'number') {
     if (!(Number.isInteger(value) && value < 100000000000)) {
-      throw new TypeError(`"${value}" is not a unix timestamp in seconds`)
+      throw new TypeError(`${VC_ERROR.SCHEMA_ERROR}: "${value}" is not a unix timestamp in seconds`)
     }
   } else if (typeof value === 'string') {
     validateTimestamp(Math.floor(new Date(value).valueOf() / 1000))
   } else if (!isDateObject(value)) {
-    throw new TypeError(`"${value}" is not a valid time`)
+    throw new TypeError(`${VC_ERROR.SCHEMA_ERROR}: "${value}" is not a valid time`)
   }
 }
 
 export function validateContext(value: string | string[]): void {
   const input = asArray(value)
   if (input.length < 1 || input.indexOf(DEFAULT_CONTEXT) === -1) {
-    throw new TypeError(`@context is missing default context "${DEFAULT_CONTEXT}"`)
+    throw new TypeError(`${VC_ERROR.SCHEMA_ERROR}: @context is missing default context "${DEFAULT_CONTEXT}"`)
   }
 }
 
 export function validateVcType(value: string | string[]): void {
   const input = asArray(value)
   if (input.length < 1 || input.indexOf(DEFAULT_VC_TYPE) === -1) {
-    throw new TypeError(`type is missing default "${DEFAULT_VC_TYPE}"`)
+    throw new TypeError(`${VC_ERROR.SCHEMA_ERROR}: type is missing default "${DEFAULT_VC_TYPE}"`)
   }
 }
 
 export function validateVpType(value: string | string[]): void {
   const input = asArray(value)
   if (input.length < 1 || input.indexOf(DEFAULT_VP_TYPE) === -1) {
-    throw new TypeError(`type is missing default "${DEFAULT_VP_TYPE}"`)
+    throw new TypeError(`${VC_ERROR.SCHEMA_ERROR}: type is missing default "${DEFAULT_VP_TYPE}"`)
   }
 }
 
 export function validateCredentialSubject(value: JwtCredentialSubject): void {
   if (Object.keys(value).length === 0) {
-    throw new TypeError('credentialSubject must not be empty')
+    throw new TypeError(`${VC_ERROR.SCHEMA_ERROR}: credentialSubject must not be empty`)
   }
 }
