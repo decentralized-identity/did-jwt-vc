@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/decentralized-identity/did-jwt-vc/compare/3.0.0...3.0.1) (2022-08-18)
+
+
+### Bug Fixes
+
+* fix error type exports ([abebb0c](https://github.com/decentralized-identity/did-jwt-vc/commit/abebb0c2b746d9aef63434052e9cc075438100aa))
+
 # [3.0.0](https://github.com/decentralized-identity/did-jwt-vc/compare/2.1.14...3.0.0) (2022-08-18)
 
 
