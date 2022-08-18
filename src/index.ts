@@ -30,7 +30,9 @@ import {
   transformCredentialInput,
   transformPresentationInput,
 } from './converters'
-import { VC_ERROR, VC_JWT_ERROR } from './errors'
+import { VC_ERROR } from './validators'
+
+export { VC_ERROR, VC_JWT_ERROR } from './validators'
 
 export {
   Issuer,
@@ -49,7 +51,6 @@ export {
   transformPresentationInput,
   normalizeCredential,
   normalizePresentation,
-  VC_JWT_ERROR,
 }
 
 export {
