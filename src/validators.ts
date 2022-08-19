@@ -8,28 +8,28 @@ import { JWT_ERROR } from 'did-jwt'
  * Error prefixes used for known verification failure cases related to the
  * {@link https://www.w3.org/TR/vc-data-model/ | Verifiable Credential data model }
  */
-export const enum VC_ERROR {
+export const VC_ERROR = {
   /**
    * Thrown when the credential or presentation being verified does not conform to the data model defined by
    * {@link https://www.w3.org/TR/vc-data-model/ | the spec}
    */
-  SCHEMA_ERROR = 'schema_error',
+  SCHEMA_ERROR: 'schema_error',
 
   /**
    * Thrown when the input is not a JWT string
    */
-  FORMAT_ERROR = 'format_error',
+  FORMAT_ERROR: 'format_error',
 
   /**
    * Thrown when verifying a presentation where `challenge` and/or `domain` don't match the expected values.
    */
-  AUTH_ERROR = 'auth_error',
+  AUTH_ERROR: 'auth_error',
 }
 
 /**
  * Known validation or verification error prefixes.
  */
-export type VC_JWT_ERROR = VC_ERROR | JWT_ERROR
+export const VC_JWT_ERROR = { ...VC_ERROR, ...JWT_ERROR }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isDateObject(input: any): input is Date {
