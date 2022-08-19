@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/decentralized-identity/did-jwt-vc/compare/3.0.1...3.1.0) (2022-08-19)
+
+
+### Features
+
+* export VC_JWT_ERROR as plain object ([#121](https://github.com/decentralized-identity/did-jwt-vc/issues/121)) ([5f48d2a](https://github.com/decentralized-identity/did-jwt-vc/commit/5f48d2af1d8e2d57a3af46e4be5c6199f715734c)), closes [#120](https://github.com/decentralized-identity/did-jwt-vc/issues/120)
+
 ## [3.0.1](https://github.com/decentralized-identity/did-jwt-vc/compare/3.0.0...3.0.1) (2022-08-18)
 
 
