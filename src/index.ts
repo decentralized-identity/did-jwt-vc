@@ -1,4 +1,4 @@
-import { createJWT, decodeJWT, JWTHeader, JWTOptions, verifyJWT } from 'did-jwt'
+import { createJWT, createMultisignatureJWT, JWTHeader, JWTOptions, verifyJWT } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
 import * as validators from './validators'
 import {
@@ -103,27 +103,22 @@ export async function createVerifiableCredentialJwt(
     )
   } else {
     const did = issuer[0].did;
-    const jwtOptions: JWTOptions[] = [];
-    const jwtHeaders: Partial<JWTHeader>[] = [];
+    const issuers = [];
     for (const iss of issuer) {
       if (iss.did !== did) {
         throw new Error('All issuers must be the same did to comply with the Verifiable Conditions spec');
       }
-      jwtOptions.push({
-        ...options,
+      issuers.push({
         issuer: iss.did || parsedPayload.iss || '',
         signer: iss.signer,
-      })
-      jwtHeaders.push({
-        ...options.header,
         alg: iss.alg || options.header?.alg || JWT_ALG,
       })
     }
 
     return createMultisignatureJWT(
       parsedPayload,
-      jwtOptions,
-      jwtHeaders
+      {},
+      issuers
     )
   }
 }
