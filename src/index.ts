@@ -126,7 +126,7 @@ export async function createVerifiableCredentialJwt(
 // TODO write TSDoc
 export async function addSignatureToJwt(jwt: JWT, issuer: Issuer): Promise<JWT> {
   // TODO finish async signature add implementation
-  return "";
+  throw Error("Not implemented");
 }
 
 /**
