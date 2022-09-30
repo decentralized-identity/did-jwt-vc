@@ -117,7 +117,7 @@ export async function createVerifiableCredentialJwt(
 
     return createMultisignatureJWT(
       parsedPayload,
-      {},
+      { ...options },
       issuers
     )
   }
