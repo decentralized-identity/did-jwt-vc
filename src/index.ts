@@ -1,4 +1,4 @@
-import { createJWT, verifyJWT } from 'did-jwt'
+import { createJWT, createMultisignatureJWT, JWTHeader, JWTOptions, verifyJWT } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
 import * as validators from './validators'
 import {
@@ -79,7 +79,7 @@ export {
  */
 export async function createVerifiableCredentialJwt(
   payload: JwtCredentialPayload | CredentialPayload,
-  issuer: Issuer,
+  issuer: Issuer | Issuer[],
   options: CreateCredentialOptions = {}
 ): Promise<JWT> {
   const parsedPayload: JwtCredentialPayload = {
@@ -87,18 +87,46 @@ export async function createVerifiableCredentialJwt(
     ...transformCredentialInput(payload, options.removeOriginalFields),
   }
   validateJwtCredentialPayload(parsedPayload)
-  return createJWT(
-    parsedPayload,
-    {
-      ...options,
-      issuer: issuer.did || parsedPayload.iss || '',
-      signer: issuer.signer,
-    },
-    {
-      ...options.header,
-      alg: issuer.alg || options.header?.alg || JWT_ALG,
+
+  if (!Array.isArray(issuer)) {
+    return createJWT(
+      parsedPayload,
+      {
+        ...options,
+        issuer: issuer.did || parsedPayload.iss || '',
+        signer: issuer.signer,
+      },
+      {
+        ...options.header,
+        alg: issuer.alg || options.header?.alg || JWT_ALG,
+      }
+    )
+  } else {
+    const did = issuer[0].did;
+    const issuers = [];
+    for (const iss of issuer) {
+      if (iss.did !== did) {
+        throw new Error('All issuers must be the same did to comply with the Verifiable Conditions spec');
+      }
+      issuers.push({
+        issuer: iss.did || parsedPayload.iss || '',
+        signer: iss.signer,
+        alg: iss.alg || options.header?.alg || JWT_ALG,
+      })
     }
-  )
+
+    return createMultisignatureJWT(
+      parsedPayload,
+      { ...options },
+      issuers
+    )
+  }
+}
+
+// TODO write TSDoc
+export async function addSignatureToJwt(jwt: JWT, issuer: Issuer): Promise<JWT> {
+  // TODO finish async signature add implementation
+  throw Error("Not implemented");
 }
 
 /**
