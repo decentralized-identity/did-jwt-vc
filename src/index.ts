@@ -102,11 +102,11 @@ export async function createVerifiableCredentialJwt(
       }
     )
   } else {
-    const did = issuer[0].did;
-    const issuers = [];
+    const did = issuer[0].did
+    const issuers = []
     for (const iss of issuer) {
       if (iss.did !== did) {
-        throw new Error('All issuers must be the same did to comply with the Verifiable Conditions spec');
+        throw new Error('All issuers must be the same did to comply with the Verifiable Conditions spec')
       }
       issuers.push({
         issuer: iss.did || parsedPayload.iss || '',
@@ -115,18 +115,14 @@ export async function createVerifiableCredentialJwt(
       })
     }
 
-    return createMultisignatureJWT(
-      parsedPayload,
-      { ...options },
-      issuers
-    )
+    return createMultisignatureJWT(parsedPayload, { ...options }, issuers)
   }
 }
 
 // TODO write TSDoc
 export async function addSignatureToJwt(jwt: JWT, issuer: Issuer): Promise<JWT> {
   // TODO finish async signature add implementation
-  throw Error("Not implemented");
+  throw Error('Not implemented')
 }
 
 /**
