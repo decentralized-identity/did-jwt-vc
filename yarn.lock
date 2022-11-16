@@ -3415,7 +3415,7 @@
     "@stablelib/xchacha20poly1305" "^1.0.1"
     "bech32" "^2.0.0"
     "canonicalize" "^1.0.8"
-    "did-resolver" "^4.0.0"
+    "did-resolver" "file:../did-resolver"
     "elliptic" "^6.5.4"
     "js-sha3" "^0.8.0"
     "multiformats" "^9.6.5"
@@ -3426,10 +3426,9 @@
   "resolved" "https://registry.npmjs.org/did-resolver/-/did-resolver-3.2.2.tgz"
   "version" "3.2.2"
 
-"did-resolver@^4.0.0":
-  "integrity" "sha512-/roxrDr9EnAmLs+s9T+8+gcpilMo+IkeytcsGO7dcxvTmVJ+0Rt60HtV8o0UXHhGBo0Q+paMH/0ffXz1rqGFYg=="
-  "resolved" "https://registry.npmjs.org/did-resolver/-/did-resolver-4.0.0.tgz"
-  "version" "4.0.0"
+"did-resolver@file:../did-resolver":
+  "resolved" "file:../did-resolver"
+  "version" "4.0.1"
 
 "diff-sequences@^28.1.1":
   "integrity" "sha512-FU0iFaH/E23a+a718l8Qa/19bF9p06kgE0KipMOMadwa3SjnaElKzPaUC0vnibs6/B/9ni97s61mcejk8W1fQw=="
