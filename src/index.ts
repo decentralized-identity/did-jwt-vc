@@ -80,7 +80,7 @@ export {
 export async function createVerifiableCredentialJwt(
   payload: JwtCredentialPayload | CredentialPayload,
   issuer: Issuer | Issuer[],
-  options: CreateCredentialOptions = {}
+  options: CreateCredentialOptions = { canonicalize: true }
 ): Promise<JWT> {
   const parsedPayload: JwtCredentialPayload = {
     iat: undefined,
@@ -106,7 +106,7 @@ export async function createVerifiableCredentialJwt(
     const issuers = []
     for (const iss of issuer) {
       if (iss.did !== did) {
-        throw new Error('All issuers must be the same did to comply with the Verifiable Conditions spec')
+        throw new Error('All issuers must be the same did to comply with the Conditional Proof spec')
       }
       issuers.push({
         issuer: iss.did || parsedPayload.iss || '',
