@@ -1,5 +1,5 @@
 {
-  "name": "did-jwt-vc",
+  "name": "@tonomy-foundation/did-jwt-vc",
   "version": "3.1.0",
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
   "type": "module",
@@ -9,6 +9,13 @@
   "unpkg": "./lib/index.umd.js",
   "types": "./lib/index.d.ts",
   "umd:main": "./lib/index.umd.js",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "np": {
+    "contents": "lib"
+  },
   "files": [
     "lib",
     "dist",
