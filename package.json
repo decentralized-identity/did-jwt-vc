@@ -1,5 +1,5 @@
 {
-  "name": "@tonomy-foundation/did-jwt-vc",
+  "name": "@tonomy/did-jwt-vc",
   "version": "3.1.0",
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
   "type": "module",
@@ -43,8 +43,8 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "file:../did-jwt",
-    "did-resolver": "file:../did-resolver"
+    "did-jwt": "@tonomy/did-jwt",
+    "did-resolver": "@tonomy/did-resolver"
   },
   "repository": {
     "type": "git",
