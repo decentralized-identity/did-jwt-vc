@@ -2,7 +2,7 @@ import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from '.
 import { JwtCredentialSubject, DateType } from './types'
 import { VerifiableCredential } from '.'
 import { asArray } from './converters'
-import { JWT_ERROR } from 'did-jwt'
+import { JWT_ERROR } from '@tonomy/did-jwt'
 
 /**
  * Error prefixes used for known verification failure cases related to the

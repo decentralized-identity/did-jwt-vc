@@ -1,4 +1,4 @@
-import { Signer, JWTVerified, JWTHeader, JWTOptions, JWTVerifyOptions } from 'did-jwt'
+import { Signer, JWTVerified, JWTHeader, JWTOptions, JWTVerifyOptions } from '@tonomy/did-jwt'
 
 export const JWT_ALG = 'ES256K'
 export const DID_FORMAT = /^did:([a-zA-Z0-9_]+):([:[a-zA-Z0-9_.-]+)(\/[^#]*)?(#.*)?$/
