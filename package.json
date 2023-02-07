@@ -43,8 +43,8 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "@tonomy/did-jwt",
-    "did-resolver": "@tonomy/did-resolver"
+    "@tonomy/did-jwt": "^6.9.2",
+    "@tonomy/did-resolver": "^4.0.4"
   },
   "repository": {
     "type": "git",
