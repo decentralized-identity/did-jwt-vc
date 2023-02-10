@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/decentralized-identity/did-jwt-vc/compare/3.1.0...3.1.1) (2023-02-10)
+
+
+### Bug Fixes
+
+* **deps:** bump did-jwt to v6.11 ([#126](https://github.com/decentralized-identity/did-jwt-vc/issues/126)) ([eb14e31](https://github.com/decentralized-identity/did-jwt-vc/commit/eb14e311f909e0ddb61e3d589bd6847bfe9ed1ac))
+
 # [3.1.0](https://github.com/decentralized-identity/did-jwt-vc/compare/3.0.1...3.1.0) (2022-08-19)
 
 
