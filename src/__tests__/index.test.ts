@@ -8,8 +8,8 @@ import {
   verifyPresentation,
   verifyPresentationPayloadOptions,
 } from '../index'
-import { decodeJWT, ES256KSigner, hexToBytes } from '@tonomy/did-jwt'
-import { Resolvable } from '@tonomy/did-resolver'
+import { decodeJWT, ES256KSigner, hexToBytes } from 'did-jwt'
+import { Resolvable } from 'did-resolver'
 import {
   CreatePresentationOptions,
   DEFAULT_CONTEXT,

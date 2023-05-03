@@ -9,7 +9,7 @@ Create and verify W3C Verifiable Credentials and Presentations in JWT format
 ## Installation
 
 ```
-npm install @tonomy/did-jwt-vc
+npm install did-jwt-vc
 ```
 
 ## Usage

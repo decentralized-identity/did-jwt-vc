@@ -1,5 +1,5 @@
-import { createJWT, createMultisignatureJWT, JWTHeader, JWTOptions, verifyJWT } from '@tonomy/did-jwt'
-import { Resolvable } from '@tonomy/did-resolver'
+import { createJWT, createMultisignatureJWT, JWTHeader, JWTOptions, verifyJWT } from 'did-jwt'
+import { Resolvable } from 'did-resolver'
 import * as validators from './validators'
 import {
   CreateCredentialOptions,

@@ -13,7 +13,7 @@ import {
   PresentationPayload,
   W3CPresentation,
 } from './types'
-import { decodeJWT } from '@tonomy/did-jwt'
+import { decodeJWT } from 'did-jwt'
 
 /*
  * Additional W3C VC fields:
@@ -32,14 +32,14 @@ function deepCopy<T>(source: T): T {
   return Array.isArray(source)
     ? source.map((item) => deepCopy(item))
     : source instanceof Date
-    ? new Date(source.getTime())
-    : source && typeof source === 'object'
-    ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
-        Object.defineProperty(o, prop, Object.getOwnPropertyDescriptor(source, prop) as NonNullable<PropertyDescriptor>)
-        o[prop] = deepCopy(source[prop as keyof T])
-        return o
-      }, Object.create(Object.getPrototypeOf(source)))
-    : (source as T)
+      ? new Date(source.getTime())
+      : source && typeof source === 'object'
+        ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
+          Object.defineProperty(o, prop, Object.getOwnPropertyDescriptor(source, prop) as NonNullable<PropertyDescriptor>)
+          o[prop] = deepCopy(source[prop as keyof T])
+          return o
+        }, Object.create(Object.getPrototypeOf(source)))
+        : (source as T)
 }
 
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
