@@ -1,4 +1,4 @@
-import { createJWT, createMultisignatureJWT, JWTHeader, JWTOptions, verifyJWT } from 'did-jwt'
+import { createJWT, createMultisignatureJWT, verifyJWT } from 'did-jwt'
 import { Resolvable } from 'did-resolver'
 import * as validators from './validators'
 import {
@@ -119,7 +119,15 @@ export async function createVerifiableCredentialJwt(
   }
 }
 
-// TODO write TSDoc
+/**
+ * Adds an additional signature to an already signed VerifiableCredential 
+ * given a `jwt` and an `Issuer`.
+ *
+ * @param {JWT} jwt - The JWT to add a new signature to
+ * @param {Issuer} issuer - The issuer to use to sign the JWT
+ *
+ * @returns {Promise<JWT>} - The JWT with the new signature added
+ */
 export async function addSignatureToJwt(jwt: JWT, issuer: Issuer): Promise<JWT> {
   // TODO finish async signature add implementation
   throw Error('Not implemented')
