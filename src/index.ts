@@ -120,20 +120,6 @@ export async function createVerifiableCredentialJwt(
 }
 
 /**
- * Adds an additional signature to an already signed VerifiableCredential 
- * given a `jwt` and an `Issuer`.
- *
- * @param {JWT} jwt - The JWT to add a new signature to
- * @param {Issuer} issuer - The issuer to use to sign the JWT
- *
- * @returns {Promise<JWT>} - The JWT with the new signature added
- */
-export async function addSignatureToJwt(jwt: JWT, issuer: Issuer): Promise<JWT> {
-  // TODO finish async signature add implementation
-  throw Error('Not implemented')
-}
-
-/**
  * Creates a VerifiablePresentation JWT given a `PresentationPayload` or `JwtPresentationPayload` and an `Issuer`.
  *
  * This method transforms the payload into the [JWT encoding](https://www.w3.org/TR/vc-data-model/#jwt-encoding)
