@@ -36,8 +36,8 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^7.0.0",
-    "did-resolver": "^4.0.0"
+    "did-jwt": "^7.1.0",
+    "did-resolver": "^4.1.0"
   },
   "repository": {
     "type": "git",
