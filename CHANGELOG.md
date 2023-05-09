@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/decentralized-identity/did-jwt-vc/compare/3.1.4...3.2.0) (2023-05-09)
+
+
+### Features
+
+* support credentials using ConditionalProof2022 ([#133](https://github.com/decentralized-identity/did-jwt-vc/issues/133)) ([6cc9bed](https://github.com/decentralized-identity/did-jwt-vc/commit/6cc9bed2bda35d60ef29e1e4cd9318f89e2d2f70))
+
 ## [3.1.4](https://github.com/decentralized-identity/did-jwt-vc/compare/3.1.3...3.1.4) (2023-05-04)
 
 
