@@ -1,11 +1,18 @@
-import { Signer, JWTVerified, JWTHeader, JWTOptions, JWTVerifyOptions } from 'did-jwt'
+import type { Signer, JWTVerified, JWTHeader, JWTOptions, JWTVerifyOptions } from 'did-jwt'
 
 export const JWT_ALG = 'ES256K'
-export const DID_FORMAT = /^did:([a-zA-Z0-9_]+):([:[a-zA-Z0-9_.-]+)(\/[^#]*)?(#.*)?$/
 export const JWT_FORMAT = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/
 export const DEFAULT_CONTEXT = 'https://www.w3.org/2018/credentials/v1'
 export const DEFAULT_VC_TYPE = 'VerifiableCredential'
 export const DEFAULT_VP_TYPE = 'VerifiablePresentation'
+/**
+ * The `JwtProof2020` is a synthetic proof type, usable for differentiating credentials by proof type when representing
+ * JWT credentials as W3C VC JSON. It is not a registered W3C VC Data Model algorithm and should not be treated as
+ * such.
+ *
+ * This proof type is only intended as a convenience and does not actually prove the validity of a VC/VP in JSON
+ * representation. The actual verifiable credential or presentation is represented in the `jwt` property.
+ */
 export const DEFAULT_JWT_PROOF_TYPE = 'JwtProof2020'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,7 +74,7 @@ export type IssuerType = Extensible<{ id: string }> | string
 export type DateType = string | Date
 
 /**
- * used as input when creating Verifiable Credentials
+ * Used as input when creating Verifiable Credentials
  */
 interface FixedCredentialPayload {
   '@context': string | string[]
@@ -113,7 +120,7 @@ type Extensible<T> = T & { [x: string]: any }
 /**
  * This data type represents a parsed VerifiableCredential.
  * It is meant to be an unambiguous representation of the properties of a Credential and is usually the result of a
- * transformation method.
+ * transformation method. See `transformCredentialInput()` for more details.
  *
  * `issuer` is always an object with an `id` property and potentially other app specific issuer claims
  * `issuanceDate` is an ISO DateTime string
@@ -154,7 +161,7 @@ interface NarrowPresentationDefinitions {
 /**
  * This data type represents a parsed Presentation payload.
  * It is meant to be an unambiguous representation of the properties of a Presentation and is usually the result of a
- * transformation method.
+ * transformation method. See `transformPresentationInput()` for more details.
  *
  * The `verifiableCredential` array should contain parsed `Verifiable<Credential>` elements.
  * Any JWT specific properties are transformed to the broader W3C variant and any other app specific properties are
