@@ -1,13 +1,13 @@
 import { createJWT, createMultisignatureJWT, verifyJWT } from 'did-jwt'
-import { Resolvable } from 'did-resolver'
-import * as validators from './validators'
-import {
+import type { Resolvable } from 'did-resolver'
+import * as validators from './validators.js'
+import { VC_ERROR } from './validators.js'
+import type {
   CreateCredentialOptions,
   CreatePresentationOptions,
   CredentialPayload,
   Issuer,
   JWT,
-  JWT_ALG,
   JwtCredentialPayload,
   JwtPresentationPayload,
   PresentationPayload,
@@ -21,7 +21,8 @@ import {
   VerifyPresentationOptions,
   W3CCredential,
   W3CPresentation,
-} from './types'
+} from './types.js'
+import { JWT_ALG } from './types.js'
 import {
   asArray,
   normalizeCredential,
@@ -29,12 +30,11 @@ import {
   notEmpty,
   transformCredentialInput,
   transformPresentationInput,
-} from './converters'
-import { VC_ERROR } from './validators'
+} from './converters.js'
 
-export { VC_ERROR, VC_JWT_ERROR } from './validators'
+export { VC_ERROR, VC_JWT_ERROR } from './validators.js'
 
-export {
+export type {
   Issuer,
   CredentialPayload,
   PresentationPayload,
@@ -47,19 +47,14 @@ export {
   Verifiable,
   W3CCredential,
   W3CPresentation,
-  transformCredentialInput,
-  transformPresentationInput,
-  normalizeCredential,
-  normalizePresentation,
-}
-
-export {
   CreateCredentialOptions,
   CreatePresentationOptions,
   VerifyCredentialOptions,
   VerifyCredentialPolicies,
   VerifyPresentationOptions,
 }
+
+export { transformCredentialInput, transformPresentationInput, normalizeCredential, normalizePresentation }
 
 /**
  * Creates a VerifiableCredential given a `CredentialPayload` or `JwtCredentialPayload` and an `Issuer`.

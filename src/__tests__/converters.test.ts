@@ -1,3 +1,5 @@
+// noinspection JSUnusedLocalSymbols
+
 import {
   normalizeCredential,
   transformCredentialInput,
@@ -8,8 +10,10 @@ import { DEFAULT_JWT_PROOF_TYPE } from '../types'
 import { CredentialPayload, PresentationPayload } from '../types'
 import { validateJwtCredentialPayload, validateJwtPresentationPayload } from '..'
 
+import * as u8a from 'uint8arrays'
+
 function encodeBase64Url(input: string): string {
-  return Buffer.from(input, 'utf-8').toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+  return u8a.toString(u8a.fromString(input, 'utf-8'), 'base64url')
 }
 
 describe('credential', () => {
@@ -1775,7 +1779,7 @@ describe('presentation', () => {
       })
 
       it('filters null or undefined values in aud', () => {
-        const result = transformPresentationInput({ verifier: ['foo', null], aud: ['bar', undefined] })
+        const result = transformPresentationInput({ verifier: ['foo', null], aud: ['bar', undefined] as any })
         expect(result).toMatchObject({ aud: ['foo', 'bar'] })
       })
 

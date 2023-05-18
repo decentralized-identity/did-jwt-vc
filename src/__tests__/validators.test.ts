@@ -1,10 +1,5 @@
 import * as validators from '../validators'
 import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE } from '../types'
-
-export const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
-export const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
-export const INVALID_DID = 'this is not a valid did'
-export const INVALID_TIMESTAMP = 1563905309015
 export const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
 export const EXTRA_CONTEXT_B = 'custom vc context'
 export const EXTRA_TYPE_A = 'UniversityDegreeCredential'

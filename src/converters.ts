@@ -15,7 +15,7 @@ import {
 } from './types'
 import { decodeJWT } from 'did-jwt'
 
-/*
+/**
  * Additional W3C VC fields:
  * These are defined as optional top-level properties in the W3C spec but are not mapped to top-level JWT names,
  * so they should be moved inside the "vc" object when transforming to a JWT.
@@ -47,7 +47,7 @@ export function notEmpty<TValue>(value: TValue | null | undefined): value is TVa
 }
 
 function cleanUndefined<T>(input: T): T {
-  if (typeof input !== 'object') {
+  if (typeof input !== 'object' || input === null) {
     return input
   }
   const obj = { ...input }
@@ -187,10 +187,13 @@ function normalizeJwtCredential(input: JWT, removeOriginalFields = true): Verifi
 }
 
 /**
- * Normalizes a credential payload into an unambiguous W3C credential data type
- * In case of conflict, Existing W3C Credential specific properties take precedence,
- * except for arrays and object types which get merged.
- * @param input either a JWT or JWT payload, or a VerifiableCredential
+ * Normalizes a credential payload into an unambiguous W3C credential data type In case of conflict, existing W3C
+ * Credential specific properties take precedence, except for arrays and object types which get merged.
+ *
+ * @param input - either a JWT or JWT payload, or a VerifiableCredential
+ * @param removeOriginalFields - if true, removes all fields that were transformed according to the W3C mapping
+ *
+ * @see {@link https://www.w3.org/TR/vc-data-model/#jwt-encoding | VC JWT encoding }
  */
 export function normalizeCredential(
   input: Partial<VerifiableCredential> | Partial<JwtCredentialPayload>,
@@ -227,7 +230,10 @@ type DeepPartial<T> = T extends Record<string, unknown> ? { [K in keyof T]?: Dee
  * Transforms a W3C Credential payload into a JWT compatible encoding.
  * The method accepts app specific fields and in case of collision, existing JWT properties will take precedence.
  * Also, `nbf`, `exp` and `jti` properties can be explicitly set to `undefined` and they will be kept intact.
- * @param input either a JWT payload or a CredentialPayloadInput
+ * @param input - either a JWT payload or a CredentialPayloadInput
+ * @param removeOriginalFields - if true, removes original W3C fields from the resulting object
+ *
+ * @see {@link https://www.w3.org/TR/vc-data-model/#jwt-encoding | VC JWT encoding }
  */
 export function transformCredentialInput(
   input: Partial<CredentialPayload> | DeepPartial<JwtCredentialPayload>,
@@ -431,8 +437,12 @@ function normalizeJwtPresentation(input: JWT, removeOriginalFields = true): Veri
 }
 
 /**
- * Normalizes a presentation payload into an unambiguous W3C Presentation data type
- * @param input either a JWT or JWT payload, or a VerifiablePresentation
+ * Normalizes a presentation payload into an unambiguous W3C Presentation data type.
+ *
+ * @see {@link https://www.w3.org/TR/vc-data-model/#jwt-encoding | VP JWT encoding }
+ *
+ * @param input - either a JWT or JWT payload, or a VerifiablePresentation
+ * @param removeOriginalFields - if true, removes all fields that were transformed according to the W3C mapping
  */
 export function normalizePresentation(
   input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload> | JWT,
@@ -464,7 +474,10 @@ export function normalizePresentation(
  * Transforms a W3C Presentation payload into a JWT compatible encoding.
  * The method accepts app specific fields and in case of collision, existing JWT properties will take precedence.
  * Also, `nbf`, `exp` and `jti` properties can be explicitly set to `undefined` and they will be kept intact.
- * @param input either a JWT payload or a CredentialPayloadInput
+ * @param input - either a JWT payload or a CredentialPayloadInput
+ * @param removeOriginalFields - when true, removes the original W3C fields from the resulting object
+ *
+ * @see {@link https://www.w3.org/TR/vc-data-model/#jwt-encoding | VP JWT encoding }
  */
 export function transformPresentationInput(
   input: Partial<PresentationPayload> | DeepPartial<JwtPresentationPayload>,
