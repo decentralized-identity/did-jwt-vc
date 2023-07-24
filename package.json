@@ -51,7 +51,7 @@
     "@types/elliptic": "6.4.14",
     "@types/faker": "6.6.9",
     "@types/jest": "29.5.3",
-    "@types/node": "20.4.2",
+    "@types/node": "20.4.4",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
     "cross-env": "7.0.3",
