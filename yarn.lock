@@ -3552,10 +3552,10 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-17.0.40.tgz"
   integrity sha512-UXdBxNGqTMtm7hCwh9HtncFVLrXoqA3oJW30j6XWp5BH/wu3mVeaxo7cq5benFdBw34HB3XDT2TRPI7rXZ+mDg==
 
-"@types/node@20.6.5":
-  version "20.6.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.6.5.tgz#4c6a79adf59a8e8193ac87a0e522605b16587258"
-  integrity sha512-2qGq5LAOTh9izcc0+F+dToFigBWiK1phKPt7rNhOqJSr35y8rlIBjDwGtFSgAI6MGIhjwOVNSQZVdJsZJ2uR1w==
+"@types/node@20.8.0":
+  version "20.8.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.0.tgz#10ddf0119cf20028781c06d7115562934e53f745"
+  integrity sha512-LzcWltT83s1bthcvjBmiBvGJiiUe84NWRHkw+ZV6Fr41z2FbIzvc815dk2nQ3RAKMuN2fkenM/z3Xv2QzEpYxQ==
 
 "@types/normalize-package-data@^2.4.0", "@types/normalize-package-data@^2.4.1":
   version "2.4.1"
@@ -5198,10 +5198,10 @@ eslint-config-prettier@8.10.0:
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.10.0.tgz#3a06a662130807e2502fc3ff8b4143d8a0658e11"
   integrity sha512-SM8AMJdeQqRYT9O9zguiruQZaN7+z+E4eAP9oiLNGKMtomwaB1E9dcgUD6ZAn/eQAb52USbvezbiljfZUhbJcg==
 
-eslint-plugin-jest@27.4.0:
-  version "27.4.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-27.4.0.tgz#3926cca723c40c3d7a3fe0e1fd911eff5e681f50"
-  integrity sha512-ukVeKmMPAUA5SWjHenvyyXnirKfHKMdOsTZdn5tZx5EW05HGVQwBohigjFZGGj3zuv1cV6hc82FvWv6LdIbkgg==
+eslint-plugin-jest@27.4.2:
+  version "27.4.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-27.4.2.tgz#181d999ac67a9b6040db1d27935887cf5a2882ed"
+  integrity sha512-3Nfvv3wbq2+PZlRTf2oaAWXWwbdBejFRBR2O8tAO67o+P8zno+QGbcDYaAXODlreXVg+9gvWhKKmG2rgfb8GEg==
   dependencies:
     "@typescript-eslint/utils" "^5.10.0"
 
@@ -5383,10 +5383,10 @@ ethr-did-resolver@^8.0.0:
     "@ethersproject/transactions" "^5.6.2"
     did-resolver "^4.0.1"
 
-ethr-did@2.3.22:
-  version "2.3.22"
-  resolved "https://registry.yarnpkg.com/ethr-did/-/ethr-did-2.3.22.tgz#6eed097ecf4d77cfc227d9288985e8be978796c3"
-  integrity sha512-IJi1uDsU9fVxXxTFT1KfIHgxfGmrmAywq+dfvRHJ9KehoR2YxI/PTdZvYVhTkM+Kt+GGB39i7iTbqzgt1jkA1A==
+ethr-did@2.3.23:
+  version "2.3.23"
+  resolved "https://registry.yarnpkg.com/ethr-did/-/ethr-did-2.3.23.tgz#6c3323e94d8b93cd723117c7f6e7de5852851b0f"
+  integrity sha512-uIXJeo7q/pMnxdCchmTjBfXjarLSpqxLwtUrfp8Ds67lJuny/CGDSgaPnducBN7DpV0mV8x7dAx5JhpHeHWe2A==
   dependencies:
     "@ethersproject/abstract-signer" "^5.7.0"
     "@ethersproject/base64" "^5.7.0"
