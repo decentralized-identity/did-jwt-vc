@@ -9,11 +9,11 @@ import {
 import { DEFAULT_JWT_PROOF_TYPE } from '../types'
 import { CredentialPayload, PresentationPayload } from '../types'
 import { validateJwtCredentialPayload, validateJwtPresentationPayload } from '..'
+import { bytesToBase64url } from 'did-jwt'
+import { utf8ToBytes } from '@noble/curves/abstract/utils'
 
-import * as u8a from 'uint8arrays'
-
-function encodeBase64Url(input: string): string {
-  return u8a.toString(u8a.fromString(input, 'utf-8'), 'base64url')
+function encodeBase64url(s: string): string {
+  return bytesToBase64url(utf8ToBytes(s))
 }
 
 describe('credential', () => {
@@ -602,7 +602,7 @@ describe('credential', () => {
         const payload = JSON.stringify(complexInput)
         const header = '{}'
 
-        const credential = `${encodeBase64Url(header)}.${encodeBase64Url(payload)}.signature`
+        const credential = `${encodeBase64url(header)}.${encodeBase64url(payload)}.signature`
 
         const result = normalizeCredential(credential)
 
@@ -622,7 +622,7 @@ describe('credential', () => {
         const payload = JSON.stringify(complexInput)
         const header = '{}'
 
-        const credential = `${encodeBase64Url(header)}.${encodeBase64Url(payload)}.signature`
+        const credential = `${encodeBase64url(header)}.${encodeBase64url(payload)}.signature`
 
         const result = normalizeCredential(credential, false)
 

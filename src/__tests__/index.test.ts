@@ -1,6 +1,5 @@
 import { EthrDID } from 'ethr-did'
 import type { Issuer, JwtCredentialPayload } from '../index.js'
-
 import {
   createVerifiableCredentialJwt,
   createVerifiablePresentationJwt,
@@ -9,7 +8,7 @@ import {
   verifyPresentationPayloadOptions,
 } from '../index.js'
 
-import { decodeJWT, ES256KSigner, hexToBytes } from 'did-jwt'
+import { bytesToBase64url, decodeJWT, ES256KSigner, hexToBytes } from 'did-jwt'
 import type { Resolvable } from 'did-resolver'
 import {
   type CreatePresentationOptions,
@@ -18,13 +17,9 @@ import {
   DEFAULT_VP_TYPE,
   type VerifyPresentationOptions,
 } from '../types.js'
-
-import elliptic from 'elliptic'
-import * as u8a from 'uint8arrays'
+import { secp256k1 } from '@noble/curves/secp256k1'
 
 import { jest } from '@jest/globals'
-
-const secp256k1 = new elliptic.ec('secp256k1')
 
 const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
 const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
@@ -375,12 +370,13 @@ describe('github #98', () => {
   it('verifies a JWT issued by a DID with publicKeyJwk', async () => {
     const did = `did:ion:long-form-mock`
     const privateKeyHex = '278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f'
-    const pubKey = secp256k1.keyFromPrivate(privateKeyHex, 'hex').getPublic()
+    const pubKeyBytes = secp256k1.getPublicKey(privateKeyHex, false)
+    const point = secp256k1.ProjectivePoint.fromHex(pubKeyBytes).toAffine()
     const publicKeyJwk = {
       kty: 'EC',
       crv: 'secp256k1',
-      x: u8a.toString(pubKey.getX().toBuffer(), 'base64url'),
-      y: u8a.toString(pubKey.getY().toBuffer(), 'base64url'),
+      x: bytesToBase64url(hexToBytes(point.x.toString(16))),
+      y: bytesToBase64url(hexToBytes(point.y.toString(16))),
     }
 
     const localResolver: Resolvable = {

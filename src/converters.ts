@@ -34,11 +34,18 @@ function deepCopy<T>(source: T): T {
     : source instanceof Date
     ? new Date(source.getTime())
     : source && typeof source === 'object'
-    ? Object.getOwnPropertyNames(source).reduce((o, prop) => {
-        Object.defineProperty(o, prop, Object.getOwnPropertyDescriptor(source, prop) as NonNullable<PropertyDescriptor>)
-        o[prop] = deepCopy(source[prop as keyof T])
-        return o
-      }, Object.create(Object.getPrototypeOf(source)))
+    ? Object.getOwnPropertyNames(source).reduce(
+        (o, prop) => {
+          Object.defineProperty(
+            o,
+            prop,
+            Object.getOwnPropertyDescriptor(source, prop) as NonNullable<PropertyDescriptor>
+          )
+          o[prop] = deepCopy(source[prop as keyof T])
+          return o
+        },
+        Object.create(Object.getPrototypeOf(source))
+      )
     : (source as T)
 }
 
