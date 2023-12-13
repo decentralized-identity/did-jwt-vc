@@ -2965,9 +2965,9 @@
     picomatch "^2.2.2"
 
 "@scure/base@^1.1.3":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.4.tgz#cb6a3552ee15595d9864a0a4e89ffcd21ebe8c39"
-  integrity sha512-wznebWtt+ejH8el87yuD4i9xLSbYZXf1Pe4DY0o/zq/eg5I0VQVXVbFs6XIM0pNVCJ/uE3t5wI9kh90mdLUxtw==
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.5.tgz#1d85d17269fe97694b9c592552dd9e5e33552157"
+  integrity sha512-Brj9FiG2W1MRQSTB212YVPRrcbjkv48FoZi/u4l/zds/ieRrqsh7aUf6CLwkAq61oKXr/ZlTzlY66gLIj3TFTQ==
 
 "@semantic-release/changelog@6.0.3":
   version "6.0.3"
@@ -4585,9 +4585,9 @@ did-jwt@^7.2.0:
     uint8arrays "^4.0.3"
 
 did-jwt@^7.4.5:
-  version "7.4.6"
-  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-7.4.6.tgz#7196b31c35a8d613ed59d18cc0ae697b30a3e093"
-  integrity sha512-+EIGBlngr2fwaDQoOyxgVqms+JfRyxI0u9Zv6+/YQ/cVoDcLtF1W9cVEUx/P+NVmCWifeNq34EClrcDnv8z2Qw==
+  version "7.4.7"
+  resolved "https://registry.yarnpkg.com/did-jwt/-/did-jwt-7.4.7.tgz#44105fb0a0cdfd78c087de52087422075c674700"
+  integrity sha512-Apz7nIfIHSKWIMaEP5L/K8xkwByvjezjTG0xiqwKdnNj1x8M0+Yasury5Dm/KPltxi2PlGfRPf3IejRKZrT8mQ==
   dependencies:
     "@noble/ciphers" "^0.4.0"
     "@noble/curves" "^1.0.0"
