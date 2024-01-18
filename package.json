@@ -35,7 +35,7 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^7.4.5",
+    "did-jwt": "^8.0.0",
     "did-resolver": "^4.1.0"
   },
   "repository": {
@@ -60,7 +60,7 @@
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-jest": "27.6.0",
     "eslint-plugin-prettier": "5.0.1",
-    "ethr-did": "3.0.4",
+    "ethr-did": "3.0.13",
     "faker": "6.6.6",
     "jest": "29.7.0",
     "microbundle": "0.15.1",
