@@ -32,21 +32,21 @@ function deepCopy<T>(source: T): T {
   return Array.isArray(source)
     ? source.map((item) => deepCopy(item))
     : source instanceof Date
-    ? new Date(source.getTime())
-    : source && typeof source === 'object'
-    ? Object.getOwnPropertyNames(source).reduce(
-        (o, prop) => {
-          Object.defineProperty(
-            o,
-            prop,
-            Object.getOwnPropertyDescriptor(source, prop) as NonNullable<PropertyDescriptor>
+      ? new Date(source.getTime())
+      : source && typeof source === 'object'
+        ? Object.getOwnPropertyNames(source).reduce(
+            (o, prop) => {
+              Object.defineProperty(
+                o,
+                prop,
+                Object.getOwnPropertyDescriptor(source, prop) as NonNullable<PropertyDescriptor>
+              )
+              o[prop] = deepCopy(source[prop as keyof T])
+              return o
+            },
+            Object.create(Object.getPrototypeOf(source))
           )
-          o[prop] = deepCopy(source[prop as keyof T])
-          return o
-        },
-        Object.create(Object.getPrototypeOf(source))
-      )
-    : (source as T)
+        : (source as T)
 }
 
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
@@ -181,7 +181,7 @@ function normalizeJwtCredential(input: JWT, removeOriginalFields = true): Verifi
   let decoded
   try {
     decoded = decodeJWT(input)
-  } catch (e) {
+  } catch {
     throw new TypeError('unknown credential format')
   }
   return {
@@ -213,7 +213,7 @@ export function normalizeCredential(
       let parsed: Record<string, unknown>
       try {
         parsed = JSON.parse(input)
-      } catch (e) {
+      } catch {
         throw new TypeError('unknown credential format')
       }
       return normalizeCredential(parsed, removeOriginalFields)
@@ -431,7 +431,7 @@ function normalizeJwtPresentation(input: JWT, removeOriginalFields = true): Veri
   let decoded
   try {
     decoded = decodeJWT(input)
-  } catch (e) {
+  } catch {
     throw new TypeError('unknown presentation format')
   }
   return {
@@ -462,7 +462,7 @@ export function normalizePresentation(
       let parsed: Record<string, unknown>
       try {
         parsed = JSON.parse(input)
-      } catch (e) {
+      } catch {
         throw new TypeError('unknown presentation format')
       }
       return normalizePresentation(parsed, removeOriginalFields)

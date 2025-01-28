@@ -256,7 +256,6 @@ export interface CreateCredentialOptions extends Partial<JWTOptions> {
  * Represents the Verification Options that can be passed to the verifyCredential method.
  * These options are forwarded to the lower level verification code
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface VerifyCredentialOptions extends JWTVerifyOptions {
   /**
    * When transforming the result of the verification into a W3C VerifiableCredential, this property dictates whether
