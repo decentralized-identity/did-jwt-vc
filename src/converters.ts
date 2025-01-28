@@ -181,7 +181,7 @@ function normalizeJwtCredential(input: JWT, removeOriginalFields = true): Verifi
   let decoded
   try {
     decoded = decodeJWT(input)
-  } catch (e) {
+  } catch {
     throw new TypeError('unknown credential format')
   }
   return {
@@ -213,7 +213,7 @@ export function normalizeCredential(
       let parsed: Record<string, unknown>
       try {
         parsed = JSON.parse(input)
-      } catch (e) {
+      } catch {
         throw new TypeError('unknown credential format')
       }
       return normalizeCredential(parsed, removeOriginalFields)
@@ -431,7 +431,7 @@ function normalizeJwtPresentation(input: JWT, removeOriginalFields = true): Veri
   let decoded
   try {
     decoded = decodeJWT(input)
-  } catch (e) {
+  } catch {
     throw new TypeError('unknown presentation format')
   }
   return {
@@ -462,7 +462,7 @@ export function normalizePresentation(
       let parsed: Record<string, unknown>
       try {
         parsed = JSON.parse(input)
-      } catch (e) {
+      } catch {
         throw new TypeError('unknown presentation format')
       }
       return normalizePresentation(parsed, removeOriginalFields)
