@@ -61,7 +61,7 @@
     "eslint-plugin-jest": "28.11.0",
     "eslint-plugin-prettier": "5.2.3",
     "ethr-did": "3.0.25",
-    "@faker-js/faker": "5.5.3",
+    "@faker-js/faker": "9.4.0",
     "jest": "29.7.0",
     "microbundle": "0.15.1",
     "prettier": "3.4.2",
