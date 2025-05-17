@@ -1,3 +1,10 @@
+## [4.0.13](https://github.com/decentralized-identity/did-jwt-vc/compare/4.0.12...4.0.13) (2025-05-17)
+
+
+### Bug Fixes
+
+* **deps:** Update dependency did-jwt to v8.0.15 ([732561c](https://github.com/decentralized-identity/did-jwt-vc/commit/732561c60aa16e2764ffee15c4c014ca83f56a4b))
+
 ## [4.0.12](https://github.com/decentralized-identity/did-jwt-vc/compare/4.0.11...4.0.12) (2025-04-25)
 
 
