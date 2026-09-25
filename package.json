@@ -64,7 +64,7 @@
     "eslint-plugin-prettier": "5.5.6",
     "ethr-did": "3.0.25",
     "prettier": "3.9.9",
-    "typescript": "5.7.3",
+    "typescript": "6.0.2",
     "vitest": "5.0.1"
   },
   "engines": {
