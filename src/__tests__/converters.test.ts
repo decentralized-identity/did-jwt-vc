@@ -2,20 +2,18 @@
 
 import {
   normalizeCredential,
-  transformCredentialInput,
   normalizePresentation,
+  transformCredentialInput,
   transformPresentationInput,
 } from '../converters.js'
-import { DEFAULT_JWT_PROOF_TYPE } from '../types.js'
-import { CredentialPayload, PresentationPayload } from '../types.js'
+import { CredentialPayload, DEFAULT_JWT_PROOF_TYPE, PresentationPayload } from '../types.js'
 import { validateJwtCredentialPayload, validateJwtPresentationPayload } from '../index.js'
 import { bytesToBase64url } from 'did-jwt'
-import { utf8ToBytes } from '@noble/curves/abstract/utils'
 
 import { describe, expect, it } from 'vitest'
 
 function encodeBase64url(s: string): string {
-  return bytesToBase64url(utf8ToBytes(s))
+  return bytesToBase64url(new TextEncoder().encode(s))
 }
 
 describe('credential', () => {

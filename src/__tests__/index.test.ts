@@ -1,4 +1,3 @@
-import { EthrDID } from 'ethr-did'
 import type { Issuer, JwtCredentialPayload } from '../index.js'
 import {
   createVerifiableCredentialJwt,
@@ -17,7 +16,7 @@ import {
   DEFAULT_VP_TYPE,
   type VerifyPresentationOptions,
 } from '../types.js'
-import { secp256k1 } from '@noble/curves/secp256k1'
+import { secp256k1 } from '@noble/curves/secp256k1.js'
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -31,10 +30,12 @@ const PRESENTATION_JWT =
   // tslint:disable-next-line: max-line-length
   'eyJhbGciOiJFUzI1NkstUiIsInR5cCI6IkpXVCJ9.eyJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL2V4YW1wbGVzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6WyJleUowZVhBaU9pSktWMVFpTENKaGJHY2lPaUpGVXpJMU5rc3RVaUo5LmV5SnBZWFFpT2pFMU5qWTVNak15Tmprc0luTjFZaUk2SW1ScFpEcGxkR2h5T2pCNE5ETTFaR1l6WldSaE5UY3hOVFJqWmpoalpqYzVNall3TnprNE9ERm1Namt4TW1ZMU5HUmlOQ0lzSW01aVppSTZNVFUyTWprMU1ESTRNaXdpZG1NaU9uc2lRR052Ym5SbGVIUWlPbHNpYUhSMGNITTZMeTkzZDNjdWR6TXViM0puTHpJd01UZ3ZZM0psWkdWdWRHbGhiSE12ZGpFaUxDSm9kSFJ3Y3pvdkwzZDNkeTUzTXk1dmNtY3ZNakF4T0M5amNtVmtaVzUwYVdGc2N5OWxlR0Z0Y0d4bGN5OTJNU0pkTENKMGVYQmxJanBiSWxabGNtbG1hV0ZpYkdWRGNtVmtaVzUwYVdGc0lpd2lWVzVwZG1WeWMybDBlVVJsWjNKbFpVTnlaV1JsYm5ScFlXd2lYU3dpWTNKbFpHVnVkR2xoYkZOMVltcGxZM1FpT25zaVpHVm5jbVZsSWpwN0luUjVjR1VpT2lKQ1lXTm9aV3h2Y2tSbFozSmxaU0lzSW01aGJXVWlPaUpDWVdOallXeGhkWExEcVdGMElHVnVJRzExYzJseGRXVnpJRzUxYmNPcGNtbHhkV1Z6SW4xOWZTd2lhWE56SWpvaVpHbGtPbVYwYUhJNk1IaG1NVEl6TW1ZNE5EQm1NMkZrTjJReU0yWmpaR0ZoT0RSa05tTTJObVJoWXpJMFpXWmlNVGs0SW4wLnJGUlpVQ3czR3UwRV9JNVpKYnJicHVIVjFKTkF3cFhhaUZadUo1OWlKLVROcXVmcjRjdUdDQkVFQ0ZiZ1FGLWxwTm01MWNxU3gzWTJJZFdhVXBhdEpRQSJdfSwiaXNzIjoiZGlkOmV0aHI6MHhGMTIzMkY4NDBmM2FEN2QyM0ZjRGFBODRkNkM2NmRhYzI0RUZiMTk4In0.oAZju9YNgYQz_RELnlK0KPizXvP90le4Tw7kRqjrXAzY3ZcRMS6EJt58iC3wehVnt680FO0HvFXDrLk3eLfY8QA'
 
-const ethrDidIssuer = new EthrDID({
-  identifier: '0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198',
-  privateKey: 'd8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75',
-}) as Issuer
+const DID_A = 'did:ethr:0xf1232f840f3ad7d23fcdaa84d6c66dac24efb198'
+const ethrDidIssuer: Issuer = {
+  did: DID_A,
+  signer: ES256KSigner(hexToBytes('d8b595680851765f38ea5405129244ba3cbad84467d190859f4c8b20c1ff6c75'), true),
+  alg: 'ES256K-R',
+}
 
 const verifiableCredentialPayload = {
   sub: DID_B,
@@ -369,9 +370,9 @@ describe('verifyPresentationPayloadOptions', () => {
 describe('github #98', () => {
   it('verifies a JWT issued by a DID with publicKeyJwk', async () => {
     const did = `did:ion:long-form-mock`
-    const privateKeyHex = '278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f'
-    const pubKeyBytes = secp256k1.getPublicKey(privateKeyHex, false)
-    const point = secp256k1.ProjectivePoint.fromHex(pubKeyBytes).toAffine()
+    const privateKeyBytes = hexToBytes('278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f')
+    const pubKeyBytes = secp256k1.getPublicKey(privateKeyBytes, false)
+    const point = secp256k1.Point.fromBytes(pubKeyBytes).toAffine()
     const publicKeyJwk = {
       kty: 'EC',
       crv: 'secp256k1',
@@ -403,7 +404,7 @@ describe('github #98', () => {
 
     const issuer: Issuer = {
       did,
-      signer: ES256KSigner(hexToBytes(privateKeyHex), false),
+      signer: ES256KSigner(privateKeyBytes, false),
       alg: 'ES256K',
     }
 
