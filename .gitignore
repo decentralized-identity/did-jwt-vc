@@ -1,5 +1,8 @@
 node_modules
-lib
+lib/
+lib.commonjs/
+lib.esm/
+**/.DS_Store
 esm
 dist
 .vscode/settings.json

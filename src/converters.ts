@@ -12,7 +12,7 @@ import {
   Verifiable,
   PresentationPayload,
   W3CPresentation,
-} from './types'
+} from './types.js'
 import { decodeJWT } from 'did-jwt'
 
 /**

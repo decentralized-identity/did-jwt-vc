@@ -4,30 +4,38 @@
   "description": "Create and verify W3C Verifiable Credentials and Presentations in JWT format",
   "type": "module",
   "source": "src/index.ts",
-  "main": "./lib/index.cjs",
-  "module": "./lib/index.module.js",
-  "types": "./lib/index.d.ts",
+  "main": "./lib.commonjs/index.js",
+  "module": "./lib.esm/index.js",
+  "types": "./lib.commonjs/index.d.ts",
   "files": [
-    "lib",
-    "dist",
+    "lib.esm",
+    "lib.commonjs",
     "src",
     "LICENSE"
   ],
   "exports": {
     ".": {
-      "types": "./lib/index.d.ts",
-      "require": "./lib/index.cjs",
-      "import": "./lib/index.module.js"
+      "import": {
+        "types": "./lib.esm/index.d.ts",
+        "default": "./lib.esm/index.js"
+      },
+      "require": {
+        "types": "./lib.commonjs/index.d.ts",
+        "default": "./lib.commonjs/index.js"
+      }
     }
   },
   "scripts": {
-    "test": "cross-env NODE_OPTIONS=\"--experimental-vm-modules\" jest",
-    "test:ci": "yarn test --coverage",
-    "build": "microbundle --compress=false",
+    "test": "vitest run",
+    "test:ci": "vitest run --coverage",
+    "build": "pnpm run build:common && pnpm run build:esm",
+    "build:common": "tsc --project tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > lib.commonjs/package.json",
+    "build:esm": "tsc",
+    "clean": "rimraf lib dist lib.commonjs lib.esm coverage *.tgz",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint --ignore-pattern \"src/**/*.test.[jt]s\" \"src/**/*.[jt]s\"",
-    "prepublishOnly": "yarn test:ci && yarn format && yarn lint",
-    "release": "semantic-release --debug"
+    "lint": "eslint \"src/**/*.[jt]s\"",
+    "changeset": "changeset",
+    "release:publish": "changeset publish"
   },
   "author": "mi-xu",
   "contributors": [
@@ -35,7 +43,7 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^9.0.0",
+    "did-jwt": "^9.0.1",
     "did-resolver": "^6.0.0"
   },
   "repository": {
@@ -43,31 +51,24 @@
     "url": "https://github.com/decentralized-identity/did-jwt-vc.git"
   },
   "devDependencies": {
-    "@babel/core": "7.26.9",
-    "@babel/preset-env": "7.26.9",
-    "@babel/preset-typescript": "7.26.0",
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
     "@noble/curves": "1.8.1",
-    "@semantic-release/changelog": "6.0.3",
-    "@semantic-release/git": "10.0.1",
-    "@types/jest": "29.5.14",
-    "@types/node": "22.13.5",
+    "@types/node": "26.6.2",
     "@typescript-eslint/eslint-plugin": "8.24.1",
     "@typescript-eslint/parser": "8.24.1",
-    "cross-env": "7.0.3",
+    "@vitest/coverage-v8": "5.0.1",
     "eslint": "9.21.0",
     "eslint-config-prettier": "10.0.1",
     "eslint-plugin-jest": "28.11.0",
     "eslint-plugin-prettier": "5.2.3",
     "ethr-did": "3.0.25",
-    "jest": "29.7.0",
-    "microbundle": "0.15.1",
     "prettier": "3.5.2",
-    "semantic-release": "24.2.3",
-    "ts-jest": "29.2.6",
-    "typescript": "5.7.3"
+    "typescript": "5.7.3",
+    "vitest": "^5.0.1"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.12"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "pnpm@12.6.0"
 }

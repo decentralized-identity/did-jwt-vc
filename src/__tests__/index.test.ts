@@ -19,7 +19,7 @@ import {
 } from '../types.js'
 import { secp256k1 } from '@noble/curves/secp256k1'
 
-import { jest } from '@jest/globals'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
 const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
@@ -78,7 +78,7 @@ const resolver: Resolvable = {
 }
 
 beforeEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 
 describe('createVerifiableCredential', () => {
@@ -284,8 +284,8 @@ describe('verifyCredential', () => {
     expect(verified.verifiableCredential).toBeDefined()
   })
 
-  it('rejects an invalid JWT', () => {
-    expect(verifyCredential('not a jwt', resolver)).rejects.toThrow()
+  it('rejects an invalid JWT', async () => {
+    await expect(verifyCredential('not a jwt', resolver)).rejects.toThrow()
   })
 })
 
@@ -297,22 +297,22 @@ describe('verifyPresentation', () => {
     expect(verified.verifiablePresentation).toBeDefined()
   })
 
-  it('rejects a Presentation without matching challenge', () => {
+  it('rejects a Presentation without matching challenge', async () => {
     const options: VerifyPresentationOptions = {
       challenge: 'TEST_CHALLENGE',
     }
-    expect(verifyPresentation(PRESENTATION_JWT, resolver, options)).rejects.toThrow(/^auth_error:.*/)
+    await expect(verifyPresentation(PRESENTATION_JWT, resolver, options)).rejects.toThrow(/^auth_error:.*/)
   })
 
-  it('rejects a Presentation without matching domain', () => {
+  it('rejects a Presentation without matching domain', async () => {
     const options: VerifyPresentationOptions = {
       domain: 'TEST_DOMAIN',
     }
-    expect(verifyPresentation(PRESENTATION_JWT, resolver, options)).rejects.toThrow(/^auth_error:.*/)
+    await expect(verifyPresentation(PRESENTATION_JWT, resolver, options)).rejects.toThrow(/^auth_error:.*/)
   })
 
-  it('rejects an invalid JWT', () => {
-    expect(verifyPresentation('not a jwt', resolver)).rejects.toThrow()
+  it('rejects an invalid JWT', async () => {
+    await expect(verifyPresentation('not a jwt', resolver)).rejects.toThrow()
   })
 })
 

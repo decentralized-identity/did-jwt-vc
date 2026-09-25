@@ -2,19 +2,18 @@ import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE } from '../types.js'
 import type { Issuer } from '../index.js'
 import { EthrDID } from 'ethr-did'
 
-import { jest } from '@jest/globals'
+import { vi, describe, expect, it } from 'vitest'
 
-import * as actualValidators from '../validators.js'
-
-jest.unstable_mockModule('../validators.js', async () => {
+vi.mock('../validators.js', async () => {
+  const actual = await vi.importActual<typeof import('../validators.js')>('../validators.js')
   return {
-    ...actualValidators,
-    validateTimestamp: jest.fn(),
-    validateVcType: jest.fn(),
-    validateVpType: jest.fn(),
-    validateContext: jest.fn(),
-    validateJwtFormat: jest.fn(),
-    validateCredentialSubject: jest.fn(),
+    ...actual,
+    validateTimestamp: vi.fn(),
+    validateVcType: vi.fn(),
+    validateVpType: vi.fn(),
+    validateContext: vi.fn(),
+    validateJwtFormat: vi.fn(),
+    validateCredentialSubject: vi.fn(),
   }
 })
 
@@ -27,7 +26,7 @@ const {
   validateCredentialSubject,
 } = await import('../validators.js')
 
-// must be done after the unstable_mockModule call to use the mocked version
+// must be done after the vi.mock call to use the mocked version
 const { createVerifiableCredentialJwt, createVerifiablePresentationJwt } = await import('../index.js')
 
 const DID_B = 'did:ethr:0x435df3eda57154cf8cf7926079881f2912f54db4'
