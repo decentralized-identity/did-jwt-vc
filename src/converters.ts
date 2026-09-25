@@ -12,7 +12,7 @@ import {
   Verifiable,
   PresentationPayload,
   W3CPresentation,
-} from './types'
+} from './types.js'
 import { decodeJWT } from 'did-jwt'
 
 /**
@@ -30,9 +30,9 @@ export function asArray(arg: any | any[]): any[] {
 
 function deepCopy<T>(source: T): T {
   return Array.isArray(source)
-    ? source.map((item) => deepCopy(item))
+    ? (source.map((item) => deepCopy(item)) as T)
     : source instanceof Date
-      ? new Date(source.getTime())
+      ? (new Date(source.getTime()) as T)
       : source && typeof source === 'object'
         ? Object.getOwnPropertyNames(source).reduce(
             (o, prop) => {

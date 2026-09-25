@@ -1,7 +1,13 @@
-import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE, JWT_FORMAT } from './types'
-import { JwtCredentialSubject, DateType } from './types'
-import { VerifiableCredential } from '.'
-import { asArray } from './converters'
+import {
+  DateType,
+  DEFAULT_CONTEXT,
+  DEFAULT_VC_TYPE,
+  DEFAULT_VP_TYPE,
+  JWT_FORMAT,
+  JwtCredentialSubject,
+  VerifiableCredential,
+} from './types.js'
+import { asArray } from './converters.js'
 import { JWT_ERROR } from 'did-jwt'
 
 /**

@@ -1,5 +1,7 @@
-import * as validators from '../validators'
-import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE } from '../types'
+import * as validators from '../validators.js'
+import { DEFAULT_CONTEXT, DEFAULT_VC_TYPE, DEFAULT_VP_TYPE } from '../types.js'
+import { describe, expect, it } from 'vitest'
+
 export const EXTRA_CONTEXT_A = 'https://www.w3.org/2018/credentials/examples/v1'
 export const EXTRA_CONTEXT_B = 'custom vc context'
 export const EXTRA_TYPE_A = 'UniversityDegreeCredential'

@@ -1,40 +1,19 @@
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import jest from "eslint-plugin-jest";
-import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import prettierPlugin from 'eslint-plugin-prettier'
+import js from '@eslint/js'
+import typescriptEslint from '@typescript-eslint/eslint-plugin'
+import { rules as configPrettierRules } from 'eslint-config-prettier'
+import { rules as configPrettierOverridesRules } from 'eslint-config-prettier/prettier'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
+const prettierRules = Object.fromEntries(
+  Object.entries({ ...configPrettierRules, ...configPrettierOverridesRules }).filter(([, v]) => v !== 0)
+)
 
-export default [...compat.extends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
-), {
-    plugins: {
-        "@typescript-eslint": typescriptEslint,
-        jest,
-    },
-
-    languageOptions: {
-        globals: {
-            ...globals.node,
-            ...jest.environments.globals.globals,
-        },
-
-        parser: tsParser,
-        ecmaVersion: 2018,
-        sourceType: "module",
-    },
-
-    rules: {},
-}];
+export default [
+  js.configs.recommended,
+  ...typescriptEslint.configs['flat/recommended'],
+  {
+    plugins: { prettier: prettierPlugin },
+    rules: { 'prettier/prettier': 'error', ...prettierRules },
+  },
+  { ignores: ['src/__tests__/**'] },
+]
