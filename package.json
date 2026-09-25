@@ -51,21 +51,21 @@
     "url": "https://github.com/decentralized-identity/did-jwt-vc.git"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^1.0.1",
-    "@changesets/cli": "^3.0.3",
+    "@changesets/changelog-github": "1.0.1",
+    "@changesets/cli": "3.0.3",
+    "@eslint/js": "10.0.1",
     "@noble/curves": "1.8.1",
     "@types/node": "26.6.2",
-    "@typescript-eslint/eslint-plugin": "8.24.1",
-    "@typescript-eslint/parser": "8.24.1",
+    "@typescript-eslint/eslint-plugin": "8.70.1",
+    "@typescript-eslint/parser": "8.70.1",
     "@vitest/coverage-v8": "5.0.1",
-    "eslint": "9.21.0",
-    "eslint-config-prettier": "10.0.1",
-    "eslint-plugin-jest": "28.11.0",
-    "eslint-plugin-prettier": "5.2.3",
+    "eslint": "10.11.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.6",
     "ethr-did": "3.0.25",
-    "prettier": "3.5.2",
+    "prettier": "3.9.9",
     "typescript": "5.7.3",
-    "vitest": "^5.0.1"
+    "vitest": "5.0.1"
   },
   "engines": {
     "node": ">=22.12"
