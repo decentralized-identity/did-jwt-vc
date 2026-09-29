@@ -168,7 +168,7 @@ importers:
     dependencies:
       did-jwt:
         specifier: ^9.0.1
-        version: 9.0.1
+        version: 9.0.2
       did-resolver:
         specifier: ^6.0.0
         version: 6.0.0
@@ -816,8 +816,9 @@ packages:
   cacheable@2.5.0:
     resolution: {integrity: sha512-60cyAOytib/OzBw1JNSoSV/boK1AtHryDIjvVBk7XbN4ugfkM3+Sry7fEjNgPMGgOjuaZPAp8ruZ0Cxafwyq9g==}
 
-  canonicalize@2.1.0:
-    resolution: {integrity: sha512-F705O3xrsUtgt98j7leetNhTWPe+5S72rlL5O4jA1pKqBVQ/dT1O1D6PFxmSXvc0SUOinWS57DKx0I3CHrXJHQ==}
+  canonicalize@5.1.0:
+    resolution: {integrity: sha512-bab9+WefZljqQ8jT0qRwVmTyzAUU63K97QIQD3agynIBrb6sa5M2eAy8Hv8K3p4V9+ONVYZKtGYl4Dg+/5Gumw==}
+    engines: {node: '>=22'}
     hasBin: true
 
   chai@6.2.2:
@@ -850,12 +851,9 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
-  did-jwt@9.0.1:
-    resolution: {integrity: sha512-igNBEfUUutj25tGMrXQcFK4N9jZ9oZZRLKySEShcABL3Esb/kVV3JDjtFosvl9ihYNN5tIoH9jJFtx2ARpZgKA==}
+  did-jwt@9.0.2:
+    resolution: {integrity: sha512-27K1C7DCPF8vG2/6xFKGj0lhL3NhpGaMOLdZxiuGOjwGjwyu1/OCF3JZ9MIkMTX2WQGBResyt3O6F59/6kDQ+g==}
     engines: {node: '>=22.12'}
-
-  did-resolver@5.0.1:
-    resolution: {integrity: sha512-AtbIfBt/D9Z6GeNKhm1AzCbF7y5PhsNukgmVYnsdxbIX8UAsquQpbm8ECfPwDRXAOM3EsGdHheK5WMojcPlAPg==}
 
   did-resolver@6.0.0:
     resolution: {integrity: sha512-qYlNpucsgfBE0foIqlnEjLx7ZvMTUOkPeIjOhVKPJKm4h8afFNS78zDLbiJPZ2yvY3Z7C79FW1UHSRyehRCpOg==}
@@ -1984,7 +1982,7 @@ snapshots:
       keyv: 5.6.0
       qified: 0.10.1
 
-  canonicalize@2.1.0: {}
+  canonicalize@5.1.0: {}
 
   chai@6.2.2: {}
 
@@ -2009,17 +2007,15 @@ snapshots:
 
   detect-libc@2.1.2: {}
 
-  did-jwt@9.0.1:
+  did-jwt@9.0.2:
     dependencies:
       '@noble/ciphers': 2.4.0
       '@noble/curves': 2.4.0
       '@noble/hashes': 2.4.0
       '@scure/base': 2.4.0
-      canonicalize: 2.1.0
-      did-resolver: 5.0.1
+      canonicalize: 5.1.0
+      did-resolver: 6.0.0
       uint8arrays: 6.1.1
-
-  did-resolver@5.0.1: {}
 
   did-resolver@6.0.0: {}
 
