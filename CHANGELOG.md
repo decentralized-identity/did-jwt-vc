@@ -1,5 +1,11 @@
 ## [4.0.16](https://github.com/decentralized-identity/did-jwt-vc/compare/4.0.15...4.0.16) (2025-08-26)
 
+## 5.0.1
+
+### Patch Changes
+
+- [#168](https://github.com/decentralized-identity/did-jwt-vc/pull/168) [`0c0c6e7`](https://github.com/decentralized-identity/did-jwt-vc/commit/0c0c6e78556303d8a943e2e23bc7a646298c009e) Thanks [@mirceanis](https://github.com/mirceanis)! - chore(deps): align did-jwt and did-resolver dependency versions
+
 ## 5.0.0
 
 ### Major Changes
