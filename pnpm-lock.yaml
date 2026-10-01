@@ -167,7 +167,7 @@ importers:
   .:
     dependencies:
       did-jwt:
-        specifier: ^9.0.1
+        specifier: ^9.0.2
         version: 9.0.2
       did-resolver:
         specifier: ^6.0.0
