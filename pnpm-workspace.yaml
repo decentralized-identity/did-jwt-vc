@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - did-jwt@9.0.3

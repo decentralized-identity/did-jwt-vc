@@ -43,7 +43,7 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "did-jwt": "^9.0.2",
+    "did-jwt": "^9.0.3",
     "did-resolver": "^6.0.0"
   },
   "repository": {
@@ -59,13 +59,13 @@
     "@typescript/native": "npm:typescript@7.0.2",
     "@typescript-eslint/eslint-plugin": "8.72.1",
     "@typescript-eslint/parser": "8.72.1",
-    "@vitest/coverage-v8": "5.0.5",
+    "@vitest/coverage-v8": "5.1.0",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.7",
     "prettier": "3.9.10",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vitest": "5.0.5"
+    "vitest": "5.1.0"
   },
   "engines": {
     "node": ">=22.12"
