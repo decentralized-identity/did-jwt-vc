@@ -1,5 +1,11 @@
 ## [4.0.16](https://github.com/decentralized-identity/did-jwt-vc/compare/4.0.15...4.0.16) (2025-08-26)
 
+## 5.0.2
+
+### Patch Changes
+
+- [#186](https://github.com/decentralized-identity/did-jwt-vc/pull/186) [`65b784e`](https://github.com/decentralized-identity/did-jwt-vc/commit/65b784e75158b8aebea247b158ab0a0abd576f2b) Thanks [@mirceanis](https://github.com/mirceanis)! - fix(deps): bump did-jwt to 9.0.3 to align transitive canonicalize dep
+
 ## 5.0.1
 
 ### Patch Changes
