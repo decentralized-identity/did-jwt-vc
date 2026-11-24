@@ -57,15 +57,15 @@
     "@noble/curves": "2.4.0",
     "@types/node": "26.6.6",
     "@typescript/native": "npm:typescript@7.0.2",
-    "@typescript-eslint/eslint-plugin": "8.72.1",
-    "@typescript-eslint/parser": "8.72.1",
-    "@vitest/coverage-v8": "5.1.0",
-    "eslint": "10.14.0",
+    "@typescript-eslint/eslint-plugin": "8.73.0",
+    "@typescript-eslint/parser": "8.73.0",
+    "@vitest/coverage-v8": "5.1.1",
+    "eslint": "10.15.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.7",
-    "prettier": "3.9.10",
+    "prettier": "3.10.1",
     "typescript": "npm:@typescript/typescript6@6.0.2",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   },
   "engines": {
     "node": ">=22.12"
